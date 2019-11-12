@@ -41,7 +41,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
     public AddFoodDialog(Food food) {
         this.food = food;
-        this.editCount.setValue(1d);
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -70,7 +69,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         editCount = view.findViewById(R.id.addfood_edit_count);
         editCount.setParams(0d, 0d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
-
+        editCount.setValue(1d);
+        
 //        summary = (TextView) view.findViewById(R.id.addfood_summary);
 //        summary.setText("aaa");
 
