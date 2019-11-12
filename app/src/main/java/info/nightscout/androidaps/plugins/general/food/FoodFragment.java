@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -46,6 +47,8 @@ import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialog;
 import info.nightscout.androidaps.plugins.treatments.CarbsGenerator;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.DateUtil;
@@ -319,6 +322,9 @@ public class FoodFragment extends Fragment {
                         break;
 
                     case R.id.add:
+                        this.showAddFood(food);
+
+
                         int wbt = this.calculateWBT(food);
                         if (wbt > 0) {
                             this.addEcarbs(wbt);
@@ -328,6 +334,11 @@ public class FoodFragment extends Fragment {
                         }
                         break;
                 }
+            }
+
+            private void showAddFood(Food food) {
+                FragmentManager manager = getFragmentManager();
+                new AddFoodDialog(food).show(manager, "AddFoodDialog");
             }
 
             private int calculateWBT(Food food) {
