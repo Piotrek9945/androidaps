@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
@@ -32,6 +33,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private final Food food;
 
     private NumberPicker editCount;
+    private TextView summary;
 
     //one shot guards
     private boolean accepted;
@@ -39,6 +41,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
     public AddFoodDialog(Food food) {
         this.food = food;
+        this.editCount.setValue(1d);
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -67,6 +70,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         editCount = view.findViewById(R.id.addfood_edit_count);
         editCount.setParams(0d, 0d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
+
+//        summary = (TextView) view.findViewById(R.id.addfood_summary);
+//        summary.setText("aaa");
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
