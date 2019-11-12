@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodPlugin;
 import info.nightscout.androidaps.utils.NumberPicker;
 import info.nightscout.androidaps.utils.SP;
 
@@ -116,25 +117,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
         okClicked = true;
         try {
-
             double count = editCount.getValue().doubleValue();
-
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle(MainApp.gs(R.string.confirmation));
-                builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
-                synchronized (builder) {
-                    if (accepted) {
-                        log.debug("guarding: already accepted");
-                        return;
-                    }
-                    accepted = true;
-
-                    builder.setMessage("Wybrano " + count + "[" + food.units + "] produktu " + food.name);
-
-                }
-            });
-            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-            builder.show();
+            food.portion = food.portion * count;
+            FoodPlugin.foodList.add(food);
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);

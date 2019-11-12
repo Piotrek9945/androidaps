@@ -324,7 +324,6 @@ public class FoodFragment extends Fragment {
                     case R.id.add:
                         this.showAddFood(food);
 
-
                         int wbt = this.calculateWBT(food);
                         if (wbt > 0) {
                             this.addEcarbs(wbt);

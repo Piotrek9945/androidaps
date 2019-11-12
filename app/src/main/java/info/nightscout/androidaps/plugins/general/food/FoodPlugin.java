@@ -1,5 +1,8 @@
 package info.nightscout.androidaps.plugins.general.food;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.interfaces.PluginBase;
 import info.nightscout.androidaps.interfaces.PluginDescription;
@@ -17,6 +20,8 @@ public class FoodPlugin extends PluginBase {
             plugin = new FoodPlugin();
         return plugin;
     }
+
+    public static List<Food> foodList = new ArrayList<>();
 
     private FoodService service;
 
