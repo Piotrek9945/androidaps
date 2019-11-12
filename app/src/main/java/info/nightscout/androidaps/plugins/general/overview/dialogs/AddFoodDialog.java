@@ -25,6 +25,7 @@ import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodPlugin;
+import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
 import info.nightscout.androidaps.utils.SP;
 
@@ -122,8 +123,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         try {
             double count = editCount.getValue().doubleValue();
             food.portion = food.portion * count;
-            FoodPlugin.foodList.add(food);
-            this.foodCountAdded.setText(String.valueOf(FoodPlugin.foodList.size()));
+            FoodService.addFoodToList(food);
+            this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);

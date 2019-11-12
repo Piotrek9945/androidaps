@@ -93,7 +93,7 @@ public class FoodFragment extends Fragment {
         category = new SpinnerHelper(view.findViewById(R.id.food_category));
         subcategory = new SpinnerHelper(view.findViewById(R.id.food_subcategory));
         foodCountAdded = view.findViewById(R.id.food_count_added);
-        foodCountAdded.setText(String.valueOf(FoodPlugin.foodList.size()));
+        foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
         recyclerView = (RecyclerView) view.findViewById(R.id.food_recyclerview);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(view.getContext());

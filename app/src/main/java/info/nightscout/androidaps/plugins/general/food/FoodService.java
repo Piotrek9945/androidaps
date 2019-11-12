@@ -50,6 +50,16 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
     private static final ScheduledExecutorService foodEventWorker = Executors.newSingleThreadScheduledExecutor();
     private static ScheduledFuture<?> scheduledFoodEventPost = null;
 
+    private static List<Food> foodList = new ArrayList<>();
+
+    public static void addFoodToList(Food food) {
+        foodList.add(food);
+    }
+
+    public static Integer getFoodListSize() {
+        return FoodService.foodList.size();
+    }
+
     public FoodService() {
         onCreate();
         dbInitialize();

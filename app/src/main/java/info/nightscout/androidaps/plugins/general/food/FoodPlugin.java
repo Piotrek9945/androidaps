@@ -21,8 +21,6 @@ public class FoodPlugin extends PluginBase {
         return plugin;
     }
 
-    public static List<Food> foodList = new ArrayList<>();
-
     private FoodService service;
 
     private FoodPlugin() {
