@@ -322,7 +322,7 @@ public class FoodFragment extends Fragment {
                         break;
 
                     case R.id.add:
-                        this.showAddFood();
+                        this.showAddFood(food);
 
 
                         int wbt = this.calculateWBT(food);
@@ -336,9 +336,9 @@ public class FoodFragment extends Fragment {
                 }
             }
 
-            private void showAddFood() {
+            private void showAddFood(Food food) {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog().show(manager, "AddFoodDialog");
+                new AddFoodDialog(food).show(manager, "AddFoodDialog");
             }
 
             private int calculateWBT(Food food) {
