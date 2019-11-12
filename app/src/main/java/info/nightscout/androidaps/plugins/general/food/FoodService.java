@@ -53,7 +53,17 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
     private static List<Food> foodList = new ArrayList<>();
 
     public static void addFoodToList(Food food) {
-        foodList.add(food);
+        boolean isAddedYet = false;
+        for(Food item : foodList) {
+            if (item._id.equals(food._id)) {
+                item.portion += food.portion;
+                isAddedYet = true;
+                break;
+            }
+        }
+        if (isAddedYet == false) {
+            foodList.add(food);
+        }
     }
 
     public static Integer getFoodListSize() {
