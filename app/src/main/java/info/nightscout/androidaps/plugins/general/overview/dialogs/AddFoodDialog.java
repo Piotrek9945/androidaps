@@ -54,21 +54,7 @@ import static info.nightscout.androidaps.utils.DateUtil.now;
 public class AddFoodDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodDialog.class);
 
-    private static final int FAV1_DEFAULT = 5;
-    private static final int FAV2_DEFAULT = 10;
-    private static final int FAV3_DEFAULT = 20;
-
-    private RadioButton startActivityTTCheckbox;
-    private RadioButton startEatingSoonTTCheckbox;
-    private RadioButton startHypoTTCheckbox;
-    private boolean togglingTT;
-
-    private NumberPicker editTime;
-    private NumberPicker editDuration;
-    private NumberPicker editCarbs;
-    private Integer maxCarbs;
-
-    private EditText notesEdit;
+    private NumberPicker editCount;
 
     //one shot guards
     private boolean accepted;
@@ -79,9 +65,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
     final private TextWatcher textWatcher = new TextWatcher() {
         @Override
-        public void afterTextChanged(Editable s) {
-            validateInputs();
-        }
+        public void afterTextChanged(Editable s) {}
 
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -92,28 +76,10 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
     };
 
-    private void validateInputs() {
-        int time = editTime.getValue().intValue();
-        if (time > 12 * 60 || time < -12 * 60) {
-            editTime.setValue(0d);
-            ToastUtils.showToastInUiThread(MainApp.instance().getApplicationContext(), MainApp.gs(R.string.constraintapllied));
-        }
-        Double duration = editDuration.getValue();
-        if (duration > 10) {
-            editDuration.setValue(0d);
-            ToastUtils.showToastInUiThread(MainApp.instance().getApplicationContext(), MainApp.gs(R.string.constraintapllied));
-        }
-        int carbs = editCarbs.getValue().intValue();
-        if (carbs > maxCarbs) {
-            editCarbs.setValue(0d);
-            ToastUtils.showToastInUiThread(MainApp.instance().getApplicationContext(), MainApp.gs(R.string.carbsconstraintapplied));
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.overview_newcarbs_dialog, container, false);
+        View view = inflater.inflate(R.layout.overview_addfood_dialog, container, false);
 
         view.findViewById(R.id.ok).setOnClickListener(this);
         view.findViewById(R.id.cancel).setOnClickListener(this);

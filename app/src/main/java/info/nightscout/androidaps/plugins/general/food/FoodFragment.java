@@ -338,7 +338,7 @@ public class FoodFragment extends Fragment {
 
             private void showAddFood() {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog().show(manager, "CarbsDialog");
+                new AddFoodDialog().show(manager, "AddFoodDialog");
             }
 
             private int calculateWBT(Food food) {
