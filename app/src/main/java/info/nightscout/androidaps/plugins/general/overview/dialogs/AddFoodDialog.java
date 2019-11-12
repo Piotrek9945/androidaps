@@ -53,6 +53,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
+            setSummaryText();
         }
     };
 
@@ -70,9 +71,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         editCount = view.findViewById(R.id.addfood_edit_count);
         editCount.setParams(0d, 0d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
         editCount.setValue(1d);
-        
-//        summary = (TextView) view.findViewById(R.id.addfood_summary);
-//        summary.setText("aaa");
+
+        summary = view.findViewById(R.id.addfood_summary);
+        setSummaryText();
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -82,6 +83,10 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             editCount.setValue(savedInstanceState.getDouble("editCount"));
         }
         return view;
+    }
+
+    private void setSummaryText() {
+        summary.setText("Ilość: " + food.portion * editCount.getValue() + " [" + food.units + "]");
     }
 
     @Override
