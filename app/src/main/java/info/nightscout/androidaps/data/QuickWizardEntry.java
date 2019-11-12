@@ -60,7 +60,7 @@ public class QuickWizardEntry {
         position = -1;
     }
 
-    QuickWizardEntry(JSONObject entry, int position) {
+    public QuickWizardEntry(JSONObject entry, int position) {
         storage = entry;
         this.position = position;
     }
