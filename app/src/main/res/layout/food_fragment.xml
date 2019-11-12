@@ -77,6 +77,29 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dodano: " />
+
+            <TextView
+                android:id="@+id/food_count_added"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="10dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple" />
+
+
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/food_recyclerview"
             android:layout_width="match_parent"

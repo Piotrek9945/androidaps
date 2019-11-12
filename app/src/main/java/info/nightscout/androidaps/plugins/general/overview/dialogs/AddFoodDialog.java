@@ -40,8 +40,11 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private boolean accepted;
     private boolean okClicked;
 
-    public AddFoodDialog(Food food) {
+    private TextView foodCountAdded;
+
+    public AddFoodDialog(Food food, TextView foodCountAdded) {
         this.food = food;
+        this.foodCountAdded = foodCountAdded;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -120,6 +123,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             double count = editCount.getValue().doubleValue();
             food.portion = food.portion * count;
             FoodPlugin.foodList.add(food);
+            this.foodCountAdded.setText(String.valueOf(FoodPlugin.foodList.size()));
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);

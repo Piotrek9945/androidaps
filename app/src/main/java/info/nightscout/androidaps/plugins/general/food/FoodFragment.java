@@ -48,7 +48,6 @@ import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
-import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialog;
 import info.nightscout.androidaps.plugins.treatments.CarbsGenerator;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.DateUtil;
@@ -79,6 +78,7 @@ public class FoodFragment extends Fragment {
     List<Food> filtered;
     ArrayList<CharSequence> categories;
     ArrayList<CharSequence> subcategories;
+    TextView foodCountAdded;
 
     final String EMPTY = MainApp.gs(R.string.none);
 
@@ -92,6 +92,8 @@ public class FoodFragment extends Fragment {
         clearFilter = (ImageView) view.findViewById(R.id.food_clearfilter);
         category = new SpinnerHelper(view.findViewById(R.id.food_category));
         subcategory = new SpinnerHelper(view.findViewById(R.id.food_subcategory));
+        foodCountAdded = view.findViewById(R.id.food_count_added);
+        foodCountAdded.setText(String.valueOf(FoodPlugin.foodList.size()));
         recyclerView = (RecyclerView) view.findViewById(R.id.food_recyclerview);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
@@ -148,7 +150,7 @@ public class FoodFragment extends Fragment {
             }
         });
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(FoodPlugin.getPlugin().getService().getFoodData());
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(FoodPlugin.getPlugin().getService().getFoodData(), foodCountAdded);
         recyclerView.setAdapter(adapter);
 
         loadData();
@@ -242,15 +244,17 @@ public class FoodFragment extends Fragment {
     }
 
     protected void updateGui() {
-        recyclerView.swapAdapter(new FoodFragment.RecyclerViewAdapter(filtered), true);
+        recyclerView.swapAdapter(new FoodFragment.RecyclerViewAdapter(filtered, foodCountAdded), true);
     }
 
     public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.FoodsViewHolder> {
 
         List<Food> foodList;
+        TextView foodCountAdded;
 
-        RecyclerViewAdapter(List<Food> foodList) {
+        RecyclerViewAdapter(List<Food> foodList, TextView foodCountAdded) {
             this.foodList = foodList;
+            this.foodCountAdded = foodCountAdded;
         }
 
         @Override
@@ -307,7 +311,7 @@ public class FoodFragment extends Fragment {
                 remove = (TextView) itemView.findViewById(R.id.food_remove);
                 remove.setOnClickListener(this);
                 remove.setPaintFlags(remove.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                addBolus = (TextView) itemView.findViewById(R.id.add);
+                addBolus = (TextView) itemView.findViewById(R.id.food_add);
                 addBolus.setOnClickListener(this);
                 addBolus.setPaintFlags(addBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             }
@@ -321,23 +325,23 @@ public class FoodFragment extends Fragment {
                         this.showRemoveDialog(food);
                         break;
 
-                    case R.id.add:
-                        this.showAddFood(food);
+                    case R.id.food_add:
+                        this.showAddFood(food, foodCountAdded);
 
-                        int wbt = this.calculateWBT(food);
-                        if (wbt > 0) {
-                            this.addEcarbs(wbt);
-                        }
-                        if (food.carbs > 0) {
-                            this.addBolus(food);
-                        }
+//                        int wbt = this.calculateWBT(food);
+//                        if (wbt > 0) {
+//                            this.addEcarbs(wbt);
+//                        }
+//                        if (food.carbs > 0) {
+//                            this.addBolus(food);
+//                        }
                         break;
                 }
             }
 
-            private void showAddFood(Food food) {
+            private void showAddFood(Food food, TextView foodCountAdded) {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog(food).show(manager, "AddFoodDialog");
+                new AddFoodDialog(food, foodCountAdded).show(manager, "AddFoodDialog");
             }
 
             private int calculateWBT(Food food) {
