@@ -74,8 +74,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_count);
-        editCount.setParams(0d, 0d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
-        editCount.setValue(1d);
+        editCount.setParams(1d, 0d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
 
         summary = view.findViewById(R.id.addfood_summary);
         setSummaryText();
@@ -127,6 +126,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 FoodService.addFoodToList(food);
                 this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
             }
+
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
