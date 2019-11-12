@@ -93,12 +93,12 @@
                 android:textColor="@android:color/holo_orange_light" />
 
             <TextView
-                android:id="@+id/add_bolus"
+                android:id="@+id/add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="5dp"
                 android:paddingStart="10dp"
-                android:text="@string/addBolus"
+                android:text="@string/add"
                 android:textAlignment="viewEnd"
                 android:textColor="@android:color/holo_purple" />
 

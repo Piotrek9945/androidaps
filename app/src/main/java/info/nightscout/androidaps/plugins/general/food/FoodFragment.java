@@ -304,7 +304,7 @@ public class FoodFragment extends Fragment {
                 remove = (TextView) itemView.findViewById(R.id.food_remove);
                 remove.setOnClickListener(this);
                 remove.setPaintFlags(remove.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                addBolus = (TextView) itemView.findViewById(R.id.add_bolus);
+                addBolus = (TextView) itemView.findViewById(R.id.add);
                 addBolus.setOnClickListener(this);
                 addBolus.setPaintFlags(addBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             }
@@ -318,7 +318,7 @@ public class FoodFragment extends Fragment {
                         this.showRemoveDialog(food);
                         break;
 
-                    case R.id.add_bolus:
+                    case R.id.add:
                         int wbt = this.calculateWBT(food);
                         if (wbt > 0) {
                             this.addEcarbs(wbt);
