@@ -123,8 +123,10 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         try {
             double count = editCount.getValue().doubleValue();
             food.portion = food.portion * count;
-            FoodService.addFoodToList(food);
-            this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+            if (food.portion > 0) {
+                FoodService.addFoodToList(food);
+                this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+            }
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
