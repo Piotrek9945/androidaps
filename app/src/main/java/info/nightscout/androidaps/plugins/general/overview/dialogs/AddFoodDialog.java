@@ -125,7 +125,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             double count = editCount.getValue().doubleValue();
             if (count > 0) {
                 Food foodCopy = SerializationUtils.clone(food);
-                foodCopy.portion *= count;
+                foodCopy.portionCount *= count;
                 FoodService.addFoodToList(foodCopy);
                 this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
             }

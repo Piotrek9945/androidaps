@@ -56,7 +56,7 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
         boolean isAddedYet = false;
         for(Food item : foodList) {
             if (item._id.equals(food._id)) {
-                item.portion += food.portion;
+                item.portionCount += food.portionCount;
                 isAddedYet = true;
                 break;
             }

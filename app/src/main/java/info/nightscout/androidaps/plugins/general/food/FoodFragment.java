@@ -115,9 +115,9 @@ public class FoodFragment extends Fragment {
                         for (Food food : foodList) {
                             String text = "";
                             text = text.concat(food.name);
-                            text = text.concat(", " + Double.valueOf(food.portion).intValue() + " " + food.units);
-                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + this.calculateWBT(food) * 10 * Double.valueOf(food.portion).intValue() + "</font>");
-                            text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs/10 * Double.valueOf(food.portion).intValue() + "</font>");
+                            text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
+                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + this.calculateWBT(food) * 10 + "</font>");
+                            text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
                             actions.add(text);
                         }
                         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -125,12 +125,6 @@ public class FoodFragment extends Fragment {
                         builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
-                                if (accepted) {
-                                    log.debug("guarding: already accepted");
-                                    return;
-                                }
-                                accepted = true;
-
                                 int wbt = this.calculateWBT(foodList);
                                 int carbs = getCarbsSum(foodList);
 
@@ -180,7 +174,7 @@ public class FoodFragment extends Fragment {
                     );
                 }
 
-                return (int) Math.floor(wbt);
+                return (int) Math.floor(wbt * food.portionCount);
             }
 
             private void addEcarbs(int wbt) {
@@ -242,7 +236,7 @@ public class FoodFragment extends Fragment {
             private int getCarbsSum(List<Food> foodList) {
                 int carbs = 0;
                 for (Food food : foodList) {
-                    carbs += food.carbs;
+                    carbs += food.carbs * food.portionCount;
                 }
                 return carbs;
             }
