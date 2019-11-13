@@ -80,6 +80,8 @@ public class FoodFragment extends Fragment {
     ArrayList<CharSequence> categories;
     ArrayList<CharSequence> subcategories;
     TextView foodCountAdded;
+    TextView editAddedFood;
+    TextView passBolus;
 
     final String EMPTY = MainApp.gs(R.string.none);
 
@@ -95,6 +97,10 @@ public class FoodFragment extends Fragment {
         subcategory = new SpinnerHelper(view.findViewById(R.id.food_subcategory));
         foodCountAdded = view.findViewById(R.id.food_count_added);
         foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+        editAddedFood = view.findViewById(R.id.edit_added_food);
+        editAddedFood.setPaintFlags(editAddedFood.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        passBolus = view.findViewById(R.id.pass_bolus);
+        passBolus.setPaintFlags(passBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         recyclerView = (RecyclerView) view.findViewById(R.id.food_recyclerview);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(view.getContext());

@@ -80,7 +80,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal">
 
             <TextView
@@ -96,6 +97,30 @@
                 android:paddingStart="5dp"
                 android:textAlignment="viewEnd"
                 android:textColor="@android:color/holo_purple" />
+
+            <TextView
+                android:id="@+id/edit_added_food"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple"
+                android:text="Edytuj dodane"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/pass_bolus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple"
+                android:text="Podaj bolus"
+                android:textSize="16dp" />
 
 
         </LinearLayout>
