@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -107,15 +108,42 @@ public class FoodFragment extends Fragment {
                 switch (v.getId()) {
                     case R.id.pass_bolus:
                         List<Food> foodList = FoodService.getFoodList();
-                        int wbt = this.calculateWBT(foodList);
-                        int carbs = getCarbsSum(foodList);
+                        if (foodList.size() == 0) {
+                            break;
+                        }
+                        List<String> actions = new LinkedList<>();
+                        for (Food food : foodList) {
+                            String text = "";
+                            text = text.concat(food.name);
+                            text = text.concat(", " + Double.valueOf(food.portion).intValue() + " " + food.units);
+                            text = text.concat(", eCarbs: " + this.calculateWBT(food) * 10);
+                            text = text.concat(", Węglow.: " + food.carbs/10);
+                            actions.add(text);
+                        }
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("Lista posiłków");
+                        builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
+                        builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                            synchronized (builder) {
+                                if (accepted) {
+                                    log.debug("guarding: already accepted");
+                                    return;
+                                }
+                                accepted = true;
 
-                        if (wbt > 0) {
-                            this.addEcarbs(wbt);
-                        }
-                        if (carbs > 0) {
-                            this.addBolus(carbs);
-                        }
+                                int wbt = this.calculateWBT(foodList);
+                                int carbs = getCarbsSum(foodList);
+
+                                if (wbt > 0) {
+                                    this.addEcarbs(wbt);
+                                }
+                                if (carbs > 0) {
+                                    this.addBolus(carbs);
+                                }
+                            }
+                        });
+                        builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+                        builder.show();
                         break;
 
                     case R.id.edit_added_food:
