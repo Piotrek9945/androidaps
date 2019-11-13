@@ -101,6 +101,165 @@ public class FoodFragment extends Fragment {
         editAddedFood.setPaintFlags(editAddedFood.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         passBolus = view.findViewById(R.id.pass_bolus);
         passBolus.setPaintFlags(passBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        passBolus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.pass_bolus:
+                        List<Food> foodList = FoodService.getFoodList();
+                        int wbt = this.calculateWBT(foodList);
+                        int carbs = getCarbsSum(foodList);
+
+                        if (wbt > 0) {
+                            this.addEcarbs(wbt);
+                        }
+                        if (carbs > 0) {
+                            this.addBolus(carbs);
+                        }
+                        break;
+
+                    case R.id.edit_added_food:
+                        break;
+                }
+            }
+
+
+            private int calculateWBT(List<Food> foodList) {
+                int wbt = 0;
+                for (Food food : foodList) {
+                    wbt += calculateWBT(food);
+                }
+                return wbt;
+            }
+
+            private int calculateWBT(Food food) {
+                final int kcalPerOneCarb = 4;
+                final int kcalPerOneFat = 9;
+                final int kcalPerOneProtein = 4;
+
+                Double wbt;
+                if (food.energy > 0) {
+                    wbt = SafeParse.stringToDouble(
+                            String.valueOf(
+                                    (food.energy - kcalPerOneCarb * food.carbs) / 100
+                            )
+                    );
+                } else {
+                    wbt = SafeParse.stringToDouble(
+                            String.valueOf(
+                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 100
+                            )
+                    );
+                }
+
+                return (int) Math.floor(wbt);
+            }
+
+            private void addEcarbs(int wbt) {
+                List<String> actions = new LinkedList<>();
+
+                int eCarbs = wbt * 10;
+                Integer duration;
+                if (wbt > 4) {
+                    duration = 8;
+                } else {
+                    duration = wbt + 2;
+                }
+                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarbs)).value();
+
+                int timeOffset = 0;
+                final long time = now() + timeOffset * 1000 * 60;
+                if (timeOffset != 0) {
+                    actions.add(MainApp.gs(R.string.time) + ": " + DateUtil.dateAndTimeString(time));
+                }
+
+                if (duration > 0) {
+                    actions.add(MainApp.gs(R.string.duration) + ": " + duration + MainApp.gs(R.string.shorthour));
+                }
+
+                if (eCarbs > 0) {
+                    actions.add("Węglow. złożone" + ": " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + carbsAfterConstraints + "g" + "</font>");
+                }
+                if (!carbsAfterConstraints.equals(eCarbs)) {
+                    actions.add("<font color='" + MainApp.gc(R.color.warning) + "'>" + MainApp.gs(R.string.carbsconstraintapplied) + "</font>");
+                }
+
+                if (carbsAfterConstraints > 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Potwierdzenie eCarb");
+                    builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
+                    builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                        synchronized (builder) {
+                            if (accepted) {
+                                log.debug("guarding: already accepted");
+                                return;
+                            }
+                            accepted = true;
+
+                            if (carbsAfterConstraints > 0) {
+                                if (duration == 0) {
+                                    CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
+                                } else {
+                                    CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
+                                    NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
+                                }
+                            }
+                        }
+                    });
+                    builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+                    builder.show();
+                }
+            }
+
+            private int getCarbsSum(List<Food> foodList) {
+                int carbs = 0;
+                for (Food food : foodList) {
+                    carbs += food.carbs;
+                }
+                return carbs;
+            }
+
+            private void addBolus(int carbs) {
+                try {
+                    BolusWizard wizard = onClickQuickwizard(carbs);
+                    wizard.confirmAndExecute(getContext());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
+//                final BgReading actualBg = DatabaseHelper.actualBg();
+                final BgReading actualBg = new BgReading();
+                actualBg.value = 120;
+                actualBg.date = 1573079975L;
+                actualBg.raw = 0;
+                final Profile profile = ProfileFunctions.getInstance().getProfile();
+                final String profileName = ProfileFunctions.getInstance().getProfileName();
+                final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
+
+                JSONObject input = new JSONObject("{\"buttonText\":\"\",\"carbs\":" + carbs + ",\"validFrom\":0,\"validTo\":86340, \"useBG\":1, \"useBolusIOB\":1, \"useBasalIOB\":1}");
+                final QuickWizardEntry quickWizardEntry = new QuickWizardEntry(input, -1);
+                if (quickWizardEntry != null && actualBg != null && profile != null && pump != null) {
+                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, actualBg, true);
+
+                    if (wizard.getCalculatedTotalInsulin() > 0d && quickWizardEntry.carbs() > 0d) {
+                        Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(quickWizardEntry.carbs())).value();
+
+                        if (Math.abs(wizard.getInsulinAfterConstraints() - wizard.getCalculatedTotalInsulin()) >= pump.getPumpDescription().pumpType.determineCorrectBolusStepSize(wizard.getInsulinAfterConstraints()) || !carbsAfterConstraints.equals(quickWizardEntry.carbs())) {
+                            OKDialog.show(getContext(), MainApp.gs(R.string.treatmentdeliveryerror), MainApp.gs(R.string.constraints_violation) + "\n" + MainApp.gs(R.string.changeyourinput), null);
+                            return wizard;
+                        }
+
+                        return wizard;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            }
+        });
         recyclerView = (RecyclerView) view.findViewById(R.id.food_recyclerview);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
@@ -327,21 +486,12 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 final Food food = (Food) v.getTag();
                 switch (v.getId()) {
-
                     case R.id.food_remove:
                         this.showRemoveDialog(food);
                         break;
 
                     case R.id.food_add:
                         this.showAddFood(food, foodCountAdded);
-
-//                        int wbt = this.calculateWBT(food);
-//                        if (wbt > 0) {
-//                            this.addEcarbs(wbt);
-//                        }
-//                        if (food.carbs > 0) {
-//                            this.addBolus(food);
-//                        }
                         break;
                 }
             }
@@ -349,94 +499,6 @@ public class FoodFragment extends Fragment {
             private void showAddFood(Food food, TextView foodCountAdded) {
                 FragmentManager manager = getFragmentManager();
                 new AddFoodDialog(food, foodCountAdded).show(manager, "AddFoodDialog");
-            }
-
-            private int calculateWBT(Food food) {
-                final int kcalPerOneCarb = 4;
-                final int kcalPerOneFat = 9;
-                final int kcalPerOneProtein = 4;
-
-                Double wbt;
-                if (food.energy > 0) {
-                    wbt = SafeParse.stringToDouble(
-                            String.valueOf(
-                                    (food.energy - kcalPerOneCarb * food.carbs) / 100
-                            )
-                    );
-                } else {
-                    wbt = SafeParse.stringToDouble(
-                            String.valueOf(
-                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 100
-                            )
-                    );
-                }
-
-                return (int) Math.floor(wbt);
-            }
-
-            private void addEcarbs(int wbt) {
-                List<String> actions = new LinkedList<>();
-
-                int eCarbs = wbt * 10;
-                Integer duration;
-                if (wbt > 4) {
-                    duration = 8;
-                } else {
-                    duration = wbt + 2;
-                }
-                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarbs)).value();
-
-                int timeOffset = 0;
-                final long time = now() + timeOffset * 1000 * 60;
-                if (timeOffset != 0) {
-                    actions.add(MainApp.gs(R.string.time) + ": " + DateUtil.dateAndTimeString(time));
-                }
-
-                if (duration > 0) {
-                    actions.add(MainApp.gs(R.string.duration) + ": " + duration + MainApp.gs(R.string.shorthour));
-                }
-
-                if (eCarbs > 0) {
-                    actions.add("Węglow. złożone" + ": " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + carbsAfterConstraints + "g" + "</font>");
-                }
-                if (!carbsAfterConstraints.equals(eCarbs)) {
-                    actions.add("<font color='" + MainApp.gc(R.color.warning) + "'>" + MainApp.gs(R.string.carbsconstraintapplied) + "</font>");
-                }
-
-                if (carbsAfterConstraints > 0) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Potwierdzenie eCarb");
-                    builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
-                    builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
-                        synchronized (builder) {
-                            if (accepted) {
-                                log.debug("guarding: already accepted");
-                                return;
-                            }
-                            accepted = true;
-
-                            if (carbsAfterConstraints > 0) {
-                                if (duration == 0) {
-                                    CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
-                                } else {
-                                    CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
-                                    NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
-                                }
-                            }
-                        }
-                    });
-                    builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-                    builder.show();
-                }
-            }
-
-            private void addBolus(Food food) {
-                try {
-                    BolusWizard wizard = onClickQuickwizard(food.carbs);
-                    wizard.confirmAndExecute(getContext());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
             }
 
             public void showRemoveDialog(Food food) {
@@ -454,38 +516,6 @@ public class FoodFragment extends Fragment {
                 });
                 builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
                 builder.show();
-            }
-
-            public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
-//                final BgReading actualBg = DatabaseHelper.actualBg();
-                final BgReading actualBg = new BgReading();
-                actualBg.value = 120;
-                actualBg.date = 1573079975L;
-                actualBg.raw = 0;
-                final Profile profile = ProfileFunctions.getInstance().getProfile();
-                final String profileName = ProfileFunctions.getInstance().getProfileName();
-                final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
-
-                JSONObject input = new JSONObject("{\"buttonText\":\"\",\"carbs\":" + carbs + ",\"validFrom\":0,\"validTo\":86340, \"useBG\":1, \"useBolusIOB\":1, \"useBasalIOB\":1}");
-                final QuickWizardEntry quickWizardEntry = new QuickWizardEntry(input, -1);
-                if (quickWizardEntry != null && actualBg != null && profile != null && pump != null) {
-                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, actualBg, true);
-
-                    if (wizard.getCalculatedTotalInsulin() > 0d && quickWizardEntry.carbs() > 0d) {
-                        Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(quickWizardEntry.carbs())).value();
-
-                        if (Math.abs(wizard.getInsulinAfterConstraints() - wizard.getCalculatedTotalInsulin()) >= pump.getPumpDescription().pumpType.determineCorrectBolusStepSize(wizard.getInsulinAfterConstraints()) || !carbsAfterConstraints.equals(quickWizardEntry.carbs())) {
-                            OKDialog.show(getContext(), MainApp.gs(R.string.treatmentdeliveryerror), MainApp.gs(R.string.constraints_violation) + "\n" + MainApp.gs(R.string.changeyourinput), null);
-                            return wizard;
-                        }
-
-                        return wizard;
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
-                }
             }
 
         }

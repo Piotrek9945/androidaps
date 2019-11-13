@@ -69,6 +69,7 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
     public static Integer getFoodListSize() {
         return FoodService.foodList.size();
     }
+    public static List<Food> getFoodList() { return FoodService.foodList; }
 
     public FoodService() {
         onCreate();
