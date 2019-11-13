@@ -59,6 +59,7 @@ import info.nightscout.androidaps.utils.SafeParse;
 import info.nightscout.androidaps.utils.SpinnerHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import kotlin.Unit;
 
 import static info.nightscout.androidaps.utils.DateUtil.now;
 
@@ -134,6 +135,9 @@ public class FoodFragment extends Fragment {
                                 if (carbs > 0) {
                                     this.addBolus(carbs);
                                 }
+
+                                FoodService.getFoodList().clear();
+                                foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
                             }
                         });
                         builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
