@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,9 +123,10 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         okClicked = true;
         try {
             double count = editCount.getValue().doubleValue();
-            food.portion = food.portion * count;
-            if (food.portion > 0) {
-                FoodService.addFoodToList(food);
+            if (count > 0) {
+                Food foodCopy = SerializationUtils.clone(food);
+                foodCopy.portion *= count;
+                FoodService.addFoodToList(foodCopy);
                 this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
             }
 
