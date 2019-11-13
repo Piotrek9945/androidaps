@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.base.Joiner;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -268,7 +269,7 @@ public class FoodFragment extends Fragment {
             Food food = foodList.get(position);
             holder.ns.setVisibility(food._id != null ? View.VISIBLE : View.GONE);
             holder.name.setText(food.name);
-            holder.portion.setText(Integer.parseInt(String.valueOf(food.portion)) + " " + food.units);
+            holder.portion.setText(Double.valueOf(food.portion).intValue() + " " + food.units);
             holder.carbs.setText(food.carbs + MainApp.gs(R.string.shortgramm));
             holder.fat.setText(MainApp.gs(R.string.shortfat) + ": " + food.fat + MainApp.gs(R.string.shortgramm));
             if (food.fat == 0)

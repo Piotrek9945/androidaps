@@ -90,7 +90,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     }
 
     private void setSummaryText() {
-        summary.setText("Ilość: " + food.portion * editCount.getValue().intValue() + " [" + food.units + "]");
+        Double result = food.portion * editCount.getValue();
+        summary.setText("Ilość: " + result.intValue() + " [" + food.units + "]");
     }
 
     @Override
