@@ -268,7 +268,7 @@ public class FoodFragment extends Fragment {
             Food food = foodList.get(position);
             holder.ns.setVisibility(food._id != null ? View.VISIBLE : View.GONE);
             holder.name.setText(food.name);
-            holder.portion.setText(food.portion + food.units);
+            holder.portion.setText(food.portion + " " + food.units);
             holder.carbs.setText(food.carbs + MainApp.gs(R.string.shortgramm));
             holder.fat.setText(MainApp.gs(R.string.shortfat) + ": " + food.fat + MainApp.gs(R.string.shortgramm));
             if (food.fat == 0)

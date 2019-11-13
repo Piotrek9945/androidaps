@@ -74,7 +74,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_count);
-        editCount.setParams(0.1d, 1d, 99999d, 1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.ok), textWatcher);
+        editCount.setParams(1d, 1d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
 
         summary = view.findViewById(R.id.addfood_summary);
         setSummaryText();
@@ -90,7 +90,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     }
 
     private void setSummaryText() {
-        summary.setText("Ilość: " + food.portion * editCount.getValue() + " [" + food.units + "]");
+        summary.setText("Ilość: " + food.portion * editCount.getValue().intValue() + " [" + food.units + "]");
     }
 
     @Override
