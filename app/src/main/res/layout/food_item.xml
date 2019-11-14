@@ -31,7 +31,7 @@
 
             <TextView
                 android:id="@+id/food_portion"
-                android:layout_width="60dp"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
                 android:text="Portion" />
@@ -91,6 +91,16 @@
                 android:text="@string/overview_quickwizard_item_remove_button"
                 android:textAlignment="viewEnd"
                 android:textColor="@android:color/holo_orange_light" />
+
+            <TextView
+                android:id="@+id/food_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="10dp"
+                android:text="@string/add"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple" />
 
         </LinearLayout>
 

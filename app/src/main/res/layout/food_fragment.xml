@@ -77,6 +77,54 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dodano: " />
+
+            <TextView
+                android:id="@+id/food_count_added"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple" />
+
+            <TextView
+                android:id="@+id/clear_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple"
+                android:text="Opróżnij listę"
+                android:textSize="16dp" />
+
+            <TextView
+                android:id="@+id/pass_bolus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple"
+                android:text="Podaj bolus"
+                android:textSize="16dp" />
+
+
+        </LinearLayout>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/food_recyclerview"
             android:layout_width="match_parent"

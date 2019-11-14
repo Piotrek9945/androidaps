@@ -346,6 +346,7 @@
     <string name="overview_editquickwizardlistactivity_add">Dodaj</string>
     <string name="overview_quickwizard_item_edit_button">Edytuj</string>
     <string name="overview_quickwizard_item_remove_button">Usuń</string>
+    <string name="add">Dodaj</string>
     <string name="mealbolus">Posiłek</string>
     <string name="correctionbous">Korekta</string>
     <string name="actions">Akcje</string>
