@@ -79,9 +79,10 @@ public class FoodFragment extends Fragment {
     List<Food> filtered;
     ArrayList<CharSequence> categories;
     ArrayList<CharSequence> subcategories;
-    TextView foodCountAdded;
     TextView clearList;
     TextView passBolus;
+
+    public static TextView foodCountAdded;
 
     final String EMPTY = MainApp.gs(R.string.none);
 
@@ -149,11 +150,8 @@ public class FoodFragment extends Fragment {
                                 int eCarb = this.calculateEcarb(foodList);
                                 int carb = getCarb(foodList);
 
-                                if (eCarb > 0) {
-                                    this.addEcarbs(eCarb);
-                                }
                                 if (carb > 0) {
-                                    this.addBolus(carb);
+                                    this.addBolus(carb, eCarb);
                                 }
 
                                 FoodService.getFoodList().clear();
@@ -199,62 +197,6 @@ public class FoodFragment extends Fragment {
                 return (int) Math.floor(eCarb * food.portionCount);
             }
 
-            private void addEcarbs(int eCarb) {
-                List<String> actions = new LinkedList<>();
-
-                int wbt = (int) Math.ceil((double) eCarb / 10d);
-                Integer duration;
-                if (wbt > 4) {
-                    duration = 8;
-                } else {
-                    duration = wbt + 2;
-                }
-                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarb)).value();
-
-                int timeOffset = 0;
-                final long time = now() + timeOffset * 1000 * 60;
-                if (timeOffset != 0) {
-                    actions.add(MainApp.gs(R.string.time) + ": " + DateUtil.dateAndTimeString(time));
-                }
-
-                if (duration > 0) {
-                    actions.add(MainApp.gs(R.string.duration) + ": " + duration + MainApp.gs(R.string.shorthour));
-                }
-
-                if (eCarb > 0) {
-                    actions.add("Węglow. złożone" + ": " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + carbsAfterConstraints + "g" + "</font>");
-                }
-                if (!carbsAfterConstraints.equals(eCarb)) {
-                    actions.add("<font color='" + MainApp.gc(R.color.warning) + "'>" + MainApp.gs(R.string.carbsconstraintapplied) + "</font>");
-                }
-
-                if (carbsAfterConstraints > 0) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Potwierdzenie eCarb");
-                    builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
-                    builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
-                        synchronized (builder) {
-                            if (accepted) {
-                                log.debug("guarding: already accepted");
-                                return;
-                            }
-                            accepted = true;
-
-                            if (carbsAfterConstraints > 0) {
-                                if (duration == 0) {
-                                    CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
-                                } else {
-                                    CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
-                                    NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
-                                }
-                            }
-                        }
-                    });
-                    builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-                    builder.show();
-                }
-            }
-
             private int getCarb(List<Food> foodList) {
                 int carbs = 0;
                 for (Food food : foodList) {
@@ -263,10 +205,10 @@ public class FoodFragment extends Fragment {
                 return carbs;
             }
 
-            private void addBolus(int carbs) {
+            private void addBolus(int carbs, int eCarb) {
                 try {
                     BolusWizard wizard = onClickQuickwizard(carbs);
-                    wizard.confirmAndExecute(getContext());
+                    wizard.confirmAndExecute(getContext(), eCarb);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -356,7 +298,7 @@ public class FoodFragment extends Fragment {
             }
         });
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(FoodPlugin.getPlugin().getService().getFoodData(), foodCountAdded);
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(FoodPlugin.getPlugin().getService().getFoodData());
         recyclerView.setAdapter(adapter);
 
         loadData();
@@ -450,17 +392,15 @@ public class FoodFragment extends Fragment {
     }
 
     protected void updateGui() {
-        recyclerView.swapAdapter(new FoodFragment.RecyclerViewAdapter(filtered, foodCountAdded), true);
+        recyclerView.swapAdapter(new FoodFragment.RecyclerViewAdapter(filtered), true);
     }
 
     public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.FoodsViewHolder> {
 
         List<Food> foodList;
-        TextView foodCountAdded;
 
-        RecyclerViewAdapter(List<Food> foodList, TextView foodCountAdded) {
+        RecyclerViewAdapter(List<Food> foodList) {
             this.foodList = foodList;
-            this.foodCountAdded = foodCountAdded;
         }
 
         @Override
@@ -531,14 +471,14 @@ public class FoodFragment extends Fragment {
                         break;
 
                     case R.id.food_add:
-                        this.showAddFood(food, foodCountAdded);
+                        this.showAddFood(food);
                         break;
                 }
             }
 
-            private void showAddFood(Food food, TextView foodCountAdded) {
+            private void showAddFood(Food food) {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog(food, foodCountAdded).show(manager, "AddFoodDialog");
+                new AddFoodDialog(food).show(manager, "AddFoodDialog");
             }
 
             public void showRemoveDialog(Food food) {
@@ -558,6 +498,33 @@ public class FoodFragment extends Fragment {
                 builder.show();
             }
 
+        }
+    }
+
+    public static void addEcarbs(Integer eCarb) {
+        if (eCarb != 0 && eCarb != null) {
+            int wbt = (int) Math.ceil((double) eCarb / 10d);
+            Integer duration;
+            if (wbt > 4) {
+                duration = 8;
+            } else {
+                duration = wbt + 2;
+            }
+            Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarb)).value();
+
+            int timeOffset = 0;
+            final long time = now() + timeOffset * 1000 * 60;
+
+            if (carbsAfterConstraints > 0) {
+                if (carbsAfterConstraints > 0) {
+                    if (duration == 0) {
+                        CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
+                    } else {
+                        CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
+                        NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
+                    }
+                }
+            }
         }
     }
 

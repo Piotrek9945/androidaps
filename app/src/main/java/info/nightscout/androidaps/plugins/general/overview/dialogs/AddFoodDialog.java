@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodPlugin;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
@@ -42,11 +43,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private boolean accepted;
     private boolean okClicked;
 
-    private TextView foodCountAdded;
-
-    public AddFoodDialog(Food food, TextView foodCountAdded) {
+    public AddFoodDialog(Food food) {
         this.food = food;
-        this.foodCountAdded = foodCountAdded;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -127,7 +125,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 Food foodCopy = SerializationUtils.clone(food);
                 foodCopy.portionCount *= count;
                 FoodService.addFoodToList(foodCopy);
-                this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                FoodFragment.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
             }
 
             dismiss();
