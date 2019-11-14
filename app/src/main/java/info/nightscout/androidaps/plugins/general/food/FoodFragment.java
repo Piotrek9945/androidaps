@@ -103,8 +103,19 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.clear_list:
-                        FoodService.getFoodList().clear();
-                        foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                        if (FoodService.getFoodListSize() > 0) {
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Potwierdzenie");
+                            builder.setMessage("Czy chcesz opróżnić listę?");
+                            builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                                synchronized (builder) {
+                                    FoodService.getFoodList().clear();
+                                    foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                                }
+                            });
+                            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+                            builder.show();
+                        }
                         break;
                 }
             }
