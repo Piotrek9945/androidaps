@@ -954,7 +954,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                     return;
                 }
 
-                wizard.confirmAndExecute(getContext());
+                wizard.confirmAndExecute(getContext(), 0);
             }
         }
     }

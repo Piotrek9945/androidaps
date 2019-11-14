@@ -115,7 +115,7 @@ class WizardDialog : DialogFragment() {
             } else {
                 okClicked = true
                 parentContext?.let { context ->
-                    wizard?.confirmAndExecute(context)
+                    wizard?.confirmAndExecute(context, 0)
                 }
             }
             dismiss()

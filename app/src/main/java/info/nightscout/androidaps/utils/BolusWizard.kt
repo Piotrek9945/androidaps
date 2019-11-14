@@ -20,6 +20,8 @@ import info.nightscout.androidaps.plugins.aps.loop.LoopPlugin
 import info.nightscout.androidaps.plugins.bus.RxBus
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
+import info.nightscout.androidaps.plugins.general.food.FoodFragment
+import info.nightscout.androidaps.plugins.general.food.FoodService
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin
@@ -263,7 +265,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         return confirmMessage
     }
 
-    fun confirmAndExecute(context: Context) {
+    fun confirmAndExecute(context: Context, eCarb: Int) {
         val profile = ProfileFunctions.getInstance().profile ?: return
         val pump = ConfigBuilderPlugin.getPlugin().activePump ?: return
 
@@ -340,6 +342,12 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.putExtra("title", MainApp.gs(R.string.treatmentdeliveryerror))
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
+                                    } else {
+                                        FoodFragment.addEcarbs(eCarb)
+                                        FoodService.getFoodList().clear()
+                                        if (FoodFragment.foodCountAdded != null) {
+                                            FoodFragment.foodCountAdded.setText(FoodService.getFoodListSize().toString())
+                                        }
                                     }
                                 }
                             })
