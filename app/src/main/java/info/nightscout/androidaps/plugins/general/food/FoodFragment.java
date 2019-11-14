@@ -48,7 +48,6 @@ import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
-import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialog;
 import info.nightscout.androidaps.plugins.treatments.CarbsGenerator;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.DateUtil;
@@ -79,6 +78,9 @@ public class FoodFragment extends Fragment {
     List<Food> filtered;
     ArrayList<CharSequence> categories;
     ArrayList<CharSequence> subcategories;
+    TextView foodCountAdded;
+    TextView clearList;
+    TextView passBolus;
 
     final String EMPTY = MainApp.gs(R.string.none);
 
@@ -92,6 +94,215 @@ public class FoodFragment extends Fragment {
         clearFilter = (ImageView) view.findViewById(R.id.food_clearfilter);
         category = new SpinnerHelper(view.findViewById(R.id.food_category));
         subcategory = new SpinnerHelper(view.findViewById(R.id.food_subcategory));
+        foodCountAdded = view.findViewById(R.id.food_count_added);
+        foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+        clearList = view.findViewById(R.id.clear_list);
+        clearList.setPaintFlags(clearList.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        clearList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.clear_list:
+                        if (FoodService.getFoodListSize() > 0) {
+                            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                            builder.setTitle("Potwierdzenie");
+                            builder.setMessage("Czy chcesz opróżnić listę?");
+                            builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                                synchronized (builder) {
+                                    FoodService.getFoodList().clear();
+                                    foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                                }
+                            });
+                            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+                            builder.show();
+                        }
+                        break;
+                }
+            }
+        });
+        passBolus = view.findViewById(R.id.pass_bolus);
+        passBolus.setPaintFlags(passBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        passBolus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.pass_bolus:
+                        List<Food> foodList = FoodService.getFoodList();
+                        if (foodList.size() == 0) {
+                            break;
+                        }
+                        List<String> actions = new LinkedList<>();
+                        for (Food food : foodList) {
+                            String text = "";
+                            text = text.concat(food.name);
+                            text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
+                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + this.calculateEcarb(food) + "</font>");
+                            text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
+                            actions.add(text);
+                        }
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        builder.setTitle("Lista posiłków");
+                        builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
+                        builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                            synchronized (builder) {
+                                int eCarb = this.calculateEcarb(foodList);
+                                int carb = getCarb(foodList);
+
+                                if (eCarb > 0) {
+                                    this.addEcarbs(eCarb);
+                                }
+                                if (carb > 0) {
+                                    this.addBolus(carb);
+                                }
+
+                                FoodService.getFoodList().clear();
+                                foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                            }
+                        });
+                        builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+                        builder.show();
+                        break;
+
+                }
+            }
+
+
+            private int calculateEcarb(List<Food> foodList) {
+                int eCarb = 0;
+                for (Food food : foodList) {
+                    eCarb += calculateEcarb(food);
+                }
+                return eCarb;
+            }
+
+            private int calculateEcarb(Food food) {
+                final int kcalPerOneCarb = 4;
+                final int kcalPerOneFat = 9;
+                final int kcalPerOneProtein = 4;
+
+                Double eCarb;
+                if (food.energy > 0) {
+                    eCarb = SafeParse.stringToDouble(
+                            String.valueOf(
+                                    (food.energy - kcalPerOneCarb * food.carbs) / 10
+                            )
+                    );
+                } else {
+                    eCarb = SafeParse.stringToDouble(
+                            String.valueOf(
+                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 10
+                            )
+                    );
+                }
+
+                return (int) Math.floor(eCarb * food.portionCount);
+            }
+
+            private void addEcarbs(int eCarb) {
+                List<String> actions = new LinkedList<>();
+
+                int wbt = (int) Math.ceil((double) eCarb / 10d);
+                Integer duration;
+                if (wbt > 4) {
+                    duration = 8;
+                } else {
+                    duration = wbt + 2;
+                }
+                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarb)).value();
+
+                int timeOffset = 0;
+                final long time = now() + timeOffset * 1000 * 60;
+                if (timeOffset != 0) {
+                    actions.add(MainApp.gs(R.string.time) + ": " + DateUtil.dateAndTimeString(time));
+                }
+
+                if (duration > 0) {
+                    actions.add(MainApp.gs(R.string.duration) + ": " + duration + MainApp.gs(R.string.shorthour));
+                }
+
+                if (eCarb > 0) {
+                    actions.add("Węglow. złożone" + ": " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + carbsAfterConstraints + "g" + "</font>");
+                }
+                if (!carbsAfterConstraints.equals(eCarb)) {
+                    actions.add("<font color='" + MainApp.gc(R.color.warning) + "'>" + MainApp.gs(R.string.carbsconstraintapplied) + "</font>");
+                }
+
+                if (carbsAfterConstraints > 0) {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Potwierdzenie eCarb");
+                    builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
+                    builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                        synchronized (builder) {
+                            if (accepted) {
+                                log.debug("guarding: already accepted");
+                                return;
+                            }
+                            accepted = true;
+
+                            if (carbsAfterConstraints > 0) {
+                                if (duration == 0) {
+                                    CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
+                                } else {
+                                    CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
+                                    NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
+                                }
+                            }
+                        }
+                    });
+                    builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+                    builder.show();
+                }
+            }
+
+            private int getCarb(List<Food> foodList) {
+                int carbs = 0;
+                for (Food food : foodList) {
+                    carbs += food.carbs * food.portionCount;
+                }
+                return carbs;
+            }
+
+            private void addBolus(int carbs) {
+                try {
+                    BolusWizard wizard = onClickQuickwizard(carbs);
+                    wizard.confirmAndExecute(getContext());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
+//                final BgReading actualBg = DatabaseHelper.actualBg();
+                final BgReading actualBg = new BgReading();
+                actualBg.value = 120;
+                actualBg.date = 1573079975L;
+                actualBg.raw = 0;
+                final Profile profile = ProfileFunctions.getInstance().getProfile();
+                final String profileName = ProfileFunctions.getInstance().getProfileName();
+                final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
+
+                JSONObject input = new JSONObject("{\"buttonText\":\"\",\"carbs\":" + carbs + ",\"validFrom\":0,\"validTo\":86340, \"useBG\":1, \"useBolusIOB\":1, \"useBasalIOB\":1}");
+                final QuickWizardEntry quickWizardEntry = new QuickWizardEntry(input, -1);
+                if (quickWizardEntry != null && actualBg != null && profile != null && pump != null) {
+                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, actualBg, true);
+
+                    if (wizard.getCalculatedTotalInsulin() > 0d && quickWizardEntry.carbs() > 0d) {
+                        Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(quickWizardEntry.carbs())).value();
+
+                        if (Math.abs(wizard.getInsulinAfterConstraints() - wizard.getCalculatedTotalInsulin()) >= pump.getPumpDescription().pumpType.determineCorrectBolusStepSize(wizard.getInsulinAfterConstraints()) || !carbsAfterConstraints.equals(quickWizardEntry.carbs())) {
+                            OKDialog.show(getContext(), MainApp.gs(R.string.treatmentdeliveryerror), MainApp.gs(R.string.constraints_violation) + "\n" + MainApp.gs(R.string.changeyourinput), null);
+                            return wizard;
+                        }
+
+                        return wizard;
+                    } else {
+                        return null;
+                    }
+                } else {
+                    return null;
+                }
+            }
+        });
         recyclerView = (RecyclerView) view.findViewById(R.id.food_recyclerview);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager llm = new LinearLayoutManager(view.getContext());
@@ -148,7 +359,7 @@ public class FoodFragment extends Fragment {
             }
         });
 
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(FoodPlugin.getPlugin().getService().getFoodData());
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(FoodPlugin.getPlugin().getService().getFoodData(), foodCountAdded);
         recyclerView.setAdapter(adapter);
 
         loadData();
@@ -242,15 +453,17 @@ public class FoodFragment extends Fragment {
     }
 
     protected void updateGui() {
-        recyclerView.swapAdapter(new FoodFragment.RecyclerViewAdapter(filtered), true);
+        recyclerView.swapAdapter(new FoodFragment.RecyclerViewAdapter(filtered, foodCountAdded), true);
     }
 
     public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.FoodsViewHolder> {
 
         List<Food> foodList;
+        TextView foodCountAdded;
 
-        RecyclerViewAdapter(List<Food> foodList) {
+        RecyclerViewAdapter(List<Food> foodList, TextView foodCountAdded) {
             this.foodList = foodList;
+            this.foodCountAdded = foodCountAdded;
         }
 
         @Override
@@ -264,7 +477,7 @@ public class FoodFragment extends Fragment {
             Food food = foodList.get(position);
             holder.ns.setVisibility(food._id != null ? View.VISIBLE : View.GONE);
             holder.name.setText(food.name);
-            holder.portion.setText(food.portion + food.units);
+            holder.portion.setText(Double.valueOf(food.portion).intValue() + " " + food.units);
             holder.carbs.setText(food.carbs + MainApp.gs(R.string.shortgramm));
             holder.fat.setText(MainApp.gs(R.string.shortfat) + ": " + food.fat + MainApp.gs(R.string.shortgramm));
             if (food.fat == 0)
@@ -272,7 +485,7 @@ public class FoodFragment extends Fragment {
             holder.protein.setText(MainApp.gs(R.string.shortprotein) + ": " + food.protein + MainApp.gs(R.string.shortgramm));
             if (food.protein == 0)
                 holder.protein.setVisibility(View.INVISIBLE);
-            holder.energy.setText(MainApp.gs(R.string.shortenergy) + ": " + food.energy + MainApp.gs(R.string.shortkilojoul));
+            holder.energy.setText(MainApp.gs(R.string.shortenergy) + ": " + food.energy + "kcal");
             if (food.energy == 0)
                 holder.energy.setVisibility(View.INVISIBLE);
             holder.remove.setTag(food);
@@ -307,7 +520,7 @@ public class FoodFragment extends Fragment {
                 remove = (TextView) itemView.findViewById(R.id.food_remove);
                 remove.setOnClickListener(this);
                 remove.setPaintFlags(remove.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                addBolus = (TextView) itemView.findViewById(R.id.add);
+                addBolus = (TextView) itemView.findViewById(R.id.food_add);
                 addBolus.setOnClickListener(this);
                 addBolus.setPaintFlags(addBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
             }
@@ -316,117 +529,19 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 final Food food = (Food) v.getTag();
                 switch (v.getId()) {
-
                     case R.id.food_remove:
                         this.showRemoveDialog(food);
                         break;
 
-                    case R.id.add:
-                        this.showAddFood(food);
-
-
-                        int wbt = this.calculateWBT(food);
-                        if (wbt > 0) {
-                            this.addEcarbs(wbt);
-                        }
-                        if (food.carbs > 0) {
-                            this.addBolus(food);
-                        }
+                    case R.id.food_add:
+                        this.showAddFood(food, foodCountAdded);
                         break;
                 }
             }
 
-            private void showAddFood(Food food) {
+            private void showAddFood(Food food, TextView foodCountAdded) {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog(food).show(manager, "AddFoodDialog");
-            }
-
-            private int calculateWBT(Food food) {
-                final int kcalPerOneCarb = 4;
-                final int kcalPerOneFat = 9;
-                final int kcalPerOneProtein = 4;
-
-                Double wbt;
-                if (food.energy > 0) {
-                    wbt = SafeParse.stringToDouble(
-                            String.valueOf(
-                                    (food.energy - kcalPerOneCarb * food.carbs) / 100
-                            )
-                    );
-                } else {
-                    wbt = SafeParse.stringToDouble(
-                            String.valueOf(
-                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 100
-                            )
-                    );
-                }
-
-                return (int) Math.floor(wbt);
-            }
-
-            private void addEcarbs(int wbt) {
-                List<String> actions = new LinkedList<>();
-
-                int eCarbs = wbt * 10;
-                Integer duration;
-                if (wbt > 4) {
-                    duration = 8;
-                } else {
-                    duration = wbt + 2;
-                }
-                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarbs)).value();
-
-                int timeOffset = 0;
-                final long time = now() + timeOffset * 1000 * 60;
-                if (timeOffset != 0) {
-                    actions.add(MainApp.gs(R.string.time) + ": " + DateUtil.dateAndTimeString(time));
-                }
-
-                if (duration > 0) {
-                    actions.add(MainApp.gs(R.string.duration) + ": " + duration + MainApp.gs(R.string.shorthour));
-                }
-
-                if (eCarbs > 0) {
-                    actions.add("Węglow. złożone" + ": " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + carbsAfterConstraints + "g" + "</font>");
-                }
-                if (!carbsAfterConstraints.equals(eCarbs)) {
-                    actions.add("<font color='" + MainApp.gc(R.color.warning) + "'>" + MainApp.gs(R.string.carbsconstraintapplied) + "</font>");
-                }
-
-                if (carbsAfterConstraints > 0) {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                    builder.setTitle("Potwierdzenie eCarb");
-                    builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
-                    builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
-                        synchronized (builder) {
-                            if (accepted) {
-                                log.debug("guarding: already accepted");
-                                return;
-                            }
-                            accepted = true;
-
-                            if (carbsAfterConstraints > 0) {
-                                if (duration == 0) {
-                                    CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
-                                } else {
-                                    CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
-                                    NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
-                                }
-                            }
-                        }
-                    });
-                    builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-                    builder.show();
-                }
-            }
-
-            private void addBolus(Food food) {
-                try {
-                    BolusWizard wizard = onClickQuickwizard(food.carbs);
-                    wizard.confirmAndExecute(getContext());
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                new AddFoodDialog(food, foodCountAdded).show(manager, "AddFoodDialog");
             }
 
             public void showRemoveDialog(Food food) {
@@ -444,38 +559,6 @@ public class FoodFragment extends Fragment {
                 });
                 builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
                 builder.show();
-            }
-
-            public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
-//                final BgReading actualBg = DatabaseHelper.actualBg();
-                final BgReading actualBg = new BgReading();
-                actualBg.value = 120;
-                actualBg.date = 1573079975L;
-                actualBg.raw = 0;
-                final Profile profile = ProfileFunctions.getInstance().getProfile();
-                final String profileName = ProfileFunctions.getInstance().getProfileName();
-                final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
-
-                JSONObject input = new JSONObject("{\"buttonText\":\"\",\"carbs\":" + carbs + ",\"validFrom\":0,\"validTo\":86340, \"useBG\":1, \"useBolusIOB\":1, \"useBasalIOB\":1}");
-                final QuickWizardEntry quickWizardEntry = new QuickWizardEntry(input, -1);
-                if (quickWizardEntry != null && actualBg != null && profile != null && pump != null) {
-                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, actualBg, true);
-
-                    if (wizard.getCalculatedTotalInsulin() > 0d && quickWizardEntry.carbs() > 0d) {
-                        Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(quickWizardEntry.carbs())).value();
-
-                        if (Math.abs(wizard.getInsulinAfterConstraints() - wizard.getCalculatedTotalInsulin()) >= pump.getPumpDescription().pumpType.determineCorrectBolusStepSize(wizard.getInsulinAfterConstraints()) || !carbsAfterConstraints.equals(quickWizardEntry.carbs())) {
-                            OKDialog.show(getContext(), MainApp.gs(R.string.treatmentdeliveryerror), MainApp.gs(R.string.constraints_violation) + "\n" + MainApp.gs(R.string.changeyourinput), null);
-                            return wizard;
-                        }
-
-                        return wizard;
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
-                }
             }
 
         }

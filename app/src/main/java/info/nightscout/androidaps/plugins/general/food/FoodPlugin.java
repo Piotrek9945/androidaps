@@ -1,5 +1,8 @@
 package info.nightscout.androidaps.plugins.general.food;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.interfaces.PluginBase;
 import info.nightscout.androidaps.interfaces.PluginDescription;

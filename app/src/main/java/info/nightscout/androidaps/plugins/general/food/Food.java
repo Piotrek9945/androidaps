@@ -6,6 +6,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import info.nightscout.androidaps.utils.JsonHelper;
@@ -15,7 +16,7 @@ import info.nightscout.androidaps.utils.JsonHelper;
  */
 
 @DatabaseTable(tableName = Food.TABLE_FOODS)
-public class Food {
+public class Food implements Serializable {
     static final String TABLE_FOODS = "Foods";
 
     @DatabaseField(id = true)
@@ -42,6 +43,8 @@ public class Food {
 
     @DatabaseField
     public double portion; // common portion in "units"
+
+    public int portionCount = 1;
 
     @DatabaseField
     public int carbs; // in grams

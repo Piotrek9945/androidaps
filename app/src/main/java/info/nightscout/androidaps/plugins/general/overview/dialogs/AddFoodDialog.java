@@ -16,6 +16,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +25,8 @@ import java.text.DecimalFormat;
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodPlugin;
+import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
 import info.nightscout.androidaps.utils.SP;
 
@@ -39,8 +42,11 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private boolean accepted;
     private boolean okClicked;
 
-    public AddFoodDialog(Food food) {
+    private TextView foodCountAdded;
+
+    public AddFoodDialog(Food food, TextView foodCountAdded) {
         this.food = food;
+        this.foodCountAdded = foodCountAdded;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -69,8 +75,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_count);
-        editCount.setParams(0d, 0d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
-        editCount.setValue(1d);
+        editCount.setParams(1d, 1d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
 
         summary = view.findViewById(R.id.addfood_summary);
         setSummaryText();
@@ -86,7 +91,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     }
 
     private void setSummaryText() {
-        summary.setText("Ilość: " + food.portion * editCount.getValue() + " [" + food.units + "]");
+        Double result = food.portion * editCount.getValue();
+        summary.setText("Ilość: " + result.intValue() + " [" + food.units + "]");
     }
 
     @Override
@@ -116,25 +122,14 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
         okClicked = true;
         try {
-
             double count = editCount.getValue().doubleValue();
+            if (count > 0) {
+                Food foodCopy = SerializationUtils.clone(food);
+                foodCopy.portionCount *= count;
+                FoodService.addFoodToList(foodCopy);
+                this.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+            }
 
-            final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle(MainApp.gs(R.string.confirmation));
-                builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
-                synchronized (builder) {
-                    if (accepted) {
-                        log.debug("guarding: already accepted");
-                        return;
-                    }
-                    accepted = true;
-
-                    builder.setMessage("Wybrano " + count + "[" + food.units + "] produktu " + food.name);
-
-                }
-            });
-            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-            builder.show();
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
