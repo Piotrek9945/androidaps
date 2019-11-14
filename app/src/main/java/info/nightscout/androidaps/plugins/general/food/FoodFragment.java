@@ -465,7 +465,7 @@ public class FoodFragment extends Fragment {
             holder.protein.setText(MainApp.gs(R.string.shortprotein) + ": " + food.protein + MainApp.gs(R.string.shortgramm));
             if (food.protein == 0)
                 holder.protein.setVisibility(View.INVISIBLE);
-            holder.energy.setText(MainApp.gs(R.string.shortenergy) + ": " + food.energy + MainApp.gs(R.string.shortkilojoul));
+            holder.energy.setText(MainApp.gs(R.string.shortenergy) + ": " + food.energy + "kcal");
             if (food.energy == 0)
                 holder.energy.setVisibility(View.INVISIBLE);
             holder.remove.setTag(food);
