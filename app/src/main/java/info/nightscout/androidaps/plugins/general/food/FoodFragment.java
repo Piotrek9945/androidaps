@@ -23,13 +23,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.base.Joiner;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -59,7 +57,6 @@ import info.nightscout.androidaps.utils.SafeParse;
 import info.nightscout.androidaps.utils.SpinnerHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import kotlin.Unit;
 
 import static info.nightscout.androidaps.utils.DateUtil.now;
 
@@ -117,7 +114,7 @@ public class FoodFragment extends Fragment {
                             String text = "";
                             text = text.concat(food.name);
                             text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
-                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + this.calculateWBT(food) * 10 + "</font>");
+                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + this.calculateEcarb(food) + "</font>");
                             text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
                             actions.add(text);
                         }
@@ -126,14 +123,14 @@ public class FoodFragment extends Fragment {
                         builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
-                                int wbt = this.calculateWBT(foodList);
-                                int carbs = getCarbsSum(foodList);
+                                int eCarb = this.calculateEcarb(foodList);
+                                int carb = getCarb(foodList);
 
-                                if (wbt > 0) {
-                                    this.addEcarbs(wbt);
+                                if (eCarb > 0) {
+                                    this.addEcarbs(eCarb);
                                 }
-                                if (carbs > 0) {
-                                    this.addBolus(carbs);
+                                if (carb > 0) {
+                                    this.addBolus(carb);
                                 }
 
                                 FoodService.getFoodList().clear();
@@ -150,48 +147,48 @@ public class FoodFragment extends Fragment {
             }
 
 
-            private int calculateWBT(List<Food> foodList) {
-                int wbt = 0;
+            private int calculateEcarb(List<Food> foodList) {
+                int eCarb = 0;
                 for (Food food : foodList) {
-                    wbt += calculateWBT(food);
+                    eCarb += calculateEcarb(food);
                 }
-                return wbt;
+                return eCarb;
             }
 
-            private int calculateWBT(Food food) {
+            private int calculateEcarb(Food food) {
                 final int kcalPerOneCarb = 4;
                 final int kcalPerOneFat = 9;
                 final int kcalPerOneProtein = 4;
 
-                Double wbt;
+                Double eCarb;
                 if (food.energy > 0) {
-                    wbt = SafeParse.stringToDouble(
+                    eCarb = SafeParse.stringToDouble(
                             String.valueOf(
-                                    (food.energy - kcalPerOneCarb * food.carbs) / 100
+                                    (food.energy - kcalPerOneCarb * food.carbs) / 10
                             )
                     );
                 } else {
-                    wbt = SafeParse.stringToDouble(
+                    eCarb = SafeParse.stringToDouble(
                             String.valueOf(
-                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 100
+                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 10
                             )
                     );
                 }
 
-                return (int) Math.floor(wbt * food.portionCount);
+                return (int) Math.floor(eCarb * food.portionCount);
             }
 
-            private void addEcarbs(int wbt) {
+            private void addEcarbs(int eCarb) {
                 List<String> actions = new LinkedList<>();
 
-                int eCarbs = wbt * 10;
+                int wbt = (int) Math.ceil((double) eCarb / 10d);
                 Integer duration;
                 if (wbt > 4) {
                     duration = 8;
                 } else {
                     duration = wbt + 2;
                 }
-                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarbs)).value();
+                Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarb)).value();
 
                 int timeOffset = 0;
                 final long time = now() + timeOffset * 1000 * 60;
@@ -203,10 +200,10 @@ public class FoodFragment extends Fragment {
                     actions.add(MainApp.gs(R.string.duration) + ": " + duration + MainApp.gs(R.string.shorthour));
                 }
 
-                if (eCarbs > 0) {
+                if (eCarb > 0) {
                     actions.add("Węglow. złożone" + ": " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + carbsAfterConstraints + "g" + "</font>");
                 }
-                if (!carbsAfterConstraints.equals(eCarbs)) {
+                if (!carbsAfterConstraints.equals(eCarb)) {
                     actions.add("<font color='" + MainApp.gc(R.color.warning) + "'>" + MainApp.gs(R.string.carbsconstraintapplied) + "</font>");
                 }
 
@@ -237,7 +234,7 @@ public class FoodFragment extends Fragment {
                 }
             }
 
-            private int getCarbsSum(List<Food> foodList) {
+            private int getCarb(List<Food> foodList) {
                 int carbs = 0;
                 for (Food food : foodList) {
                     carbs += food.carbs * food.portionCount;
