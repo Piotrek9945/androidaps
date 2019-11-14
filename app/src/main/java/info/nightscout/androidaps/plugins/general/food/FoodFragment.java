@@ -40,6 +40,7 @@ import info.nightscout.androidaps.data.Profile;
 import info.nightscout.androidaps.data.QuickWizardEntry;
 import info.nightscout.androidaps.db.BgReading;
 import info.nightscout.androidaps.db.CareportalEvent;
+import info.nightscout.androidaps.db.DatabaseHelper;
 import info.nightscout.androidaps.events.EventFoodDatabaseChanged;
 import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
@@ -272,11 +273,7 @@ public class FoodFragment extends Fragment {
             }
 
             public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
-//                final BgReading actualBg = DatabaseHelper.actualBg();
-                final BgReading actualBg = new BgReading();
-                actualBg.value = 120;
-                actualBg.date = 1573079975L;
-                actualBg.raw = 0;
+                final BgReading actualBg = DatabaseHelper.actualBg();
                 final Profile profile = ProfileFunctions.getInstance().getProfile();
                 final String profileName = ProfileFunctions.getInstance().getProfileName();
                 final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
