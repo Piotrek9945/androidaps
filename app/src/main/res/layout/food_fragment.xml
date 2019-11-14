@@ -99,7 +99,7 @@
                 android:textColor="@android:color/holo_purple" />
 
             <TextView
-                android:id="@+id/edit_added_food"
+                android:id="@+id/clear_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingEnd="5dp"
@@ -107,7 +107,7 @@
                 android:layout_weight="1"
                 android:textAlignment="viewEnd"
                 android:textColor="@android:color/holo_purple"
-                android:text="Edytuj dodane"
+                android:text="Opróżnij listę"
                 android:textSize="16dp" />
 
             <TextView
