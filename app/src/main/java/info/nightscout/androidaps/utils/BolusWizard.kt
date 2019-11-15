@@ -343,6 +343,8 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
+                                        detailedBolusInfo.carbs = 0.0
+                                        detailedBolusInfo.insulin = 0.0
                                         FoodFragment.addEcarbs(eCarb)
                                         FoodService.getFoodList().clear()
                                         if (FoodFragment.foodCountAdded != null) {
