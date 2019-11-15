@@ -204,11 +204,6 @@ public class CommandQueue {
 
     // returns true if command is queued
     public synchronized boolean bolus(DetailedBolusInfo detailedBolusInfo, Callback callback) {
-        if (detailedBolusInfo.carbs == 0.0 && detailedBolusInfo.insulin == 0.0) {
-            callback.run();
-            return true;
-        }
-
         Command.CommandType type = detailedBolusInfo.isSMB ? Command.CommandType.SMB_BOLUS : Command.CommandType.BOLUS;
 
         if (type == Command.CommandType.SMB_BOLUS) {
