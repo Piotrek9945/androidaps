@@ -343,10 +343,12 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
-                                        FoodFragment.addEcarbs(eCarb)
-                                        FoodService.getFoodList().clear()
-                                        if (FoodFragment.foodCountAdded != null) {
-                                            FoodFragment.foodCountAdded.setText(FoodService.getFoodListSize().toString())
+                                        if (eCarb > 0) {
+                                            FoodFragment.addEcarbs(eCarb)
+                                            FoodService.getFoodList().clear()
+                                            if (FoodFragment.foodCountAdded != null) {
+                                                FoodFragment.foodCountAdded.setText(FoodService.getFoodListSize().toString())
+                                            }
                                         }
                                     }
                                 }
