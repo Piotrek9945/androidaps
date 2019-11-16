@@ -27,6 +27,7 @@ import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin
 import info.nightscout.androidaps.queue.Callback
+import info.nightscout.androidaps.queue.CommandQueue
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
@@ -266,6 +267,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
     }
 
     fun confirmAndExecute(context: Context, eCarb: Int) {
+        ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = eCarb
         val profile = ProfileFunctions.getInstance().profile ?: return
         val pump = ConfigBuilderPlugin.getPlugin().activePump ?: return
 
@@ -344,11 +346,9 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         MainApp.instance().startActivity(i)
                                     } else {
                                         if (eCarb > 0) {
+                                            ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
                                             FoodFragment.addEcarbs(eCarb)
-                                            FoodService.getFoodList().clear()
-                                            if (FoodFragment.foodCountAdded != null) {
-                                                FoodFragment.foodCountAdded.setText(FoodService.getFoodListSize().toString())
-                                            }
+                                            ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
                                         }
                                     }
                                 }
