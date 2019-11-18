@@ -22,9 +22,12 @@ import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
 import info.nightscout.androidaps.plugins.general.food.FoodFragment
 import info.nightscout.androidaps.plugins.general.food.FoodService
+import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
+import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin
+import info.nightscout.androidaps.plugins.treatments.Treatment
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin
 import info.nightscout.androidaps.queue.Callback
 import info.nightscout.androidaps.queue.CommandQueue
@@ -346,9 +349,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         MainApp.instance().startActivity(i)
                                     } else {
                                         if (eCarb > 0) {
-                                            ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-                                            FoodFragment.addEcarbs(eCarb)
-                                            ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
+                                            addEcarb(eCarb)
                                         }
                                     }
                                 }
@@ -362,5 +363,45 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null)
             builder.show()
         }
+    }
+
+    fun addEcarb(eCarb : Int) {
+        var futureEcarbSum = getFutureEcarbSum()
+        deleteAllFutureEcarb()
+        addEcarbNow(futureEcarbSum + eCarb)
+    }
+
+
+    fun deleteAllFutureEcarb() {
+        var futureTreatments = getFutureEcarbList()
+        for (treatment in futureTreatments) {
+            val _id = treatment._id
+            if (NSUpload.isIdValid(_id)) {
+                NSUpload.removeCareportalEntryFromNS(_id)
+            } else {
+                UploadQueue.removeID("dbAdd", _id)
+            }
+            TreatmentsPlugin.getPlugin().service.delete(treatment)
+        }
+    }
+
+    fun getFutureEcarbList() : List<Treatment> {
+        return TreatmentsPlugin.getPlugin().service.getTreatmentDataFromTime(DateUtil.now() + 1000, true)
+    }
+
+    fun getFutureEcarbSum() : Int {
+        var futureEcarbList = getFutureEcarbList()
+        var futureEcarb = 0.0
+        futureEcarbList.forEach {
+            futureEcarb += it.carbs
+        }
+        return futureEcarb.toInt()
+    }
+
+    fun addEcarbNow(eCarb : Int) {
+        ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
+        FoodFragment.addEcarbs(eCarb)
+        ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
+
     }
 }
