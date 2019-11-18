@@ -152,6 +152,8 @@ public class FoodFragment extends Fragment {
 
                                 if (carb > 0) {
                                     this.addBolus(carb, eCarb);
+                                } else {
+                                    BolusWizard.Companion.addEcarbIfNeeded(eCarb);
                                 }
 
                                 FoodService.getFoodList().clear();
