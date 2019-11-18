@@ -215,15 +215,14 @@ public class FoodFragment extends Fragment {
             }
 
             public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
-                final BgReading actualBg = DatabaseHelper.actualBg();
                 final Profile profile = ProfileFunctions.getInstance().getProfile();
                 final String profileName = ProfileFunctions.getInstance().getProfileName();
                 final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
 
                 JSONObject input = new JSONObject("{\"buttonText\":\"\",\"carbs\":" + carbs + ",\"validFrom\":0,\"validTo\":86340, \"useBG\":1, \"useBolusIOB\":1, \"useBasalIOB\":1}");
                 final QuickWizardEntry quickWizardEntry = new QuickWizardEntry(input, -1);
-                if (quickWizardEntry != null && actualBg != null && profile != null && pump != null) {
-                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, actualBg, true);
+                if (quickWizardEntry != null && profile != null && pump != null) {
+                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, null, true);
 
                     if (wizard.getCalculatedTotalInsulin() > 0d && quickWizardEntry.carbs() > 0d) {
                         Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(quickWizardEntry.carbs())).value();
