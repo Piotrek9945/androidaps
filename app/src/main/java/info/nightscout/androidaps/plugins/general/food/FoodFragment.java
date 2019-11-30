@@ -148,11 +148,15 @@ public class FoodFragment extends Fragment {
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
                                 int eCarb = this.calculateEcarb(foodList);
+                                log.debug("eCarbSync: " + eCarb);
                                 int carb = getCarb(foodList);
+                                log.debug("carbSync: " + carb);
 
                                 if (carb > 0) {
+                                    log.debug("'carb > 0' happens");
                                     this.addBolus(carb, eCarb);
                                 } else {
+                                    log.debug("ELSE happens");
                                     BolusWizard.Companion.addEcarbIfNeeded(eCarb);
                                 }
 

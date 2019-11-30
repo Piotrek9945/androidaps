@@ -271,6 +271,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
     }
 
     fun confirmAndExecute(context: Context, eCarb: Int) {
+        log.debug("eCarb in BolusWizard 1: " + eCarb)
         ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = eCarb
         val profile = ProfileFunctions.getInstance().profile ?: return
         val pump = ConfigBuilderPlugin.getPlugin().activePump ?: return
@@ -349,6 +350,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
+                                        log.debug("eCarb in BolusWizard 2: " + eCarb)
                                         addEcarbIfNeeded(eCarb)
                                     }
                                 }
@@ -364,6 +366,8 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         }
     }
     companion object {
+        private val log = LoggerFactory.getLogger(L.CORE)
+
         fun addEcarbIfNeeded(eCarb: Int) {
             if (eCarb > 0) {
                 addEcarb(eCarb)
@@ -372,7 +376,9 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
 
         private fun addEcarb(eCarb : Int) {
             var futureEcarbSum = getFutureEcarbSum()
+            log.debug("eCarb future: " + futureEcarbSum)
             deleteAllFutureEcarb()
+            log.debug("eCarbbb: " + eCarb)
             addEcarbNow(futureEcarbSum + eCarb)
         }
 
