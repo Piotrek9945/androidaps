@@ -36,6 +36,7 @@ import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 
 class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                             val profileName: String,
@@ -389,7 +390,14 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         }
 
         private fun getFutureEcarbList() : List<Treatment> {
-            return TreatmentsPlugin.getPlugin().service.getTreatmentDataFromTime(DateUtil.now() + 1000, true)
+            var treatments = TreatmentsPlugin.getPlugin().service.getTreatmentDataFromTime(DateUtil.now() + 1000, true)
+            return filterTreatments(treatments)
+        }
+
+        private fun filterTreatments(treatments: List<Treatment>): List<Treatment> {
+            return treatments.filter {
+                it.source == Source.USER
+            }
         }
 
         private fun getFutureEcarbSum() : Int {
