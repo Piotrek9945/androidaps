@@ -396,7 +396,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
 
         private fun filterTreatments(treatments: List<Treatment>): List<Treatment> {
             return treatments.filter {
-                it.source == Source.USER
+                it.source == Source.USER && it.insulin == 0.0
             }
         }
 
