@@ -374,14 +374,28 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
 
         private fun addExtCarb(newCarb : Int) {
             var futureTreatments = getFutureTreatments(createdInLastMillis)
-            deleteFutureTreatments(futureTreatments)
-            var recentCarb = getFutureCarbSum(futureTreatments)
-            addExtCarbNow(recentCarb + newCarb)
+            var carbCount = getFutureCarbCount(futureTreatments)
+            if (carbCount > 0) {
+                deleteFutureTreatments(futureTreatments)
+            }
+            addExtCarbNow(carbCount + newCarb)
+        }
+
+        private fun getFutureCarbCount(futureTreatments: List<Treatment>): Int {
+            return if (futureTreatments.isEmpty()) {
+                0
+            } else {
+                return getFutureCarbSum(futureTreatments)
+            }
         }
 
         private fun getFutureTreatments(createdInLastMillis : Long) : List<Treatment> {
             var times = getCarbTimes(createdInLastMillis)
-            return times.map { getTreatment(it) }
+            return if (times.isEmpty()) {
+                return emptyList()
+            } else {
+                times.map { getTreatment(it) }
+            }
         }
 
         private fun getCarbTimes(createdInLastTime : Long) : List<Long> {
