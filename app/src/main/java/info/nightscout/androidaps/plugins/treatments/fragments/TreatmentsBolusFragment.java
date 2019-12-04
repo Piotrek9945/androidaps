@@ -32,6 +32,7 @@ import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue;
 import info.nightscout.androidaps.plugins.general.nsclient.events.EventNSClientRestart;
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.events.EventAutosensCalculationFinished;
+import info.nightscout.androidaps.plugins.treatments.CarbsGenerator;
 import info.nightscout.androidaps.plugins.treatments.Treatment;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.plugins.treatments.dialogs.WizardInfoDialog;
@@ -250,6 +251,7 @@ public class TreatmentsBolusFragment extends Fragment implements View.OnClickLis
                         }
                         TreatmentsPlugin.getPlugin().getService().delete(treatment);
                     }
+                    CarbsGenerator.meal.clear();
                     updateGui();
                 });
                 builder.setNegativeButton(MainApp.gs(R.string.cancel), null);

@@ -390,29 +390,38 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         }
 
         private fun getFutureTreatments(createdInLastMillis : Long) : List<Treatment> {
+            var treatments = getFutureTreatments()
             var times = getCarbTimes(createdInLastMillis)
-            return if (times.isEmpty()) {
+            return if (treatments.isEmpty() || times.isEmpty()) {
                 return emptyList()
             } else {
-                times.map { getTreatment(it) }
+                times.map { getTreatment(it, treatments) }
             }
         }
 
         private fun getCarbTimes(createdInLastTime : Long) : List<Long> {
             var carbTimes = arrayListOf<Long>()
-            CarbsGenerator.meal.forEach {
-                if (it.date + createdInLastTime > now()) {
-                    carbTimes.addAll(it.carbTimes)
+            CarbsGenerator.meal.forEach { mealItem ->
+                if (mealItem.date + createdInLastTime > now()) {
+                    mealItem.carbTimes.forEach {
+                        if (it > now()) {
+                            carbTimes.add(it)
+                        }
+                    }
                 }
             }
             return carbTimes
         }
 
-        private fun getTreatment(date : Long) : Treatment {
-            var treatments = getFutureTreatments()
-            return treatments.first {
-                date == it.date
+        private fun getTreatment(date : Long, treatments: List<Treatment>) : Treatment {
+            return Collections.min(treatments) { t1, t2 ->
+                when {
+                    (abs(t1.date - date) > abs(t2.date - date)) -> 1
+                    (abs(t1.date - date) < abs(t2.date - date)) -> -1
+                    else -> 0
+                }
             }
+
         }
 
         private fun deleteFutureTreatments(futureTreatments : List<Treatment>) {

@@ -28,11 +28,12 @@ public class CarbsGenerator {
         MealCarb mealCarb = new MealCarb(startTime);
         for (int i = 0; i < ticks; i++){
             long carbTime = startTime + i * 15 * 60 * 1000;
-            mealCarb.addCarbTime(carbTime);
             int smallCarbAmount = (int) Math.round((1d * remainingCarbs) / (ticks-i));  //on last iteration (ticks-i) is 1 -> smallCarbAmount == remainingCarbs
             remainingCarbs -= smallCarbAmount;
-            if (smallCarbAmount > 0)
+            if (smallCarbAmount > 0) {
                 createCarb(smallCarbAmount, carbTime, CareportalEvent.MEALBOLUS, notes);
+                mealCarb.addCarbTime(carbTime);
+            }
         }
         CarbsGenerator.meal.add(mealCarb);
         CarbsGenerator.removeFinishedMeals();
@@ -43,7 +44,9 @@ public class CarbsGenerator {
             List<Long> carbTimes = it.getCarbTimes();
             Long latestTime = null;
             for (Long carbTime : carbTimes) {
-                if (latestTime == null || carbTime > latestTime) {
+                if (latestTime == null) {
+                    latestTime = carbTime;
+                } else if (carbTime > latestTime) {
                     latestTime = carbTime;
                 }
             }
