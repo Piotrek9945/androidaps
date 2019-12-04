@@ -426,7 +426,6 @@ public class FoodFragment extends Fragment {
             holder.energy.setText(MainApp.gs(R.string.shortenergy) + ": " + food.energy + "kcal");
             if (food.energy == 0)
                 holder.energy.setVisibility(View.INVISIBLE);
-            holder.remove.setTag(food);
             holder.addBolus.setTag(food);
         }
 
@@ -443,7 +442,6 @@ public class FoodFragment extends Fragment {
             TextView protein;
             TextView energy;
             TextView ns;
-            TextView remove;
             TextView addBolus;
 
             FoodsViewHolder(View itemView) {
@@ -455,9 +453,6 @@ public class FoodFragment extends Fragment {
                 protein = (TextView) itemView.findViewById(R.id.food_protein);
                 energy = (TextView) itemView.findViewById(R.id.food_energy);
                 ns = (TextView) itemView.findViewById(R.id.ns_sign);
-                remove = (TextView) itemView.findViewById(R.id.food_remove);
-                remove.setOnClickListener(this);
-                remove.setPaintFlags(remove.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                 addBolus = (TextView) itemView.findViewById(R.id.food_add);
                 addBolus.setOnClickListener(this);
                 addBolus.setPaintFlags(addBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
@@ -467,10 +462,6 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 final Food food = (Food) v.getTag();
                 switch (v.getId()) {
-                    case R.id.food_remove:
-                        this.showRemoveDialog(food);
-                        break;
-
                     case R.id.food_add:
                         this.showAddFood(food);
                         break;
@@ -480,23 +471,6 @@ public class FoodFragment extends Fragment {
             private void showAddFood(Food food) {
                 FragmentManager manager = getFragmentManager();
                 new AddFoodDialog(food).show(manager, "AddFoodDialog");
-            }
-
-            public void showRemoveDialog(Food food) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                builder.setTitle(MainApp.gs(R.string.confirmation));
-                builder.setMessage(MainApp.gs(R.string.removerecord) + "\n" + food.name);
-                builder.setPositiveButton(MainApp.gs(R.string.ok), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        final String _id = food._id;
-                        if (_id != null && !_id.equals("")) {
-                            NSUpload.removeFoodFromNS(_id);
-                        }
-                        FoodPlugin.getPlugin().getService().delete(food);
-                    }
-                });
-                builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-                builder.show();
             }
 
         }
