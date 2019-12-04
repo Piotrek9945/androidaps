@@ -3,9 +3,13 @@ package info.nightscout.androidaps.plugins.treatments;
 import android.content.Intent;
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.data.DetailedBolusInfo;
+import info.nightscout.androidaps.data.MealCarb;
 import info.nightscout.androidaps.db.CareportalEvent;
 import info.nightscout.androidaps.db.Source;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
@@ -16,15 +20,36 @@ import info.nightscout.androidaps.utils.T;
 import static info.nightscout.androidaps.utils.DateUtil.now;
 
 public class CarbsGenerator {
+    public static List<MealCarb> meal = new ArrayList<>();
+
     public static void generateCarbs(int amount, long startTime, int duration, @Nullable String notes) {
         long remainingCarbs = amount;
         int ticks = (duration * 4); //duration guaranteed to be integer greater zero
+        MealCarb mealCarb = new MealCarb(startTime);
         for (int i = 0; i < ticks; i++){
             long carbTime = startTime + i * 15 * 60 * 1000;
+            mealCarb.addCarbTime(carbTime);
             int smallCarbAmount = (int) Math.round((1d * remainingCarbs) / (ticks-i));  //on last iteration (ticks-i) is 1 -> smallCarbAmount == remainingCarbs
             remainingCarbs -= smallCarbAmount;
             if (smallCarbAmount > 0)
                 createCarb(smallCarbAmount, carbTime, CareportalEvent.MEALBOLUS, notes);
+        }
+        CarbsGenerator.meal.add(mealCarb);
+        CarbsGenerator.removeFinishedMeals();
+    }
+
+    private static void removeFinishedMeals() {
+        for(MealCarb it : CarbsGenerator.meal) {
+            List<Long> carbTimes = it.getCarbTimes();
+            Long latestTime = null;
+            for (Long carbTime : carbTimes) {
+                if (latestTime == null || carbTime > latestTime) {
+                    latestTime = carbTime;
+                }
+            }
+            if (latestTime < now()) {
+                CarbsGenerator.meal.remove(it);
+            }
         }
     }
 

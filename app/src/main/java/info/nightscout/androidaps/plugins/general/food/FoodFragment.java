@@ -1,6 +1,5 @@
 package info.nightscout.androidaps.plugins.general.food;
 
-import android.content.DialogInterface;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
@@ -38,9 +37,7 @@ import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.data.Profile;
 import info.nightscout.androidaps.data.QuickWizardEntry;
-import info.nightscout.androidaps.db.BgReading;
 import info.nightscout.androidaps.db.CareportalEvent;
-import info.nightscout.androidaps.db.DatabaseHelper;
 import info.nightscout.androidaps.events.EventFoodDatabaseChanged;
 import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
@@ -51,7 +48,6 @@ import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
 import info.nightscout.androidaps.plugins.treatments.CarbsGenerator;
 import info.nightscout.androidaps.utils.BolusWizard;
-import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import info.nightscout.androidaps.utils.OKDialog;
 import info.nightscout.androidaps.utils.SafeParse;
@@ -153,7 +149,7 @@ public class FoodFragment extends Fragment {
                                 if (carb > 0) {
                                     this.addBolus(carb, eCarb);
                                 } else {
-                                    BolusWizard.Companion.addEcarbIfNeeded(eCarb);
+                                    BolusWizard.Companion.addExtCarbIfNeeded(eCarb);
                                 }
 
                                 FoodService.getFoodList().clear();
@@ -492,9 +488,7 @@ public class FoodFragment extends Fragment {
 
             if (carbsAfterConstraints > 0) {
                 if (carbsAfterConstraints > 0) {
-                    if (duration == 0) {
-                        CarbsGenerator.createCarb(carbsAfterConstraints, time, CareportalEvent.CARBCORRECTION, "");
-                    } else {
+                    if (duration > 0) {
                         CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
                         NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
                     }
