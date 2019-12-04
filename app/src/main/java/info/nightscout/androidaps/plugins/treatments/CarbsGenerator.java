@@ -31,8 +31,10 @@ public class CarbsGenerator {
             int smallCarbAmount = (int) Math.round((1d * remainingCarbs) / (ticks-i));  //on last iteration (ticks-i) is 1 -> smallCarbAmount == remainingCarbs
             remainingCarbs -= smallCarbAmount;
             if (smallCarbAmount > 0) {
-                createCarb(smallCarbAmount, carbTime, CareportalEvent.MEALBOLUS, notes);
-                mealCarb.addCarbTime(carbTime);
+                boolean success = createCarb(smallCarbAmount, carbTime, CareportalEvent.MEALBOLUS, notes);
+                if (success) {
+                    mealCarb.addCarbTime(carbTime);
+                }
             }
         }
         CarbsGenerator.meal.add(mealCarb);
@@ -50,13 +52,13 @@ public class CarbsGenerator {
                     latestTime = carbTime;
                 }
             }
-            if (latestTime < now()) {
+            if (latestTime != null && latestTime < now()) {
                 CarbsGenerator.meal.remove(it);
             }
         }
     }
 
-    public static void createCarb(int carbs, long time, String eventType, @Nullable String notes) {
+    public static boolean createCarb(int carbs, long time, String eventType, @Nullable String notes) {
         DetailedBolusInfo carbInfo = new DetailedBolusInfo();
         carbInfo.date = time;
         carbInfo.eventType = eventType;
@@ -82,6 +84,8 @@ public class CarbsGenerator {
             // Don't send to pump if it is in the future or more than 5 minutes in the past
             // as pumps might return those as as "now" when reading the history.
             TreatmentsPlugin.getPlugin().addToHistoryTreatment(carbInfo, false);
+            return true;
         }
+        return false;
     }
 }
