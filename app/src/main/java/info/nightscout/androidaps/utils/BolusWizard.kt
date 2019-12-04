@@ -21,7 +21,6 @@ import info.nightscout.androidaps.plugins.bus.RxBus
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
 import info.nightscout.androidaps.plugins.general.food.FoodFragment
-import info.nightscout.androidaps.plugins.general.food.FoodService
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
 import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
@@ -30,13 +29,11 @@ import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorP
 import info.nightscout.androidaps.plugins.treatments.Treatment
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin
 import info.nightscout.androidaps.queue.Callback
-import info.nightscout.androidaps.queue.CommandQueue
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.absoluteValue
 
 class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                             val profileName: String,
@@ -58,6 +55,8 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
 ) {
 
     private val log = LoggerFactory.getLogger(L.CORE)
+
+    var eCarbTimeToRecreate = 15L * 1000L
 
     // Intermediate
     var sens = 0.0
@@ -371,13 +370,13 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         }
 
         private fun addEcarb(eCarb : Int) {
-            var futureEcarbSum = getFutureEcarbSum()
-            deleteAllFutureEcarb()
+            var futureTreatments = getFutureEcarbList()
+            deleteFutureEcarbList(futureTreatments)
+            var futureEcarbSum = getFutureEcarbSum(futureTreatments)
             addEcarbNow(futureEcarbSum + eCarb)
         }
 
-        private fun deleteAllFutureEcarb() {
-            var futureTreatments = getFutureEcarbList()
+        private fun deleteFutureEcarbList(futureTreatments : List<Treatment>) {
             for (treatment in futureTreatments) {
                 val _id = treatment._id
                 if (NSUpload.isIdValid(_id)) {
@@ -400,10 +399,9 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             }
         }
 
-        private fun getFutureEcarbSum() : Int {
-            var futureEcarbList = getFutureEcarbList()
+        private fun getFutureEcarbSum(futureTreatments : List<Treatment>) : Int {
             var futureEcarb = 0.0
-            futureEcarbList.forEach {
+            futureTreatments.forEach {
                 futureEcarb += it.carbs
             }
             return futureEcarb.toInt()
