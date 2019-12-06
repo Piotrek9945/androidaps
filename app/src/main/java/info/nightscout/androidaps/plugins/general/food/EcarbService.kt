@@ -12,12 +12,10 @@ import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue
 import info.nightscout.androidaps.plugins.treatments.CarbsGenerator
 import info.nightscout.androidaps.plugins.treatments.Treatment
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin
-import info.nightscout.androidaps.utils.SafeParse
-
 import info.nightscout.androidaps.utils.DateUtil.now
+import info.nightscout.androidaps.utils.SafeParse
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.ceil
 import kotlin.math.floor
 
 class EcarbService {
@@ -188,7 +186,7 @@ class EcarbService {
         }
 
         private fun getWBT(eCarbs: Int): Int {
-            return ceil(eCarbs.toDouble() / 10.0).toInt()
+            return floor(eCarbs.toDouble() / 10.0).toInt()
         }
 
     }
