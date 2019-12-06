@@ -24,6 +24,7 @@ class EcarbService {
     companion object {
 
         private var CREATED_IN_LAST_MILLIS = 15 * 60 * 1000L
+        private var ECARB_TIME_OFFSET_MINS = 15
 
         fun calculateEcarbs(foodList: List<Food>): Int {
             var eCarbs = 0
@@ -169,12 +170,11 @@ class EcarbService {
             val duration = getDuration(eCarbs)
             val eCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarbs)).value()
 
-            val timeOffset = 0
-            val time = now() + timeOffset * 1000 * 60
+            val time = now() + ECARB_TIME_OFFSET_MINS * 1000 * 60
 
             if (eCarbsAfterConstraints > 0) {
                 CarbsGenerator.generateCarbs(eCarbsAfterConstraints!!, time, duration, "")
-                NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, duration, timeOffset))
+                NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, duration, ECARB_TIME_OFFSET_MINS))
             }
         }
 
