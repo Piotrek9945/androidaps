@@ -22,8 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.base.Joiner;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,27 +33,18 @@ import java.util.Set;
 
 import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
-import info.nightscout.androidaps.data.Profile;
-import info.nightscout.androidaps.data.QuickWizardEntry;
-import info.nightscout.androidaps.db.CareportalEvent;
 import info.nightscout.androidaps.events.EventFoodDatabaseChanged;
-import info.nightscout.androidaps.interfaces.Constraint;
-import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.bus.RxBus;
-import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
-import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
-import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
-import info.nightscout.androidaps.plugins.treatments.CarbsGenerator;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.FabricPrivacy;
-import info.nightscout.androidaps.utils.OKDialog;
-import info.nightscout.androidaps.utils.SafeParse;
 import info.nightscout.androidaps.utils.SpinnerHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static info.nightscout.androidaps.utils.DateUtil.now;
+import static info.nightscout.androidaps.plugins.general.food.CarbService.calculateCarb;
+import static info.nightscout.androidaps.plugins.general.food.ExtCarbBolusService.generateExtCarbBolus;
+import static info.nightscout.androidaps.plugins.general.food.ExtCarbService.calculateExtCarb;
 
 /**
  * Created by mike on 16.10.2017.
@@ -93,7 +82,7 @@ public class FoodFragment extends Fragment {
         category = new SpinnerHelper(view.findViewById(R.id.food_category));
         subcategory = new SpinnerHelper(view.findViewById(R.id.food_subcategory));
         foodCountAdded = view.findViewById(R.id.food_count_added);
-        foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+        foodCountAdded.setText(String.valueOf(FoodService.getFoodList().size()));
         clearList = view.findViewById(R.id.clear_list);
         clearList.setPaintFlags(clearList.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         clearList.setOnClickListener(new View.OnClickListener() {
@@ -101,14 +90,13 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.clear_list:
-                        if (FoodService.getFoodListSize() > 0) {
+                        if (FoodService.getFoodList().size() > 0) {
                             final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                             builder.setTitle("Potwierdzenie");
                             builder.setMessage("Czy chcesz opróżnić listę?");
                             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                                 synchronized (builder) {
-                                    FoodService.getFoodList().clear();
-                                    foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                                    FoodService.clearFoodCountAdded();
                                 }
                             });
                             builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
@@ -134,7 +122,7 @@ public class FoodFragment extends Fragment {
                             String text = "";
                             text = text.concat(food.name);
                             text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
-                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + this.calculateEcarb(food) + "</font>");
+                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + calculateExtCarb(food) + "</font>");
                             text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
                             actions.add(text);
                         }
@@ -143,17 +131,7 @@ public class FoodFragment extends Fragment {
                         builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
-                                int extCarb = this.calculateEcarb(foodList);
-                                int carb = getCarb(foodList);
-
-                                if (carb > 0) {
-                                    this.addBolus(carb, extCarb);
-                                } else {
-                                    BolusWizard.Companion.addExtCarbIfNeeded(extCarb);
-                                }
-
-                                FoodService.getFoodList().clear();
-                                foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
+                                ExtCarbBolusService.generateExtCarbBolus(getContext(), foodList);
                             }
                         });
                         builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
@@ -163,81 +141,6 @@ public class FoodFragment extends Fragment {
                 }
             }
 
-
-            private int calculateEcarb(List<Food> foodList) {
-                int eCarb = 0;
-                for (Food food : foodList) {
-                    eCarb += calculateEcarb(food);
-                }
-                return eCarb;
-            }
-
-            private int calculateEcarb(Food food) {
-                final int kcalPerOneCarb = 4;
-                final int kcalPerOneFat = 9;
-                final int kcalPerOneProtein = 4;
-
-                Double eCarb;
-                if (food.energy > 0) {
-                    eCarb = SafeParse.stringToDouble(
-                            String.valueOf(
-                                    (food.energy - kcalPerOneCarb * food.carbs) / 10
-                            )
-                    );
-                } else {
-                    eCarb = SafeParse.stringToDouble(
-                            String.valueOf(
-                                    (food.fat * kcalPerOneFat + food.protein * kcalPerOneProtein) / 10
-                            )
-                    );
-                }
-
-                return (int) Math.floor(eCarb * food.portionCount);
-            }
-
-            private int getCarb(List<Food> foodList) {
-                int carbs = 0;
-                for (Food food : foodList) {
-                    carbs += food.carbs * food.portionCount;
-                }
-                return carbs;
-            }
-
-            private void addBolus(int carbs, int eCarb) {
-                try {
-                    BolusWizard wizard = onClickQuickwizard(carbs);
-                    wizard.confirmAndExecute(getContext(), eCarb);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            public BolusWizard onClickQuickwizard(Integer carbs) throws JSONException {
-                final Profile profile = ProfileFunctions.getInstance().getProfile();
-                final String profileName = ProfileFunctions.getInstance().getProfileName();
-                final PumpInterface pump = ConfigBuilderPlugin.getPlugin().getActivePump();
-
-                JSONObject input = new JSONObject("{\"buttonText\":\"\",\"carbs\":" + carbs + ",\"validFrom\":0,\"validTo\":86340, \"useBG\":1, \"useBolusIOB\":1, \"useBasalIOB\":1}");
-                final QuickWizardEntry quickWizardEntry = new QuickWizardEntry(input, -1);
-                if (quickWizardEntry != null && profile != null && pump != null) {
-                    final BolusWizard wizard = quickWizardEntry.doCalc(profile, profileName, null, true);
-
-                    if (wizard.getCalculatedTotalInsulin() > 0d && quickWizardEntry.carbs() > 0d) {
-                        Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(quickWizardEntry.carbs())).value();
-
-                        if (Math.abs(wizard.getInsulinAfterConstraints() - wizard.getCalculatedTotalInsulin()) >= pump.getPumpDescription().pumpType.determineCorrectBolusStepSize(wizard.getInsulinAfterConstraints()) || !carbsAfterConstraints.equals(quickWizardEntry.carbs())) {
-                            OKDialog.show(getContext(), MainApp.gs(R.string.treatmentdeliveryerror), MainApp.gs(R.string.constraints_violation) + "\n" + MainApp.gs(R.string.changeyourinput), null);
-                            return wizard;
-                        }
-
-                        return wizard;
-                    } else {
-                        return null;
-                    }
-                } else {
-                    return null;
-                }
-            }
         });
         recyclerView = (RecyclerView) view.findViewById(R.id.food_recyclerview);
         recyclerView.setHasFixedSize(true);

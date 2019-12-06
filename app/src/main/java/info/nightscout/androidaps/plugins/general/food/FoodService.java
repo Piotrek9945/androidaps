@@ -39,6 +39,8 @@ import info.nightscout.androidaps.utils.FabricPrivacy;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
+import static info.nightscout.androidaps.plugins.general.food.FoodFragment.foodCountAdded;
+
 /**
  * Created by mike on 24.09.2017.
  */
@@ -66,10 +68,16 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
         }
     }
 
-    public static Integer getFoodListSize() {
-        return FoodService.foodList.size();
+    static List<Food> getFoodList() { return FoodService.foodList; }
+
+    public static void clearFoodCountAdded() {
+        foodList.clear();
+        updateFoodCountAdded();
     }
-    public static List<Food> getFoodList() { return FoodService.foodList; }
+
+    public static void updateFoodCountAdded() {
+        FoodFragment.foodCountAdded.setText(String.valueOf(getFoodList().size()));
+    }
 
     public FoodService() {
         onCreate();
