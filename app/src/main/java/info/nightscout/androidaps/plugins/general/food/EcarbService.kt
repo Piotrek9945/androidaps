@@ -180,7 +180,7 @@ class EcarbService {
 
         private fun getDuration(eCarbs: Int): Int {
             val wbt = getWBT(eCarbs)
-            return if (wbt > 4) {
+            return if (wbt > 6) {
                 8
             } else {
                 wbt + 2
