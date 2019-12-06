@@ -9,11 +9,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -22,14 +20,10 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 
-import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
-import info.nightscout.androidaps.plugins.general.food.FoodFragment;
-import info.nightscout.androidaps.plugins.general.food.FoodPlugin;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
-import info.nightscout.androidaps.utils.SP;
 
 public class AddFoodDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodDialog.class);
@@ -40,7 +34,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private TextView summary;
 
     //one shot guards
-    private boolean accepted;
     private boolean okClicked;
 
     public AddFoodDialog(Food food) {
@@ -120,18 +113,30 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
         okClicked = true;
         try {
-            double count = editCount.getValue().doubleValue();
-            if (count > 0) {
-                Food foodCopy = SerializationUtils.clone(food);
-                foodCopy.portionCount *= count;
-                FoodService.addFoodToList(foodCopy);
-                FoodFragment.foodCountAdded.setText(String.valueOf(FoodService.getFoodListSize()));
-            }
-
+            addFood(editCount);
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
         }
+    }
+
+    private void addFood(NumberPicker editCount) {
+        double count = editCount.getValue().doubleValue();
+        if (count > 0) {
+            Food foodCopy = cloneFood();
+            multiplyCountByPortions(foodCopy, count);
+            FoodService.addFoodToList(foodCopy);
+            FoodService.updateFoodCountAdded();
+        }
+    }
+
+    private Food cloneFood() {
+        return SerializationUtils.clone(food);
+    }
+
+    private Food multiplyCountByPortions(Food food, double count) {
+        food.portionCount *= count;
+        return food;
     }
 
     @Override
