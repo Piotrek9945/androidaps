@@ -23,7 +23,7 @@ import kotlin.math.floor
 class EcarbService {
     companion object {
 
-        private var CREATED_IN_LAST_MILLIS = 1 * 1000 * 1000L
+        private var CREATED_IN_LAST_MILLIS = 1 * 60 * 1000L
 
         fun calculateEcarbs(foodList: List<Food>): Int {
             var eCarbs = 0
