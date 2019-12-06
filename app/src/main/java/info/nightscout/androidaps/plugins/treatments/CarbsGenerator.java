@@ -13,6 +13,7 @@ import info.nightscout.androidaps.data.MealCarb;
 import info.nightscout.androidaps.db.CareportalEvent;
 import info.nightscout.androidaps.db.Source;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
+import info.nightscout.androidaps.plugins.general.food.EcarbService;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity;
 import info.nightscout.androidaps.queue.Callback;
 import info.nightscout.androidaps.utils.T;
@@ -25,7 +26,7 @@ public class CarbsGenerator {
     public static void generateCarbs(int amount, long startTime, int duration, @Nullable String notes) {
         long remainingCarbs = amount;
         int ticks = (duration * 4); //duration guaranteed to be integer greater zero
-        MealCarb mealCarb = new MealCarb(startTime);
+        MealCarb mealCarb = new MealCarb(startTime - EcarbService.Companion.getECARB_TIME_OFFSET_MINS() * 1000 * 60);
         for (int i = 0; i < ticks; i++){
             long carbTime = startTime + i * 15 * 60 * 1000;
             int smallCarbAmount = (int) Math.round((1d * remainingCarbs) / (ticks-i));  //on last iteration (ticks-i) is 1 -> smallCarbAmount == remainingCarbs

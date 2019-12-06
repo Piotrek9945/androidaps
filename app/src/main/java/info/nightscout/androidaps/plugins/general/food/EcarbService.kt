@@ -24,7 +24,7 @@ class EcarbService {
     companion object {
 
         private var RECENTLY_CREATED_MILLIS = 3 * 60 * 1000L
-        private var ECARB_TIME_OFFSET_MINS = 5
+        @JvmStatic val ECARB_TIME_OFFSET_MINS = 5
 
         fun calculateEcarbs(foodList: List<Food>): Int {
             var eCarbs = 0
@@ -60,15 +60,15 @@ class EcarbService {
         }
         
         private fun getCountAndRemoveNotAbsorbedEcarbsFromLastMeals() : Int {
-            var futureTreatments = getNotAbsorbedEcarbsFromLastMeals(RECENTLY_CREATED_MILLIS)
+            var futureTreatments = getNotAbsorbedEcarbsFromLastMeals()
             var oldEcarbs = getCarbCount(futureTreatments)
             removeFutureTreatmentsAndMeals(futureTreatments)
             return oldEcarbs
         }
 
-        private fun getNotAbsorbedEcarbsFromLastMeals(mealsCreatedInLastMillis : Long) : List<Treatment> {
+        private fun getNotAbsorbedEcarbsFromLastMeals() : List<Treatment> {
             var treatments = getAllFutureTreatments()
-            var meals = getRecentlyCreatedMeals(mealsCreatedInLastMillis)
+            var meals = getRecentlyCreatedMeals()
             var times = getNotAbsorbedCarbTimes(meals)
 
             return if (treatments.isEmpty() || times.isEmpty()) {
@@ -80,7 +80,7 @@ class EcarbService {
 
         private fun removeFutureTreatmentsAndMeals(futureTreatments: List<Treatment>) {
             deleteFutureTreatments(futureTreatments)
-            deleteMeals(getRecentlyCreatedMeals(RECENTLY_CREATED_MILLIS))
+            deleteMeals(getRecentlyCreatedMeals())
         }
 
         private fun getAllFutureTreatments() : List<Treatment> {
@@ -104,10 +104,10 @@ class EcarbService {
             }
         }
 
-        private fun getRecentlyCreatedMeals(createdInLastTime : Long) : List<MealCarb> {
+        private fun getRecentlyCreatedMeals() : List<MealCarb> {
             var meals = arrayListOf<MealCarb>()
             CarbsGenerator.getMeals().forEach { mealItem ->
-                if (mealItem.date + createdInLastTime > now()) {
+                if (mealItem.date + RECENTLY_CREATED_MILLIS > now()) {
                     meals.add(mealItem)
                 }
             }
