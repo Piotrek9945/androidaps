@@ -117,7 +117,7 @@ public class FoodFragment extends Fragment {
                             String text = "";
                             text = text.concat(food.name);
                             text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
-                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + ExtCarbService.Companion.calculateEcarbs(food) + "</font>");
+                            text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + EcarbService.Companion.calculateEcarbs(food) + "</font>");
                             text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
                             actions.add(text);
                         }
@@ -126,7 +126,7 @@ public class FoodFragment extends Fragment {
                         builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
-                                ExtCarbBolusService.generateTreatment(getContext(), foodList);
+                                EcarbBolusService.generateTreatment(getContext(), foodList);
                             }
                         });
                         builder.setNegativeButton(MainApp.gs(R.string.cancel), null);

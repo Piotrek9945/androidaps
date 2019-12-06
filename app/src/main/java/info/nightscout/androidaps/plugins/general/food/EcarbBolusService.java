@@ -20,18 +20,18 @@ import info.nightscout.androidaps.utils.OKDialog;
 
 import static info.nightscout.androidaps.plugins.general.food.CarbService.calculateCarb;
 
-public class ExtCarbBolusService {
+public class EcarbBolusService {
 
-    public ExtCarbBolusService() {}
+    public EcarbBolusService() {}
 
     public static void generateTreatment(Context context, List<Food> foodList) {
-        int extCarbs = ExtCarbService.Companion.calculateEcarbs(foodList);
+        int eCarbs = EcarbService.Companion.calculateEcarbs(foodList);
         int carbs = calculateCarb(foodList);
 
         if (carbs > 0) {
-            generateEcarbAndBolus(context, carbs, extCarbs);
+            generateEcarbAndBolus(context, carbs, eCarbs);
         } else {
-            ExtCarbService.Companion.generateEcarbs(extCarbs);
+            EcarbService.Companion.generateEcarbs(eCarbs);
         }
 
         FoodService.clearFoodCountAdded();

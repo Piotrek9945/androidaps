@@ -20,7 +20,7 @@ import info.nightscout.androidaps.plugins.aps.loop.LoopPlugin
 import info.nightscout.androidaps.plugins.bus.RxBus
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
-import info.nightscout.androidaps.plugins.general.food.ExtCarbService
+import info.nightscout.androidaps.plugins.general.food.EcarbService
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin
@@ -343,7 +343,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
-                                        ExtCarbService.generateEcarbs(eCarbs)
+                                        EcarbService.generateEcarbs(eCarbs)
                                     }
                                 }
                             })

@@ -2,6 +2,7 @@ package info.nightscout.androidaps.plugins.general.food
 
 import info.nightscout.androidaps.MainApp
 import info.nightscout.androidaps.R
+import info.nightscout.androidaps.data.MealCarb
 import info.nightscout.androidaps.db.CareportalEvent
 import info.nightscout.androidaps.db.Source
 import info.nightscout.androidaps.interfaces.Constraint
@@ -19,7 +20,7 @@ import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.floor
 
-class ExtCarbService {
+class EcarbService {
     companion object {
 
         private var CREATED_IN_LAST_MILLIS = 1 * 1000 * 1000L
@@ -50,23 +51,35 @@ class ExtCarbService {
             return floor(eCarbs * food.portionCount).toInt()
         }
 
-        fun generateEcarbs(newCarbs : Int) {
-            if (newCarbs > 0) {
-                var futureTreatments = getFutureTreatmentsFromLastMeals(CREATED_IN_LAST_MILLIS)
-                deleteFutureTreatments(futureTreatments)
-                var oldCarbs = getCarbCount(futureTreatments)
-                generateExtCarbWrapped(oldCarbs + newCarbs)
+        fun generateEcarbs(newEcarbs : Int) {
+            if (newEcarbs > 0) {
+                var oldEcarbs = getCountAndRemoveNotAbsorbedEcarbsFromLastMeals()
+                generateEcarbWrapped(oldEcarbs + newEcarbs)
             }
         }
+        
+        private fun getCountAndRemoveNotAbsorbedEcarbsFromLastMeals() : Int {
+            var futureTreatments = getNotAbsorbedEcarbsFromLastMeals(CREATED_IN_LAST_MILLIS)
+            var oldEcarbs = getCarbCount(futureTreatments)
+            removeFutureTreatmentsAndMeals(futureTreatments)
+            return oldEcarbs
+        }
 
-        private fun getFutureTreatmentsFromLastMeals(mealsCreatedInLastMillis : Long) : List<Treatment> {
+        private fun getNotAbsorbedEcarbsFromLastMeals(mealsCreatedInLastMillis : Long) : List<Treatment> {
             var treatments = getAllFutureTreatments()
-            var times = getCarbTimesFromLastMeals(mealsCreatedInLastMillis)
+            var meals = getRecentlyCreatedMeals(mealsCreatedInLastMillis)
+            var times = getNotAbsorbedCarbTimes(meals)
+
             return if (treatments.isEmpty() || times.isEmpty()) {
                 return emptyList()
             } else {
                 times.map { getTreatmentFromCarbTime(it, treatments) }
             }
+        }
+
+        private fun removeFutureTreatmentsAndMeals(futureTreatments: List<Treatment>) {
+            deleteFutureTreatments(futureTreatments)
+            deleteMeals(getRecentlyCreatedMeals(CREATED_IN_LAST_MILLIS))
         }
 
         private fun getAllFutureTreatments() : List<Treatment> {
@@ -90,14 +103,28 @@ class ExtCarbService {
             }
         }
 
-        private fun getCarbTimesFromLastMeals(createdInLastTime : Long) : List<Long> {
-            var carbTimes = arrayListOf<Long>()
+        private fun getRecentlyCreatedMeals(createdInLastTime : Long) : List<MealCarb> {
+            var meals = arrayListOf<MealCarb>()
             CarbsGenerator.getMeals().forEach { mealItem ->
                 if (mealItem.date + createdInLastTime > now()) {
-                    mealItem.carbTimes.forEach {
-                        if (it > now()) {
-                            carbTimes.add(it)
-                        }
+                    meals.add(mealItem)
+                }
+            }
+            return meals
+        }
+        
+        private fun deleteMeals(meals : List<MealCarb>) {
+            meals.forEach {
+                CarbsGenerator.getMeals().remove(it)
+            }
+        }
+
+        private fun getNotAbsorbedCarbTimes(meals : List<MealCarb>) : List<Long> {
+            var carbTimes = arrayListOf<Long>()
+            meals.forEach { meal: MealCarb ->
+                meal.carbTimes.forEach { time ->
+                    if (time > now()) {
+                        carbTimes.add(time)
                     }
                 }
             }
@@ -132,22 +159,22 @@ class ExtCarbService {
             }
         }
 
-        private fun generateExtCarbWrapped(eCarbs: Int) {
+        private fun generateEcarbWrapped(eCarbs: Int) {
             ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-            generateExtCarbNow(eCarbs)
+            generateEcarbNow(eCarbs)
             ConfigBuilderPlugin.getPlugin().commandQueue.eCarbs = 0
         }
 
-        private fun generateExtCarbNow(eCarbs: Int) {
+        private fun generateEcarbNow(eCarbs: Int) {
             val duration = getDuration(eCarbs)
-            val extCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarbs)).value()
+            val eCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarbs)).value()
 
             val timeOffset = 0
             val time = now() + timeOffset * 1000 * 60
 
-            if (extCarbsAfterConstraints > 0) {
-                CarbsGenerator.generateCarbs(extCarbsAfterConstraints!!, time, duration, "")
-                NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, extCarbsAfterConstraints, duration, timeOffset))
+            if (eCarbsAfterConstraints > 0) {
+                CarbsGenerator.generateCarbs(eCarbsAfterConstraints!!, time, duration, "")
+                NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, duration, timeOffset))
             }
         }
 
