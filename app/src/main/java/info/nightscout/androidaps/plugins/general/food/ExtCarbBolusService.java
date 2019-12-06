@@ -25,22 +25,22 @@ public class ExtCarbBolusService {
     public ExtCarbBolusService() {}
 
     public static void generateTreatment(Context context, List<Food> foodList) {
-        int extCarb = ExtCarbService.Companion.calculateExtCarb(foodList);
-        int carb = calculateCarb(foodList);
+        int extCarbs = ExtCarbService.Companion.calculateEcarbs(foodList);
+        int carbs = calculateCarb(foodList);
 
-        if (carb > 0) {
-            generateExtCarbAndBolus(context, carb, extCarb);
+        if (carbs > 0) {
+            generateEcarbAndBolus(context, carbs, extCarbs);
         } else {
-            ExtCarbService.Companion.generateExtCarb(extCarb);
+            ExtCarbService.Companion.generateEcarbs(extCarbs);
         }
 
         FoodService.clearFoodCountAdded();
     }
 
-    public static void generateExtCarbAndBolus(Context context, int carbs, int eCarb) {
+    public static void generateEcarbAndBolus(Context context, int carbs, int eCarbs) {
         try {
             BolusWizard wizard = onClickQuickwizard(context, carbs);
-            wizard.confirmAndExecute(context, eCarb);
+            wizard.confirmAndExecute(context, eCarbs);
         } catch (JSONException e) {
             e.printStackTrace();
         }

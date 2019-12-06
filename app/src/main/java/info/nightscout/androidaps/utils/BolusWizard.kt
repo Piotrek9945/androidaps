@@ -264,8 +264,8 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         return confirmMessage
     }
 
-    fun confirmAndExecute(context: Context, eCarb: Int) {
-        ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = eCarb
+    fun confirmAndExecute(context: Context, eCarbs: Int) {
+        ConfigBuilderPlugin.getPlugin().commandQueue.eCarbs = eCarbs
         val profile = ProfileFunctions.getInstance().profile ?: return
         val pump = ConfigBuilderPlugin.getPlugin().activePump ?: return
 
@@ -343,7 +343,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
-                                        ExtCarbService.generateExtCarb(eCarb)
+                                        ExtCarbService.generateEcarbs(eCarbs)
                                     }
                                 }
                             })

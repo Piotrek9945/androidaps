@@ -24,20 +24,20 @@ class ExtCarbService {
 
         private var CREATED_IN_LAST_MILLIS = 1 * 1000 * 1000L
 
-        fun calculateExtCarb(foodList: List<Food>): Int {
-            var eCarb = 0
+        fun calculateEcarbs(foodList: List<Food>): Int {
+            var eCarbs = 0
             for (food in foodList) {
-                eCarb += calculateExtCarb(food)
+                eCarbs += calculateEcarbs(food)
             }
-            return eCarb
+            return eCarbs
         }
 
-        fun calculateExtCarb(food: Food): Int {
+        fun calculateEcarbs(food: Food): Int {
             val kcalPerOneCarb = 4
             val kcalPerOneFat = 9
             val kcalPerOneProtein = 4
 
-            val eCarb = if (food.energy > 0) {
+            val eCarbs = if (food.energy > 0) {
                 SafeParse.stringToDouble(
                         ((food.energy - kcalPerOneCarb * food.carbs) / 10).toString()
                 )
@@ -47,15 +47,15 @@ class ExtCarbService {
                 )
             }
 
-            return floor(eCarb * food.portionCount).toInt()
+            return floor(eCarbs * food.portionCount).toInt()
         }
 
-        fun generateExtCarb(newCarb : Int) {
-            if (newCarb > 0) {
+        fun generateEcarbs(newCarbs : Int) {
+            if (newCarbs > 0) {
                 var futureTreatments = getFutureTreatmentsFromLastMeals(CREATED_IN_LAST_MILLIS)
                 deleteFutureTreatments(futureTreatments)
-                var carbCount = getCarbCount(futureTreatments)
-                generateExtCarbWrapped(carbCount + newCarb)
+                var oldCarbs = getCarbCount(futureTreatments)
+                generateExtCarbWrapped(oldCarbs + newCarbs)
             }
         }
 
@@ -113,11 +113,11 @@ class ExtCarbService {
         }
 
         private fun getTreatmentCarbCount(futureTreatments : List<Treatment>) : Int {
-            var eCarb = 0.0
+            var eCarbs = 0.0
             futureTreatments.forEach {
-                eCarb += it.carbs
+                eCarbs += it.carbs
             }
-            return eCarb.toInt()
+            return eCarbs.toInt()
         }
 
         private fun deleteFutureTreatments(futureTreatments : List<Treatment>) {
@@ -132,15 +132,15 @@ class ExtCarbService {
             }
         }
 
-        private fun generateExtCarbWrapped(eCarb: Int) {
+        private fun generateExtCarbWrapped(eCarbs: Int) {
             ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-            generateExtCarbNow(eCarb)
-            ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
+            generateExtCarbNow(eCarbs)
+            ConfigBuilderPlugin.getPlugin().commandQueue.eCarbs = 0
         }
 
-        private fun generateExtCarbNow(eCarb: Int) {
-            val duration = getDuration(eCarb)
-            val extCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarb)).value()
+        private fun generateExtCarbNow(eCarbs: Int) {
+            val duration = getDuration(eCarbs)
+            val extCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarbs)).value()
 
             val timeOffset = 0
             val time = now() + timeOffset * 1000 * 60
@@ -151,8 +151,8 @@ class ExtCarbService {
             }
         }
 
-        private fun getDuration(extCarb: Int): Int {
-            val wbt = getWBT(extCarb)
+        private fun getDuration(eCarbs: Int): Int {
+            val wbt = getWBT(eCarbs)
             return if (wbt > 4) {
                 8
             } else {
@@ -160,8 +160,8 @@ class ExtCarbService {
             }
         }
 
-        private fun getWBT(eCarb: Int): Int {
-            return ceil(eCarb.toDouble() / 10.0).toInt()
+        private fun getWBT(eCarbs: Int): Int {
+            return ceil(eCarbs.toDouble() / 10.0).toInt()
         }
 
     }
