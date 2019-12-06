@@ -23,8 +23,8 @@ import kotlin.math.floor
 class EcarbService {
     companion object {
 
-        private var RECENTLY_CREATED_MILLIS = 3 * 60 * 1000L
-        @JvmStatic val ECARB_TIME_OFFSET_MINS = 5
+        private var RECENTLY_CREATED_MILLIS = 15 * 60 * 1000L
+        @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
         fun calculateEcarbs(foodList: List<Food>): Int {
             var eCarbs = 0
