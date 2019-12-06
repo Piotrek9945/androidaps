@@ -21,6 +21,7 @@ import kotlin.math.floor
 class EcarbService {
     companion object {
 
+        private var ECARB_SAFETY_COEFFICIENT = 0.7
         private var RECENTLY_CREATED_MILLIS = 15 * 60 * 1000L
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
@@ -47,7 +48,7 @@ class EcarbService {
                 )
             }
 
-            return floor(eCarbs * food.portionCount).toInt()
+            return floor(eCarbs * food.portionCount * ECARB_SAFETY_COEFFICIENT).toInt()
         }
 
         fun generateEcarbs(newEcarbs : Int) {
