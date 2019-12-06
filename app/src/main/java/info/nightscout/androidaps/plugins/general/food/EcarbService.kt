@@ -23,8 +23,8 @@ import kotlin.math.floor
 class EcarbService {
     companion object {
 
-        private var CREATED_IN_LAST_MILLIS = 15 * 60 * 1000L
-        private var ECARB_TIME_OFFSET_MINS = 15
+        private var RECENTLY_CREATED_MILLIS = 3 * 60 * 1000L
+        private var ECARB_TIME_OFFSET_MINS = 5
 
         fun calculateEcarbs(foodList: List<Food>): Int {
             var eCarbs = 0
@@ -60,7 +60,7 @@ class EcarbService {
         }
         
         private fun getCountAndRemoveNotAbsorbedEcarbsFromLastMeals() : Int {
-            var futureTreatments = getNotAbsorbedEcarbsFromLastMeals(CREATED_IN_LAST_MILLIS)
+            var futureTreatments = getNotAbsorbedEcarbsFromLastMeals(RECENTLY_CREATED_MILLIS)
             var oldEcarbs = getCarbCount(futureTreatments)
             removeFutureTreatmentsAndMeals(futureTreatments)
             return oldEcarbs
@@ -80,7 +80,7 @@ class EcarbService {
 
         private fun removeFutureTreatmentsAndMeals(futureTreatments: List<Treatment>) {
             deleteFutureTreatments(futureTreatments)
-            deleteMeals(getRecentlyCreatedMeals(CREATED_IN_LAST_MILLIS))
+            deleteMeals(getRecentlyCreatedMeals(RECENTLY_CREATED_MILLIS))
         }
 
         private fun getAllFutureTreatments() : List<Treatment> {
