@@ -20,7 +20,7 @@ import info.nightscout.androidaps.plugins.aps.loop.LoopPlugin
 import info.nightscout.androidaps.plugins.bus.RxBus
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
-import info.nightscout.androidaps.plugins.general.food.FoodFragment
+import info.nightscout.androidaps.plugins.general.food.ExtCarbService
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
 import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
@@ -458,7 +458,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
 
         private fun addExtCarbNow(eCarb : Int) {
             ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-            FoodFragment.addEcarbs(eCarb)
+            ExtCarbService.generateExtCarbs(eCarb)
             ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
         }
     }

@@ -143,13 +143,13 @@ public class FoodFragment extends Fragment {
                         builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
-                                int eCarb = this.calculateEcarb(foodList);
+                                int extCarb = this.calculateEcarb(foodList);
                                 int carb = getCarb(foodList);
 
                                 if (carb > 0) {
-                                    this.addBolus(carb, eCarb);
+                                    this.addBolus(carb, extCarb);
                                 } else {
-                                    BolusWizard.Companion.addExtCarbIfNeeded(eCarb);
+                                    BolusWizard.Companion.addExtCarbIfNeeded(extCarb);
                                 }
 
                                 FoodService.getFoodList().clear();
@@ -469,31 +469,6 @@ public class FoodFragment extends Fragment {
                 new AddFoodDialog(food).show(manager, "AddFoodDialog");
             }
 
-        }
-    }
-
-    public static void addEcarbs(Integer eCarb) {
-        if (eCarb != 0 && eCarb != null) {
-            int wbt = (int) Math.ceil((double) eCarb / 10d);
-            Integer duration;
-            if (wbt > 4) {
-                duration = 8;
-            } else {
-                duration = wbt + 2;
-            }
-            Integer carbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(new Constraint<>(eCarb)).value();
-
-            int timeOffset = 0;
-            final long time = now() + timeOffset * 1000 * 60;
-
-            if (carbsAfterConstraints > 0) {
-                if (carbsAfterConstraints > 0) {
-                    if (duration > 0) {
-                        CarbsGenerator.generateCarbs(carbsAfterConstraints, time, duration, "");
-                        NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, carbsAfterConstraints, duration, timeOffset));
-                    }
-                }
-            }
         }
     }
 
