@@ -408,7 +408,6 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                             carbTimes.add(it)
                         }
                     }
-                    carbTimes.addAll(mealItem.carbTimes)
                 }
             }
             return carbTimes
