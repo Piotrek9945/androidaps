@@ -251,7 +251,7 @@ public class TreatmentsBolusFragment extends Fragment implements View.OnClickLis
                         }
                         TreatmentsPlugin.getPlugin().getService().delete(treatment);
                     }
-                    CarbsGenerator.meal.clear();
+                    CarbsGenerator.removeMealsAbsorbedCompletely();
                     updateGui();
                 });
                 builder.setNegativeButton(MainApp.gs(R.string.cancel), null);

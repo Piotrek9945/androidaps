@@ -20,7 +20,7 @@ import info.nightscout.androidaps.utils.T;
 import static info.nightscout.androidaps.utils.DateUtil.now;
 
 public class CarbsGenerator {
-    public static List<MealCarb> meal = new ArrayList<>();
+    private static List<MealCarb> meals = new ArrayList<>();
 
     public static void generateCarbs(int amount, long startTime, int duration, @Nullable String notes) {
         long remainingCarbs = amount;
@@ -37,26 +37,37 @@ public class CarbsGenerator {
                 }
             }
         }
-        CarbsGenerator.meal.add(mealCarb);
-
-        CarbsGenerator.removeFinishedMeals();
+        CarbsGenerator.meals.add(mealCarb);
     }
 
-    public static void removeFinishedMeals() {
-        for(MealCarb it : CarbsGenerator.meal) {
+    public static List<MealCarb> getMeals() {
+        removeMealsAbsorbedCompletely();
+        return meals;
+    }
+
+    /**
+     * remove meals which all eCarbs are absorbed yet
+     */
+    public static void removeMealsAbsorbedCompletely() {
+        for(MealCarb it : CarbsGenerator.meals) {
             List<Long> carbTimes = it.getCarbTimes();
-            Long latestTime = null;
-            for (Long carbTime : carbTimes) {
-                if (latestTime == null) {
-                    latestTime = carbTime;
-                } else if (carbTime > latestTime) {
-                    latestTime = carbTime;
-                }
-            }
+            Long latestTime = getLatestTime(carbTimes);
             if (latestTime != null && latestTime < now()) {
-                CarbsGenerator.meal.remove(it);
+                CarbsGenerator.meals.remove(it);
             }
         }
+    }
+
+    private static Long getLatestTime(List<Long> carbTimes) {
+        Long latestTime = null;
+        for (Long carbTime : carbTimes) {
+            if (latestTime == null) {
+                latestTime = carbTime;
+            } else if (carbTime > latestTime) {
+                latestTime = carbTime;
+            }
+        }
+        return  latestTime;
     }
 
     public static boolean createCarb(int carbs, long time, String eventType, @Nullable String notes) {

@@ -19,20 +19,19 @@ import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.OKDialog;
 
 import static info.nightscout.androidaps.plugins.general.food.CarbService.calculateCarb;
-import static info.nightscout.androidaps.plugins.general.food.ExtCarbService.calculateExtCarb;
 
 public class ExtCarbBolusService {
 
     public ExtCarbBolusService() {}
 
     public static void generateTreatment(Context context, List<Food> foodList) {
-        int extCarb = calculateExtCarb(foodList);
+        int extCarb = ExtCarbService.Companion.calculateExtCarb(foodList);
         int carb = calculateCarb(foodList);
 
         if (carb > 0) {
             generateExtCarbAndBolus(context, carb, extCarb);
         } else {
-            BolusWizard.Companion.generateExtCarb(extCarb);
+            ExtCarbService.Companion.generateExtCarb(extCarb);
         }
 
         FoodService.clearFoodCountAdded();

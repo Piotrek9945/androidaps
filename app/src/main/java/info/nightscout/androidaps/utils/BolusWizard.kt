@@ -21,16 +21,11 @@ import info.nightscout.androidaps.plugins.bus.RxBus
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
 import info.nightscout.androidaps.plugins.general.food.ExtCarbService
-import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
-import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin
-import info.nightscout.androidaps.plugins.treatments.CarbsGenerator
-import info.nightscout.androidaps.plugins.treatments.Treatment
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin
 import info.nightscout.androidaps.queue.Callback
-import info.nightscout.androidaps.utils.DateUtil.now
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
@@ -348,7 +343,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
-                                        generateExtCarb(eCarb)
+                                        ExtCarbService.generateExtCarb(eCarb)
                                     }
                                 }
                             })
@@ -360,99 +355,6 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             }
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null)
             builder.show()
-        }
-    }
-    companion object {
-
-        private var CREATED_IN_LAST_MILLIS = 1 * 1000 * 1000L
-
-        fun generateExtCarb(newCarb : Int) {
-            if (newCarb > 0) {
-                var futureTreatments = getFutureTreatmentsFromLastMeals(CREATED_IN_LAST_MILLIS)
-                deleteFutureTreatments(futureTreatments)
-                var carbCount = getCarbCount(futureTreatments)
-                generateExtCarbNow(carbCount + newCarb)
-            }
-        }
-
-        private fun getCarbCount(futureTreatments: List<Treatment>): Int {
-            return if (futureTreatments.isEmpty()) {
-                0
-            } else {
-                return getTreatmentCarbCount(futureTreatments)
-            }
-        }
-
-        private fun getFutureTreatmentsFromLastMeals(mealsCreatedInLastMillis : Long) : List<Treatment> {
-            var treatments = getAllFutureTreatments()
-            var times = getCarbTimesFromLastMeals(mealsCreatedInLastMillis)
-            return if (treatments.isEmpty() || times.isEmpty()) {
-                return emptyList()
-            } else {
-                times.map { getTreatmentFromCarbTime(it, treatments) }
-            }
-        }
-
-        private fun getCarbTimesFromLastMeals(createdInLastTime : Long) : List<Long> {
-            CarbsGenerator.removeFinishedMeals()
-            var carbTimes = arrayListOf<Long>()
-            CarbsGenerator.meal.forEach { mealItem ->
-                if (mealItem.date + createdInLastTime > now()) {
-                    mealItem.carbTimes.forEach {
-                        if (it > now()) {
-                            carbTimes.add(it)
-                        }
-                    }
-                }
-            }
-            return carbTimes
-        }
-
-        private fun getTreatmentFromCarbTime(date : Long, treatments: List<Treatment>) : Treatment {
-            return Collections.min(treatments) { t1, t2 ->
-                when {
-                    (abs(t1.date - date) > abs(t2.date - date)) -> 1
-                    (abs(t1.date - date) < abs(t2.date - date)) -> -1
-                    else -> 0
-                }
-            }
-        }
-
-        private fun deleteFutureTreatments(futureTreatments : List<Treatment>) {
-            for (treatment in futureTreatments) {
-                val _id = treatment._id
-                if (NSUpload.isIdValid(_id)) {
-                    NSUpload.removeCareportalEntryFromNS(_id)
-                } else {
-                    UploadQueue.removeID("dbAdd", _id)
-                }
-                TreatmentsPlugin.getPlugin().service.delete(treatment)
-            }
-        }
-
-        private fun getAllFutureTreatments() : List<Treatment> {
-            var treatments = TreatmentsPlugin.getPlugin().service.getTreatmentDataFromTime(now() + 1000, true)
-            return filterTreatments(treatments)
-        }
-
-        private fun filterTreatments(treatments: List<Treatment>): List<Treatment> {
-            return treatments.filter {
-                it.source == Source.USER && it.insulin == 0.0
-            }
-        }
-
-        private fun getTreatmentCarbCount(futureTreatments : List<Treatment>) : Int {
-            var futureEcarb = 0.0
-            futureTreatments.forEach {
-                futureEcarb += it.carbs
-            }
-            return futureEcarb.toInt()
-        }
-
-        private fun generateExtCarbNow(eCarb : Int) {
-            ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-            ExtCarbService.generateExtCarbs(eCarb)
-            ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
         }
     }
 }
