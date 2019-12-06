@@ -38,10 +38,11 @@ public class CarbsGenerator {
             }
         }
         CarbsGenerator.meal.add(mealCarb);
+
         CarbsGenerator.removeFinishedMeals();
     }
 
-    private static void removeFinishedMeals() {
+    public static void removeFinishedMeals() {
         for(MealCarb it : CarbsGenerator.meal) {
             List<Long> carbTimes = it.getCarbTimes();
             Long latestTime = null;

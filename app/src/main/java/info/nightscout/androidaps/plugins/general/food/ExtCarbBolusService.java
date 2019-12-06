@@ -25,20 +25,20 @@ public class ExtCarbBolusService {
 
     public ExtCarbBolusService() {}
 
-    public static void generateExtCarbBolus(Context context, List<Food> foodList) {
+    public static void generateTreatment(Context context, List<Food> foodList) {
         int extCarb = calculateExtCarb(foodList);
         int carb = calculateCarb(foodList);
 
         if (carb > 0) {
-            generateExtCarbBolus(context, carb, extCarb);
+            generateExtCarbAndBolus(context, carb, extCarb);
         } else {
-            BolusWizard.Companion.addExtCarbIfNeeded(extCarb);
+            BolusWizard.Companion.generateExtCarb(extCarb);
         }
 
         FoodService.clearFoodCountAdded();
     }
 
-    public static void generateExtCarbBolus(Context context, int carbs, int eCarb) {
+    public static void generateExtCarbAndBolus(Context context, int carbs, int eCarb) {
         try {
             BolusWizard wizard = onClickQuickwizard(context, carbs);
             wizard.confirmAndExecute(context, eCarb);

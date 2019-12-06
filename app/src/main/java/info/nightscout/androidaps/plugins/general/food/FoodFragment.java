@@ -36,14 +36,11 @@ import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.events.EventFoodDatabaseChanged;
 import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
-import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import info.nightscout.androidaps.utils.SpinnerHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-import static info.nightscout.androidaps.plugins.general.food.CarbService.calculateCarb;
-import static info.nightscout.androidaps.plugins.general.food.ExtCarbBolusService.generateExtCarbBolus;
 import static info.nightscout.androidaps.plugins.general.food.ExtCarbService.calculateExtCarb;
 
 /**
@@ -131,7 +128,7 @@ public class FoodFragment extends Fragment {
                         builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
                         builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                             synchronized (builder) {
-                                ExtCarbBolusService.generateExtCarbBolus(getContext(), foodList);
+                                ExtCarbBolusService.generateTreatment(getContext(), foodList);
                             }
                         });
                         builder.setNegativeButton(MainApp.gs(R.string.cancel), null);

@@ -348,7 +348,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
-                                        addExtCarbIfNeeded(eCarb)
+                                        generateExtCarb(eCarb)
                                     }
                                 }
                             })
@@ -364,42 +364,37 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
     }
     companion object {
 
-        var createdInLastMillis = 1 * 1000 * 1000L
+        private var CREATED_IN_LAST_MILLIS = 1 * 1000 * 1000L
 
-        fun addExtCarbIfNeeded(eCarb: Int) {
-            if (eCarb > 0) {
-                addExtCarb(eCarb)
-            }
-        }
-
-        private fun addExtCarb(newCarb : Int) {
-            var futureTreatments = getFutureTreatments(createdInLastMillis)
-            var carbCount = getFutureCarbCount(futureTreatments)
-            if (carbCount > 0) {
+        fun generateExtCarb(newCarb : Int) {
+            if (newCarb > 0) {
+                var futureTreatments = getFutureTreatmentsFromLastMeals(CREATED_IN_LAST_MILLIS)
                 deleteFutureTreatments(futureTreatments)
+                var carbCount = getCarbCount(futureTreatments)
+                generateExtCarbNow(carbCount + newCarb)
             }
-            addExtCarbNow(carbCount + newCarb)
         }
 
-        private fun getFutureCarbCount(futureTreatments: List<Treatment>): Int {
+        private fun getCarbCount(futureTreatments: List<Treatment>): Int {
             return if (futureTreatments.isEmpty()) {
                 0
             } else {
-                return getFutureCarbSum(futureTreatments)
+                return getTreatmentCarbCount(futureTreatments)
             }
         }
 
-        private fun getFutureTreatments(createdInLastMillis : Long) : List<Treatment> {
-            var treatments = getFutureTreatments()
-            var times = getCarbTimes(createdInLastMillis)
+        private fun getFutureTreatmentsFromLastMeals(mealsCreatedInLastMillis : Long) : List<Treatment> {
+            var treatments = getAllFutureTreatments()
+            var times = getCarbTimesFromLastMeals(mealsCreatedInLastMillis)
             return if (treatments.isEmpty() || times.isEmpty()) {
                 return emptyList()
             } else {
-                times.map { getTreatment(it, treatments) }
+                times.map { getTreatmentFromCarbTime(it, treatments) }
             }
         }
 
-        private fun getCarbTimes(createdInLastTime : Long) : List<Long> {
+        private fun getCarbTimesFromLastMeals(createdInLastTime : Long) : List<Long> {
+            CarbsGenerator.removeFinishedMeals()
             var carbTimes = arrayListOf<Long>()
             CarbsGenerator.meal.forEach { mealItem ->
                 if (mealItem.date + createdInLastTime > now()) {
@@ -413,7 +408,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             return carbTimes
         }
 
-        private fun getTreatment(date : Long, treatments: List<Treatment>) : Treatment {
+        private fun getTreatmentFromCarbTime(date : Long, treatments: List<Treatment>) : Treatment {
             return Collections.min(treatments) { t1, t2 ->
                 when {
                     (abs(t1.date - date) > abs(t2.date - date)) -> 1
@@ -421,7 +416,6 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                     else -> 0
                 }
             }
-
         }
 
         private fun deleteFutureTreatments(futureTreatments : List<Treatment>) {
@@ -436,7 +430,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             }
         }
 
-        private fun getFutureTreatments() : List<Treatment> {
+        private fun getAllFutureTreatments() : List<Treatment> {
             var treatments = TreatmentsPlugin.getPlugin().service.getTreatmentDataFromTime(now() + 1000, true)
             return filterTreatments(treatments)
         }
@@ -447,7 +441,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             }
         }
 
-        private fun getFutureCarbSum(futureTreatments : List<Treatment>) : Int {
+        private fun getTreatmentCarbCount(futureTreatments : List<Treatment>) : Int {
             var futureEcarb = 0.0
             futureTreatments.forEach {
                 futureEcarb += it.carbs
@@ -455,7 +449,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             return futureEcarb.toInt()
         }
 
-        private fun addExtCarbNow(eCarb : Int) {
+        private fun generateExtCarbNow(eCarb : Int) {
             ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
             ExtCarbService.generateExtCarbs(eCarb)
             ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
