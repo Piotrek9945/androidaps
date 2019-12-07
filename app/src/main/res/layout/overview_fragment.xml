@@ -466,6 +466,7 @@
                     android:textSize="10sp"
                     android:visibility="gone" />
 
+
                 <info.nightscout.androidaps.utils.SingleClickButton
                     android:id="@+id/overview_calibrationbutton"
                     style="?android:attr/buttonStyle"
@@ -511,6 +512,20 @@
                     android:textSize="10sp"
                     android:visibility="gone" />
 
+                <info.nightscout.androidaps.utils.SingleClickButton
+                    android:id="@+id/overview_last_food"
+                    style="?android:attr/buttonStyle"
+                    android:layout_width="0px"
+                    android:layout_height="fill_parent"
+                    android:layout_marginRight="-4dp"
+                    android:layout_weight="0.5"
+                    android:drawableTop="@drawable/icon_quickwizard"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="POWTÓRZ OSTATNI"
+                    android:textColor="@color/colorCalculatorButton"
+                    android:textSize="10sp"
+                    android:visibility="visible" />
             </LinearLayout>
 
         </LinearLayout>
