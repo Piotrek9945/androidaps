@@ -20,23 +20,17 @@ import info.nightscout.androidaps.plugins.aps.loop.LoopPlugin
 import info.nightscout.androidaps.plugins.bus.RxBus
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions
-import info.nightscout.androidaps.plugins.general.food.FoodFragment
-import info.nightscout.androidaps.plugins.general.food.FoodService
-import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
-import info.nightscout.androidaps.plugins.general.nsclient.UploadQueue
+import info.nightscout.androidaps.plugins.general.food.EcarbService
 import info.nightscout.androidaps.plugins.general.overview.dialogs.ErrorHelperActivity
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.GlucoseStatus
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin
-import info.nightscout.androidaps.plugins.treatments.Treatment
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin
 import info.nightscout.androidaps.queue.Callback
-import info.nightscout.androidaps.queue.CommandQueue
 import org.json.JSONException
 import org.json.JSONObject
 import org.slf4j.LoggerFactory
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.absoluteValue
 
 class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                             val profileName: String,
@@ -270,8 +264,8 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
         return confirmMessage
     }
 
-    fun confirmAndExecute(context: Context, eCarb: Int) {
-        ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = eCarb
+    fun confirmAndExecute(context: Context, eCarbs: Int) {
+        ConfigBuilderPlugin.getPlugin().commandQueue.eCarbs = eCarbs
         val profile = ProfileFunctions.getInstance().profile ?: return
         val pump = ConfigBuilderPlugin.getPlugin().activePump ?: return
 
@@ -349,7 +343,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
                                     } else {
-                                        addEcarbIfNeeded(eCarb)
+                                        EcarbService.generateEcarbs(eCarbs)
                                     }
                                 }
                             })
@@ -361,58 +355,6 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
             }
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null)
             builder.show()
-        }
-    }
-    companion object {
-        fun addEcarbIfNeeded(eCarb: Int) {
-            if (eCarb > 0) {
-                addEcarb(eCarb)
-            }
-        }
-
-        private fun addEcarb(eCarb : Int) {
-            var futureEcarbSum = getFutureEcarbSum()
-            deleteAllFutureEcarb()
-            addEcarbNow(futureEcarbSum + eCarb)
-        }
-
-        private fun deleteAllFutureEcarb() {
-            var futureTreatments = getFutureEcarbList()
-            for (treatment in futureTreatments) {
-                val _id = treatment._id
-                if (NSUpload.isIdValid(_id)) {
-                    NSUpload.removeCareportalEntryFromNS(_id)
-                } else {
-                    UploadQueue.removeID("dbAdd", _id)
-                }
-                TreatmentsPlugin.getPlugin().service.delete(treatment)
-            }
-        }
-
-        private fun getFutureEcarbList() : List<Treatment> {
-            var treatments = TreatmentsPlugin.getPlugin().service.getTreatmentDataFromTime(DateUtil.now() + 1000, true)
-            return filterTreatments(treatments)
-        }
-
-        private fun filterTreatments(treatments: List<Treatment>): List<Treatment> {
-            return treatments.filter {
-                it.source == Source.USER && it.insulin == 0.0
-            }
-        }
-
-        private fun getFutureEcarbSum() : Int {
-            var futureEcarbList = getFutureEcarbList()
-            var futureEcarb = 0.0
-            futureEcarbList.forEach {
-                futureEcarb += it.carbs
-            }
-            return futureEcarb.toInt()
-        }
-
-        private fun addEcarbNow(eCarb : Int) {
-            ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-            FoodFragment.addEcarbs(eCarb)
-            ConfigBuilderPlugin.getPlugin().commandQueue.eCarb = 0
         }
     }
 }

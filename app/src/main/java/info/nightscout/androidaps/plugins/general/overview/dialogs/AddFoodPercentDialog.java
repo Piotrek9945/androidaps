@@ -10,35 +10,32 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.util.List;
 
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
 
-public class AddFoodDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
-    private static Logger log = LoggerFactory.getLogger(AddFoodDialog.class);
-
-    private final Food food;
+public class AddFoodPercentDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
+    private static Logger log = LoggerFactory.getLogger(AddFoodPercentDialog.class);
 
     private NumberPicker editCount;
-    private TextView summary;
 
     //one shot guards
     private boolean okClicked;
+    private List<Food> foodListCopy;
+    private List<Food> foodList;
 
-    public AddFoodDialog(Food food) {
-        this.food = food;
-    }
+    public AddFoodPercentDialog() {}
 
     final private TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -50,14 +47,14 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            setSummaryText();
+//            setSummaryText();
         }
     };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.overview_addfood_dialog, container, false);
+        View view = inflater.inflate(R.layout.overview_addfood_percent_dialog, container, false);
 
         view.findViewById(R.id.ok).setOnClickListener(this);
         view.findViewById(R.id.cancel).setOnClickListener(this);
@@ -65,11 +62,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        editCount = view.findViewById(R.id.addfood_edit_count);
-        editCount.setParams(1d, 1d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
-
-        summary = view.findViewById(R.id.addfood_summary);
-        setSummaryText();
+        editCount = view.findViewById(R.id.addfood_edit_percent);
+        editCount.setParams(100d, 70d, 150d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -79,11 +73,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             editCount.setValue(savedInstanceState.getDouble("editCount"));
         }
         return view;
-    }
-
-    private void setSummaryText() {
-        Double result = food.portion * editCount.getValue();
-        summary.setText("Ilość: " + result.intValue() + " [" + food.units + "]");
     }
 
     @Override
@@ -113,26 +102,20 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
         okClicked = true;
         try {
-            addFood(editCount);
+            double correction = editCount.getValue() / 100;
+            this.foodListCopy = FoodService.cloneFoodList(FoodService.getFoodList());
+            for (Food food : foodListCopy) {
+                food.carbs = (int) Math.floor(food.carbs * correction);
+                food.fat = (int) Math.floor(food.fat * correction);
+                food.protein = (int) Math.floor(food.protein * correction);
+                food.energy = (int) Math.floor(food.energy * correction);
+            }
+            FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy);
+
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
         }
-    }
-
-    private void addFood(NumberPicker editCount) {
-        double count = editCount.getValue().doubleValue();
-        if (count > 0) {
-            Food foodCopy = FoodService.cloneFood(food);
-            multiplyCountByPortions(foodCopy, count);
-            FoodService.addFoodToList(foodCopy);
-            FoodService.updateFoodCountAdded();
-        }
-    }
-
-    private Food multiplyCountByPortions(Food food, double count) {
-        food.portionCount *= count;
-        return food;
     }
 
     @Override

@@ -13,6 +13,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,6 +39,8 @@ import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
+
+import static info.nightscout.androidaps.plugins.general.food.FoodFragment.foodCountAdded;
 
 /**
  * Created by mike on 24.09.2017.
@@ -66,10 +69,28 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
         }
     }
 
-    public static Integer getFoodListSize() {
-        return FoodService.foodList.size();
-    }
     public static List<Food> getFoodList() { return FoodService.foodList; }
+
+    public static void clearFoodCountAdded() {
+        foodList.clear();
+        updateFoodCountAdded();
+    }
+
+    public static void updateFoodCountAdded() {
+        FoodFragment.foodCountAdded.setText(String.valueOf(getFoodList().size()));
+    }
+
+    public static Food cloneFood(Food food) {
+        return SerializationUtils.clone(food);
+    }
+
+    public static List<Food> cloneFoodList(List<Food> foodList) {
+        List<Food> newFoodList = new ArrayList<>();
+        for (Food food : foodList) {
+            newFoodList.add(FoodService.cloneFood(food));
+        }
+        return newFoodList;
+    }
 
     public FoodService() {
         onCreate();

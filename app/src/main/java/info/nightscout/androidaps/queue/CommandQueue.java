@@ -25,7 +25,6 @@ import info.nightscout.androidaps.logging.L;
 import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
-import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.BolusProgressDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.BolusProgressHelperActivity;
 import info.nightscout.androidaps.plugins.general.overview.events.EventDismissBolusProgressIfRunning;
@@ -87,7 +86,7 @@ public class CommandQueue {
     private Logger log = LoggerFactory.getLogger(L.PUMPQUEUE);
 
     public Boolean isEcarbEnded = false;
-    public Integer eCarb = 0;
+    public Integer eCarbs = 0;
 
     private final LinkedList<Command> queue = new LinkedList<>();
     Command performing;
@@ -229,7 +228,7 @@ public class CommandQueue {
             type = Command.CommandType.CARBS_ONLY_TREATMENT;
             //Carbs only can be added in parallel as they can be "in the future".
         } else {
-            if (isRunning(type) && (isEcarbEnded == false || eCarb == 0)) {
+            if (isRunning(type) && (isEcarbEnded == false || eCarbs == 0)) {
                 if (!callback.result.success) {
                     callback.result(executingNowError()).run();
                 }
