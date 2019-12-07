@@ -33,9 +33,10 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
     //one shot guards
     private boolean okClicked;
     private List<Food> foodListCopy;
-    private List<Food> foodList;
 
-    public AddFoodPercentDialog() {}
+    public AddFoodPercentDialog() {
+        this.foodListCopy = FoodService.cloneFoodList(FoodService.getFoodList());
+    }
 
     final private TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -63,7 +64,7 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_percent);
-        editCount.setParams(100d, 70d, 150d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        editCount.setParams(100d, 30d, 300d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -103,7 +104,6 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
         okClicked = true;
         try {
             double correction = editCount.getValue() / 100;
-            this.foodListCopy = FoodService.cloneFoodList(FoodService.getFoodList());
             for (Food food : foodListCopy) {
                 food.carbs = (int) Math.floor(food.carbs * correction);
                 food.fat = (int) Math.floor(food.fat * correction);

@@ -91,7 +91,7 @@ public class FoodFragment extends Fragment {
             });
             builder.setNeutralButton("ZMIEŃ PROCENT", (dialog, id) -> {
                 synchronized (builder) {
-                    showAddFoodPercent(manager, foodList);
+                    showAddFoodPercent(manager);
                 }
             });
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
@@ -99,7 +99,7 @@ public class FoodFragment extends Fragment {
         }
     }
 
-    public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
+    public static void showAddFoodPercent(FragmentManager manager) {
         new AddFoodPercentDialog().show(manager, "AddFoodPercentDialog");
     }
 
