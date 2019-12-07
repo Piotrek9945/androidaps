@@ -111,11 +111,19 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
                 food.protein = FoodUtils.Companion.roundDoubleToInt(food.protein * correction);
                 food.energy = FoodUtils.Companion.roundDoubleToInt(food.energy * correction);
             }
-            FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy);
+            FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy, isPercentChanged(correction));
 
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
+        }
+    }
+
+    private boolean isPercentChanged(double correction) {
+        if (correction == 1.0) {
+            return false;
+        } else {
+            return true;
         }
     }
 

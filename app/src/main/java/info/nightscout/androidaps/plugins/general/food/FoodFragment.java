@@ -70,7 +70,7 @@ public class FoodFragment extends Fragment {
 
     private boolean accepted;
 
-    public static void passBolus(Context context, FragmentManager manager, List<Food> foodList) {
+    public static void passBolus(Context context, FragmentManager manager, List<Food> foodList, boolean isPercentChanged) {
         if (foodList.size() > 0) {
             List<String> actions = new LinkedList<>();
             for (Food food : foodList) {
@@ -82,20 +82,28 @@ public class FoodFragment extends Fragment {
                 actions.add(text);
             }
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Lista posiłków");
+            setDialogTitle(builder, isPercentChanged);
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
                     EcarbBolusService.generateTreatment(context, foodList);
                 }
             });
-            builder.setNeutralButton("ZMIEŃ PROCENT", (dialog, id) -> {
+            builder.setNeutralButton("KOREKTA", (dialog, id) -> {
                 synchronized (builder) {
                     showAddFoodPercent(manager);
                 }
             });
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
             builder.show();
+        }
+    }
+
+    private static void setDialogTitle(AlertDialog.Builder builder, boolean isPercentChanged) {
+        if (isPercentChanged) {
+            builder.setTitle("Lista posiłków (korekta)");
+        } else {
+            builder.setTitle("Lista posiłków");
         }
     }
 
@@ -143,7 +151,7 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.pass_bolus:
-                        FoodFragment.passBolus(getContext(), getFragmentManager(), FoodService.getFoodList());
+                        FoodFragment.passBolus(getContext(), getFragmentManager(), FoodService.getFoodList(), false);
                         break;
                 }
             }
