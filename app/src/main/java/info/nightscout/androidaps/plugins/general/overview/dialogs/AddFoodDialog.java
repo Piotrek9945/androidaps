@@ -9,12 +9,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
-import org.apache.commons.lang3.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +30,8 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private final Food food;
 
     private NumberPicker editCount;
-    private TextView summary;
+    private Button floatDecrementButton;
+    private Button floatIncrementButton;
 
     //one shot guards
     private boolean okClicked;
@@ -50,7 +50,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            setSummaryText();
         }
     };
 
@@ -66,10 +65,13 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_count);
-        editCount.setParams(1d, 1d, 99999d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
+        editCount.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.ok), textWatcher);
 
-        summary = view.findViewById(R.id.addfood_summary);
-        setSummaryText();
+        floatDecrementButton = view.findViewById(R.id.decrement_button);
+        floatDecrementButton.setOnClickListener(this);
+
+        floatIncrementButton = view.findViewById(R.id.increment_button);
+        floatIncrementButton.setOnClickListener(this);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -79,11 +81,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             editCount.setValue(savedInstanceState.getDouble("editCount"));
         }
         return view;
-    }
-
-    private void setSummaryText() {
-        Double result = food.portion * editCount.getValue();
-        summary.setText("Ilość: " + result.intValue() + " [" + food.units + "]");
     }
 
     @Override
@@ -102,7 +99,19 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             case R.id.cancel:
                 dismiss();
                 break;
+            case R.id.decrement_button:
+                changePickerValue(-1);
+                break;
+            case R.id.increment_button:
+                changePickerValue(+1);
+                break;
         }
+    }
+
+    private void changePickerValue(double changeValue) {
+        double oldValue = editCount.getValue();
+        double newValue = oldValue + changeValue;
+        editCount.setValue(newValue);
     }
 
     private void submit() {

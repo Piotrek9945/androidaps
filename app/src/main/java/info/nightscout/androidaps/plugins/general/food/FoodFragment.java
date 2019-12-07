@@ -70,28 +70,28 @@ public class FoodFragment extends Fragment {
 
     private boolean accepted;
 
-    public static void passBolus(Context context, FragmentManager manager, List<Food> foodList) {
+    public static void passBolus(Context context, FragmentManager manager, List<Food> foodList, boolean isPercentChanged) {
         if (foodList.size() > 0) {
             List<String> actions = new LinkedList<>();
             for (Food food : foodList) {
                 String text = "";
                 text = text.concat(food.name);
-                text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
-                text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + EcarbService.Companion.calculateEcarbs(food) + "</font>");
-                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
+                text = text.concat(", " + FoodUtils.Companion.formatFloatToDisplay(food.portion * food.portionCount) + " " + food.units);
+                text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)) + "</font>");
+                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(food.carbs * food.portionCount) + "</font>");
                 actions.add(text);
             }
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Lista posiłków");
+            setDialogTitle(builder, isPercentChanged);
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
                     EcarbBolusService.generateTreatment(context, foodList);
                 }
             });
-            builder.setNeutralButton("ZMIEŃ PROCENT", (dialog, id) -> {
+            builder.setNeutralButton("KOREKTA", (dialog, id) -> {
                 synchronized (builder) {
-                    showAddFoodPercent(manager, foodList);
+                    showAddFoodPercent(manager);
                 }
             });
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
@@ -99,7 +99,15 @@ public class FoodFragment extends Fragment {
         }
     }
 
-    public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
+    private static void setDialogTitle(AlertDialog.Builder builder, boolean isPercentChanged) {
+        if (isPercentChanged) {
+            builder.setTitle("Lista posiłków (korekta)");
+        } else {
+            builder.setTitle("Lista posiłków");
+        }
+    }
+
+    public static void showAddFoodPercent(FragmentManager manager) {
         new AddFoodPercentDialog().show(manager, "AddFoodPercentDialog");
     }
 
@@ -143,7 +151,7 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.pass_bolus:
-                        FoodFragment.passBolus(getContext(), getFragmentManager(), FoodService.getFoodList());
+                        FoodFragment.passBolus(getContext(), getFragmentManager(), FoodService.getFoodList(), false);
                         break;
                 }
             }

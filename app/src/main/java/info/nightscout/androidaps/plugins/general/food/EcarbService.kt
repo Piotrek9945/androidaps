@@ -17,6 +17,7 @@ import info.nightscout.androidaps.utils.SafeParse
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.floor
+import kotlin.math.round
 
 class EcarbService {
     companion object {
@@ -26,14 +27,14 @@ class EcarbService {
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
         fun calculateEcarbs(foodList: List<Food>): Int {
-            var eCarbs = 0
+            var eCarbs = 0.0
             for (food in foodList) {
                 eCarbs += calculateEcarbs(food)
             }
-            return eCarbs
+            return FoodUtils.roundDoubleToInt(eCarbs)
         }
 
-        fun calculateEcarbs(food: Food): Int {
+        fun calculateEcarbs(food: Food): Double {
             val kcalPerOneCarb = 4
             val kcalPerOneFat = 9
             val kcalPerOneProtein = 4
@@ -48,7 +49,7 @@ class EcarbService {
                 )
             }
 
-            return floor(eCarbs * food.portionCount * ECARB_SAFETY_COEFFICIENT).toInt()
+            return eCarbs * food.portionCount * ECARB_SAFETY_COEFFICIENT
         }
 
         fun generateEcarbs(newEcarbs : Int) {
@@ -172,7 +173,7 @@ class EcarbService {
             val time = now() + ECARB_TIME_OFFSET_MINS * 1000 * 60
 
             if (eCarbsAfterConstraints > 0) {
-                CarbsGenerator.generateCarbs(eCarbsAfterConstraints!!, time, duration, "")
+                CarbsGenerator.generateCarbs(eCarbsAfterConstraints, time, duration, "")
                 NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, duration, ECARB_TIME_OFFSET_MINS))
             }
         }
@@ -187,7 +188,7 @@ class EcarbService {
         }
 
         private fun getWBT(eCarbs: Int): Int {
-            return floor(eCarbs.toDouble() / 10.0).toInt()
+            return FoodUtils.roundDoubleToInt(eCarbs / 10.0)
         }
 
     }

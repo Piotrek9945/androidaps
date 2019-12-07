@@ -6,12 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".plugins.general.overview.dialogs.AddFoodDialog">
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-
-        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="true"
@@ -28,42 +23,51 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/colorCarbsButton" />
 
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="30dp"
+                android:layout_gravity="center"
+                android:paddingTop="10dp"
+                android:text="Krotność"
+                android:textStyle="bold" />
+
+            <info.nightscout.androidaps.utils.NumberPicker
+                android:id="@+id/addfood_edit_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:paddingTop="5dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="10dp"
                 android:paddingBottom="5dp">
 
-                <TextView
-                    android:layout_width="60dp"
+                <Button
+                    android:id="@+id/decrement_button"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:textStyle="bold"
-                    android:text="Krotność"/>
+                    android:layout_weight="4"
+                    android:text="-1" />
 
-                <info.nightscout.androidaps.utils.NumberPicker
-                    android:id="@+id/addfood_edit_count"
+                <Space
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:paddingLeft="5dp"
-                    android:paddingRight="5dp"
-                    android:layout_gravity="end" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/increment_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="4"
+                    android:text="+1" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/addfood_summary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:textStyle="bold"
-                android:paddingTop="10dp"/>
-
-
-            <include layout="@layout/mdtp_done_button" />
+            <include
+                layout="@layout/mdtp_done_button" />
 
         </LinearLayout>
-
-    </ScrollView>
 
 </FrameLayout>

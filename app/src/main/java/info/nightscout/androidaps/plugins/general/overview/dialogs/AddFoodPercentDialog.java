@@ -23,6 +23,7 @@ import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
+import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.utils.NumberPicker;
 
 public class AddFoodPercentDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -33,9 +34,10 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
     //one shot guards
     private boolean okClicked;
     private List<Food> foodListCopy;
-    private List<Food> foodList;
 
-    public AddFoodPercentDialog() {}
+    public AddFoodPercentDialog() {
+        this.foodListCopy = FoodService.cloneFoodList(FoodService.getFoodList());
+    }
 
     final private TextWatcher textWatcher = new TextWatcher() {
         @Override
@@ -63,7 +65,7 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_percent);
-        editCount.setParams(100d, 70d, 150d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        editCount.setParams(100d, 30d, 300d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -103,18 +105,25 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
         okClicked = true;
         try {
             double correction = editCount.getValue() / 100;
-            this.foodListCopy = FoodService.cloneFoodList(FoodService.getFoodList());
             for (Food food : foodListCopy) {
-                food.carbs = (int) Math.floor(food.carbs * correction);
-                food.fat = (int) Math.floor(food.fat * correction);
-                food.protein = (int) Math.floor(food.protein * correction);
-                food.energy = (int) Math.floor(food.energy * correction);
+                food.carbs = FoodUtils.Companion.roundDoubleToInt(food.carbs * correction);
+                food.fat = FoodUtils.Companion.roundDoubleToInt(food.fat * correction);
+                food.protein = FoodUtils.Companion.roundDoubleToInt(food.protein * correction);
+                food.energy = FoodUtils.Companion.roundDoubleToInt(food.energy * correction);
             }
-            FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy);
+            FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy, isPercentChanged(correction));
 
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
+        }
+    }
+
+    private boolean isPercentChanged(double correction) {
+        if (correction == 1.0) {
+            return false;
+        } else {
+            return true;
         }
     }
 

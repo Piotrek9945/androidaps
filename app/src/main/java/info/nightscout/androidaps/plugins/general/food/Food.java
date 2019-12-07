@@ -44,7 +44,7 @@ public class Food implements Serializable {
     @DatabaseField
     public double portion; // common portion in "units"
 
-    public int portionCount = 1;
+    public double portionCount = 1;
 
     @DatabaseField
     public int carbs; // in grams
