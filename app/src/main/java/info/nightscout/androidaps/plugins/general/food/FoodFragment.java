@@ -76,9 +76,9 @@ public class FoodFragment extends Fragment {
             for (Food food : foodList) {
                 String text = "";
                 text = text.concat(food.name);
-                text = text.concat(", " + Double.valueOf(food.portion).intValue() * food.portionCount + " " + food.units);
-                text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + EcarbService.Companion.calculateEcarbs(food) + "</font>");
-                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + food.carbs * food.portionCount + "</font>");
+                text = text.concat(", " + FoodUtils.Companion.formatFloatToDisplay(food.portion * food.portionCount) + " " + food.units);
+                text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)) + "</font>");
+                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(food.carbs * food.portionCount) + "</font>");
                 actions.add(text);
             }
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);

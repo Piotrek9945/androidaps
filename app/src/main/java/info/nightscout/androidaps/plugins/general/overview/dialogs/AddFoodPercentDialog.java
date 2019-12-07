@@ -23,6 +23,7 @@ import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
+import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.utils.NumberPicker;
 
 public class AddFoodPercentDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -105,10 +106,10 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
         try {
             double correction = editCount.getValue() / 100;
             for (Food food : foodListCopy) {
-                food.carbs = (int) Math.floor(food.carbs * correction);
-                food.fat = (int) Math.floor(food.fat * correction);
-                food.protein = (int) Math.floor(food.protein * correction);
-                food.energy = (int) Math.floor(food.energy * correction);
+                food.carbs = FoodUtils.Companion.roundDoubleToInt(food.carbs * correction);
+                food.fat = FoodUtils.Companion.roundDoubleToInt(food.fat * correction);
+                food.protein = FoodUtils.Companion.roundDoubleToInt(food.protein * correction);
+                food.energy = FoodUtils.Companion.roundDoubleToInt(food.energy * correction);
             }
             FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy);
 
