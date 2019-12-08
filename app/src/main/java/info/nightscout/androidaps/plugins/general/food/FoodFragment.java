@@ -385,7 +385,7 @@ public class FoodFragment extends Fragment {
 
             private void showAddFood(Food food) {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog(food).show(manager, "AddFoodDialog");
+                new AddFoodDialog(food, false).show(manager, "AddFoodDialog");
             }
 
         }

@@ -55,6 +55,8 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
 
     private static List<Food> foodList = new ArrayList<>();
 
+    public static Food lastFood;
+
     public static void addFoodToList(Food food) {
         boolean isAddedYet = false;
         for(Food item : foodList) {

@@ -11,16 +11,22 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
 
@@ -28,16 +34,19 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private static Logger log = LoggerFactory.getLogger(AddFoodDialog.class);
 
     private final Food food;
+    private final boolean lastMeal;
 
     private NumberPicker editCount;
     private Button floatDecrementButton;
     private Button floatIncrementButton;
+    private TextView lastMealText;
 
     //one shot guards
     private boolean okClicked;
 
-    public AddFoodDialog(Food food) {
+    public AddFoodDialog(Food food, boolean lastMeal) {
         this.food = food;
+        this.lastMeal = lastMeal;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -72,6 +81,12 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         floatIncrementButton = view.findViewById(R.id.increment_button);
         floatIncrementButton.setOnClickListener(this);
+
+        if (lastMeal == true) {
+            lastMealText = view.findViewById(R.id.last_meal_text);
+            lastMealText.setVisibility(View.VISIBLE);
+            lastMealText.setText(food.name + ", " + food.portion + " " + food.units);
+        }
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -132,11 +147,23 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private void addFood(NumberPicker editCount) {
         double count = editCount.getValue().doubleValue();
         if (count > 0) {
-            Food foodCopy = FoodService.cloneFood(food);
-            multiplyCountByPortions(foodCopy, count);
-            FoodService.addFoodToList(foodCopy);
-            FoodService.updateFoodCountAdded();
+            if (lastMeal == true) {
+                FoodService.clearFoodCountAdded();
+            } else {
+                FoodService.lastFood = food;
+            }
+            addFoodNow(count);
+            if (lastMeal == true) {
+                FoodFragment.passBolus(getContext(), getFragmentManager(), Collections.singletonList(food), false);
+            }
         }
+    }
+
+    private void addFoodNow(double count) {
+        Food foodCopy = FoodService.cloneFood(food);
+        multiplyCountByPortions(foodCopy, count);
+        FoodService.addFoodToList(foodCopy);
+        FoodService.updateFoodCountAdded();
     }
 
     private Food multiplyCountByPortions(Food food, double count) {
