@@ -20,8 +20,8 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 import info.nightscout.androidaps.R;
+import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.Food;
-import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.utils.NumberPicker;
@@ -111,7 +111,7 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
                 food.protein = FoodUtils.Companion.roundDoubleToInt(food.protein * correction);
                 food.energy = FoodUtils.Companion.roundDoubleToInt(food.energy * correction);
             }
-            FoodFragment.passBolus(getContext(), getFragmentManager(), foodListCopy, isPercentChanged(correction));
+            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, isPercentChanged(correction));
 
             dismiss();
         } catch (Exception e) {

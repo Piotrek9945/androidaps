@@ -1,10 +1,17 @@
 package info.nightscout.androidaps.plugins.general.food;
 
 import android.content.Context;
+import android.text.Html;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentManager;
+
+import com.google.common.base.Joiner;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import info.nightscout.androidaps.MainApp;
@@ -15,12 +22,54 @@ import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodPercentDialog;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.OKDialog;
 
 public class EcarbBolusService {
 
     public EcarbBolusService() {}
+
+    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isPercentChanged) {
+        if (foodList.size() > 0) {
+            List<String> actions = new LinkedList<>();
+            for (Food food : foodList) {
+                String text = "";
+                text = text.concat(food.name);
+                text = text.concat(", " + FoodUtils.Companion.formatFloatToDisplay(food.portion * food.portionCount) + " " + food.units);
+                text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)) + "</font>");
+                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(food.carbs * food.portionCount) + "</font>");
+                actions.add(text);
+            }
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            setDialogTitle(builder, isPercentChanged);
+            builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
+            builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
+                synchronized (builder) {
+                    EcarbBolusService.generateTreatment(context, foodList);
+                }
+            });
+            builder.setNeutralButton("KOREKTA", (dialog, id) -> {
+                synchronized (builder) {
+                    showAddFoodPercent(manager);
+                }
+            });
+            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+            builder.show();
+        }
+    }
+
+    private static void setDialogTitle(AlertDialog.Builder builder, boolean isPercentChanged) {
+        if (isPercentChanged) {
+            builder.setTitle("Lista posiłków (korekta)");
+        } else {
+            builder.setTitle("Lista posiłków");
+        }
+    }
+
+    public static void showAddFoodPercent(FragmentManager manager) {
+        new AddFoodPercentDialog().show(manager, "AddFoodPercentDialog");
+    }
 
     public static void generateTreatment(Context context, List<Food> foodList) {
         int eCarbs = EcarbService.Companion.calculateEcarbs(foodList);

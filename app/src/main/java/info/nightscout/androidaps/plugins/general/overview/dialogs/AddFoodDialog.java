@@ -22,8 +22,8 @@ import java.text.DecimalFormat;
 import java.util.Collections;
 
 import info.nightscout.androidaps.R;
+import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.Food;
-import info.nightscout.androidaps.plugins.general.food.FoodFragment;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
 
@@ -151,7 +151,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 addFoodNow(count);
             }
             if (isLastMeal == true && FoodService.getLastFood() != null) {
-                FoodFragment.passBolus(getContext(), getFragmentManager(), Collections.singletonList(food), false);
+                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(food), false);
             }
         }
     }
