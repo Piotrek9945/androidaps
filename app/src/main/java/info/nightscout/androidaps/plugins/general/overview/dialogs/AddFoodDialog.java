@@ -18,11 +18,8 @@ import androidx.fragment.app.DialogFragment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.Food;
@@ -34,7 +31,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private static Logger log = LoggerFactory.getLogger(AddFoodDialog.class);
 
     private final Food food;
-    private final boolean lastMeal;
+    private final boolean isLastMeal;
 
     private NumberPicker editCount;
     private Button floatDecrementButton;
@@ -44,9 +41,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     //one shot guards
     private boolean okClicked;
 
-    public AddFoodDialog(Food food, boolean lastMeal) {
+    public AddFoodDialog(Food food, boolean isLastMeal) {
         this.food = food;
-        this.lastMeal = lastMeal;
+        this.isLastMeal = isLastMeal;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -82,7 +79,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         floatIncrementButton = view.findViewById(R.id.increment_button);
         floatIncrementButton.setOnClickListener(this);
 
-        if (lastMeal == true) {
+        if (isLastMeal == true) {
             lastMealText = view.findViewById(R.id.last_meal_text);
             lastMealText.setVisibility(View.VISIBLE);
             lastMealText.setText(food.name + ", " + food.portion + " " + food.units);
@@ -147,13 +144,13 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private void addFood(NumberPicker editCount) {
         double count = editCount.getValue().doubleValue();
         if (count > 0) {
-            if (lastMeal == true) {
+            if (isLastMeal == true) {
                 FoodService.clearFoodCountAdded();
             } else {
-                FoodService.lastFood = food;
+                FoodService.setLastFood(food);
+                addFoodNow(count);
             }
-            addFoodNow(count);
-            if (lastMeal == true) {
+            if (isLastMeal == true && FoodService.getLastFood() != null) {
                 FoodFragment.passBolus(getContext(), getFragmentManager(), Collections.singletonList(food), false);
             }
         }
