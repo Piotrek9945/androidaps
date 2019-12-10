@@ -49,7 +49,7 @@ class EcarbService {
                 )
             }
 
-            return eCarbs * food.portionCount * ECARB_SAFETY_COEFFICIENT
+            return eCarbs * food.portionCount * ECARB_SAFETY_COEFFICIENT * food.correctionFactor;
         }
 
         fun generateEcarbs(newEcarbs : Int) {

@@ -86,9 +86,12 @@ import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.careportal.CareportalFragment;
 import info.nightscout.androidaps.plugins.general.careportal.Dialogs.NewNSTreatmentDialog;
 import info.nightscout.androidaps.plugins.general.careportal.OptionsToShow;
+import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.nsclient.data.NSDeviceStatus;
 import info.nightscout.androidaps.plugins.general.overview.activities.QuickWizardListActivity;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.CalibrationDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewInsulinDialog;
@@ -180,6 +183,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
     SingleClickButton carbsButton;
     SingleClickButton cgmButton;
     SingleClickButton quickWizardButton;
+    SingleClickButton lastFoodButton;
 
     boolean smallWidth;
     boolean smallHeight;
@@ -295,6 +299,8 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
         cgmButton = (SingleClickButton) view.findViewById(R.id.overview_cgmbutton);
         if (cgmButton != null)
             cgmButton.setOnClickListener(this);
+        lastFoodButton = (SingleClickButton) view.findViewById(R.id.overview_last_food_button);
+        lastFoodButton.setOnClickListener(this);
 
         acceptTempLayout = (LinearLayout) view.findViewById(R.id.overview_accepttemplayout);
 
@@ -877,6 +883,11 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                 if (ConfigBuilderPlugin.getPlugin().getActivePump().isSuspended() || !ConfigBuilderPlugin.getPlugin().getActivePump().isInitialized())
                     ConfigBuilderPlugin.getPlugin().getCommandQueue().readStatus("RefreshClicked", null);
                 break;
+            case R.id.overview_last_food_button:
+                Food lastFood = FoodService.getLastFood();
+                if (lastFood != null) {
+                    new AddFoodDialog(lastFood, true).show(manager, "AddFoodDialog");
+                }
         }
 
     }

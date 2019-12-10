@@ -1,10 +1,8 @@
 package info.nightscout.androidaps.plugins.general.food;
 
-import android.content.Context;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Html;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,14 +19,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.common.base.Joiner;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -37,7 +32,6 @@ import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.events.EventFoodDatabaseChanged;
 import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodDialog;
-import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodPercentDialog;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import info.nightscout.androidaps.utils.SpinnerHelper;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -69,47 +63,6 @@ public class FoodFragment extends Fragment {
     final String EMPTY = MainApp.gs(R.string.none);
 
     private boolean accepted;
-
-    public static void passBolus(Context context, FragmentManager manager, List<Food> foodList, boolean isPercentChanged) {
-        if (foodList.size() > 0) {
-            List<String> actions = new LinkedList<>();
-            for (Food food : foodList) {
-                String text = "";
-                text = text.concat(food.name);
-                text = text.concat(", " + FoodUtils.Companion.formatFloatToDisplay(food.portion * food.portionCount) + " " + food.units);
-                text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)) + "</font>");
-                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(food.carbs * food.portionCount) + "</font>");
-                actions.add(text);
-            }
-            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            setDialogTitle(builder, isPercentChanged);
-            builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
-            builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
-                synchronized (builder) {
-                    EcarbBolusService.generateTreatment(context, foodList);
-                }
-            });
-            builder.setNeutralButton("KOREKTA", (dialog, id) -> {
-                synchronized (builder) {
-                    showAddFoodPercent(manager);
-                }
-            });
-            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
-            builder.show();
-        }
-    }
-
-    private static void setDialogTitle(AlertDialog.Builder builder, boolean isPercentChanged) {
-        if (isPercentChanged) {
-            builder.setTitle("Lista posiłków (korekta)");
-        } else {
-            builder.setTitle("Lista posiłków");
-        }
-    }
-
-    public static void showAddFoodPercent(FragmentManager manager) {
-        new AddFoodPercentDialog().show(manager, "AddFoodPercentDialog");
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -151,7 +104,7 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.pass_bolus:
-                        FoodFragment.passBolus(getContext(), getFragmentManager(), FoodService.getFoodList(), false);
+                        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), FoodService.getFoodList());
                         break;
                 }
             }
@@ -385,7 +338,7 @@ public class FoodFragment extends Fragment {
 
             private void showAddFood(Food food) {
                 FragmentManager manager = getFragmentManager();
-                new AddFoodDialog(food).show(manager, "AddFoodDialog");
+                new AddFoodDialog(food, false).show(manager, "AddFoodDialog");
             }
 
         }

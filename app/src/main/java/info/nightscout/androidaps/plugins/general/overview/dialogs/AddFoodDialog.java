@@ -11,6 +11,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
 
@@ -18,8 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
 
 import info.nightscout.androidaps.R;
+import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
 import info.nightscout.androidaps.utils.NumberPicker;
@@ -28,16 +31,19 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private static Logger log = LoggerFactory.getLogger(AddFoodDialog.class);
 
     private final Food food;
+    private final boolean isLastMeal;
 
     private NumberPicker editCount;
     private Button floatDecrementButton;
     private Button floatIncrementButton;
+    private TextView lastMealText;
 
     //one shot guards
     private boolean okClicked;
 
-    public AddFoodDialog(Food food) {
+    public AddFoodDialog(Food food, boolean isLastMeal) {
         this.food = food;
+        this.isLastMeal = isLastMeal;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -72,6 +78,12 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         floatIncrementButton = view.findViewById(R.id.increment_button);
         floatIncrementButton.setOnClickListener(this);
+
+        if (isLastMeal == true) {
+            lastMealText = view.findViewById(R.id.last_meal_text);
+            lastMealText.setVisibility(View.VISIBLE);
+            lastMealText.setText(food.name + ", " + food.portion + " " + food.units);
+        }
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -134,9 +146,21 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         if (count > 0) {
             Food foodCopy = FoodService.cloneFood(food);
             multiplyCountByPortions(foodCopy, count);
-            FoodService.addFoodToList(foodCopy);
-            FoodService.updateFoodCountAdded();
+            if (isLastMeal == true) {
+                FoodService.clearFoodCountAdded();
+            } else {
+                FoodService.setLastFood(foodCopy);
+                addFoodNow(foodCopy);
+            }
+            if (isLastMeal == true && FoodService.getLastFood() != null) {
+                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
+            }
         }
+    }
+
+    private void addFoodNow(Food food) {
+        FoodService.addFoodToList(food);
+        FoodService.updateFoodCountAdded();
     }
 
     private Food multiplyCountByPortions(Food food, double count) {

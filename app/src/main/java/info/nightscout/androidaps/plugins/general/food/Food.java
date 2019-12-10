@@ -46,6 +46,9 @@ public class Food implements Serializable {
 
     public double portionCount = 1;
 
+
+    public double correctionFactor = 1;
+
     @DatabaseField
     public int carbs; // in grams
 
