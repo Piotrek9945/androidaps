@@ -144,22 +144,22 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private void addFood(NumberPicker editCount) {
         double count = editCount.getValue().doubleValue();
         if (count > 0) {
+            Food foodCopy = FoodService.cloneFood(food);
+            multiplyCountByPortions(foodCopy, count);
             if (isLastMeal == true) {
                 FoodService.clearFoodCountAdded();
             } else {
-                FoodService.setLastFood(food);
-                addFoodNow(count);
+                FoodService.setLastFood(foodCopy);
+                addFoodNow(foodCopy);
             }
             if (isLastMeal == true && FoodService.getLastFood() != null) {
-                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(food));
+                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
             }
         }
     }
 
-    private void addFoodNow(double count) {
-        Food foodCopy = FoodService.cloneFood(food);
-        multiplyCountByPortions(foodCopy, count);
-        FoodService.addFoodToList(foodCopy);
+    private void addFoodNow(Food food) {
+        FoodService.addFoodToList(food);
         FoodService.updateFoodCountAdded();
     }
 
