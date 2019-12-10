@@ -23,7 +23,7 @@ class EcarbService {
     companion object {
 
         private var ECARB_SAFETY_COEFFICIENT = 0.7
-        private var RECENTLY_CREATED_MILLIS = 60 * 60 * 1000L
+        private var RECENTLY_CREATED_MILLIS = 30 * 60 * 1000L
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
         fun calculateEcarbs(foodList: List<Food>): Int {
