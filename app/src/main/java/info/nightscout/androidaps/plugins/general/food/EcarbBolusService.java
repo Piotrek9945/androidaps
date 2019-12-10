@@ -60,11 +60,11 @@ public class EcarbBolusService {
         }
     }
 
-    private static void setDialogTitle(AlertDialog.Builder builder, boolean isPercentChanged) {
-        if (isPercentChanged) {
-            builder.setTitle("Lista posiłków (korekta)");
-        } else {
+    private static void setDialogTitle(AlertDialog.Builder builder, boolean isDefaultCorrectionFactor) {
+        if (isDefaultCorrectionFactor) {
             builder.setTitle("Lista posiłków");
+        } else {
+            builder.setTitle("Lista posiłków (korekta)");
         }
     }
 
