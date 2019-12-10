@@ -35,8 +35,8 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
     private boolean okClicked;
     private List<Food> foodListCopy;
 
-    public AddFoodPercentDialog() {
-        this.foodListCopy = FoodService.cloneFoodList(FoodService.getFoodList());
+    public AddFoodPercentDialog(List<Food> foodList) {
+        this.foodListCopy = FoodService.cloneFoodList(foodList);
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -106,24 +106,13 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
         try {
             double correction = editCount.getValue() / 100;
             for (Food food : foodListCopy) {
-                food.carbs = FoodUtils.Companion.roundDoubleToInt(food.carbs * correction);
-                food.fat = FoodUtils.Companion.roundDoubleToInt(food.fat * correction);
-                food.protein = FoodUtils.Companion.roundDoubleToInt(food.protein * correction);
-                food.energy = FoodUtils.Companion.roundDoubleToInt(food.energy * correction);
+                food.correctionFactor = correction;
             }
-            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, isPercentChanged(correction));
+            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy);
 
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
-        }
-    }
-
-    private boolean isPercentChanged(double correction) {
-        if (correction == 1.0) {
-            return false;
-        } else {
-            return true;
         }
     }
 

@@ -151,7 +151,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 addFoodNow(count);
             }
             if (isLastMeal == true && FoodService.getLastFood() != null) {
-                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(food), false);
+                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(food));
             }
         }
     }

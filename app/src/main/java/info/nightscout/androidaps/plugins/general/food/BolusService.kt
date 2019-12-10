@@ -12,13 +12,17 @@ import info.nightscout.androidaps.utils.SafeParse
 import info.nightscout.androidaps.utils.DateUtil.now
 import kotlin.math.round
 
-class CarbService {
+class BolusService {
     companion object {
+
+        fun calculateCarb(food : Food) : Double {
+            return food.carbs * food.portionCount * food.correctionFactor
+        }
 
         fun calculateCarb(foodList: List<Food>): Int {
             var carbs = 0.0
             for (food in foodList) {
-                carbs += food.carbs * food.portionCount
+                carbs += calculateCarb(food)
             }
             return roundDoubleToInt(carbs)
         }

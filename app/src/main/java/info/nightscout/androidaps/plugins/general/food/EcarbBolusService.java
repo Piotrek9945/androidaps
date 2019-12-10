@@ -11,6 +11,7 @@ import com.google.common.base.Joiner;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class EcarbBolusService {
 
     public EcarbBolusService() {}
 
-    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isPercentChanged) {
+    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList) {
         if (foodList.size() > 0) {
             List<String> actions = new LinkedList<>();
             for (Food food : foodList) {
@@ -38,11 +39,11 @@ public class EcarbBolusService {
                 text = text.concat(food.name);
                 text = text.concat(", " + FoodUtils.Companion.formatFloatToDisplay(food.portion * food.portionCount) + " " + food.units);
                 text = text.concat(", eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)) + "</font>");
-                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(food.carbs * food.portionCount) + "</font>");
+                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(BolusService.Companion.calculateCarb(food)) + "</font>");
                 actions.add(text);
             }
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            setDialogTitle(builder, isPercentChanged);
+            setDialogTitle(builder, isDefaultCorrectionFactor(foodList));
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
@@ -51,7 +52,7 @@ public class EcarbBolusService {
             });
             builder.setNeutralButton("KOREKTA", (dialog, id) -> {
                 synchronized (builder) {
-                    showAddFoodPercent(manager);
+                    showAddFoodPercent(manager, foodList);
                 }
             });
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
@@ -67,13 +68,13 @@ public class EcarbBolusService {
         }
     }
 
-    public static void showAddFoodPercent(FragmentManager manager) {
-        new AddFoodPercentDialog().show(manager, "AddFoodPercentDialog");
+    public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
+        new AddFoodPercentDialog(foodList).show(manager, "AddFoodPercentDialog");
     }
 
     public static void generateTreatment(Context context, List<Food> foodList) {
         int eCarbs = EcarbService.Companion.calculateEcarbs(foodList);
-        int carbs = CarbService.Companion.calculateCarb(foodList);
+        int carbs = BolusService.Companion.calculateCarb(foodList);
 
         if (carbs > 0) {
             generateEcarbAndBolus(context, carbs, eCarbs);
@@ -118,6 +119,23 @@ public class EcarbBolusService {
         } else {
             return null;
         }
+    }
+
+    private static boolean isDefaultCorrectionFactor(Food food) {
+        if (food.correctionFactor == 1.0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isDefaultCorrectionFactor(List<Food> foodList) {
+        for (Food food : foodList) {
+            if (isDefaultCorrectionFactor(food) == false) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }
