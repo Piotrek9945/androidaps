@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.util.Collections;
+import java.util.List;
 
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
@@ -134,38 +135,37 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
         okClicked = true;
         try {
-            addFood(editCount);
+            double count = editCount.getValue().doubleValue();
+            if (count > 0) {
+                if (isLastMeal == true) {
+                    prepareLastMeal(count);
+                } else {
+                    prepareFoodList(count);
+                }
+            }
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
         }
     }
 
-    private void addFood(NumberPicker editCount) {
-        double count = editCount.getValue().doubleValue();
-        if (count > 0) {
-            Food foodCopy = FoodService.cloneFood(food);
-            multiplyCountByPortions(foodCopy, count);
-            if (isLastMeal == true) {
-                FoodService.clearFoodCountAdded();
-            } else {
-                FoodService.setLastFood(foodCopy);
-                addFoodNow(foodCopy);
-            }
-            if (isLastMeal == true && FoodService.getLastFood() != null) {
-                EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
-            }
-        }
-    }
-
-    private void addFoodNow(Food food) {
-        FoodService.addFoodToList(food);
+    private void prepareFoodList(double count) {
+        Food foodCopy = FoodService.cloneFood(food);
+        multiplyCountByPortions(foodCopy, count);
+        FoodService.setLastFood(foodCopy);
+        FoodService.addFoodToList(foodCopy);
         FoodService.updateFoodCountAdded();
     }
 
-    private Food multiplyCountByPortions(Food food, double count) {
+    private void prepareLastMeal(double count) {
+        Food foodCopy = FoodService.cloneFood(food);
+        foodCopy.portionCount = 1;
+        multiplyCountByPortions(foodCopy, count);
+        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
+    }
+
+    private void multiplyCountByPortions(Food food, double count) {
         food.portionCount *= count;
-        return food;
     }
 
     @Override
