@@ -72,6 +72,12 @@
 
             </LinearLayout>
 
+            <CheckBox
+                android:id="@+id/accurate"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Dokładnie wyliczone" />
+
             <include
                 layout="@layout/mdtp_done_button" />
 

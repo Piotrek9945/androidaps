@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
@@ -38,6 +39,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private Button floatDecrementButton;
     private Button floatIncrementButton;
     private TextView lastMealText;
+    private CheckBox accurate;
 
     //one shot guards
     private boolean okClicked;
@@ -84,6 +86,12 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             lastMealText = view.findViewById(R.id.last_meal_text);
             lastMealText.setVisibility(View.VISIBLE);
             lastMealText.setText(food.name + ", " + food.portion + " " + food.units);
+        }
+
+        accurate = view.findViewById(R.id.accurate);
+        accurate.setOnClickListener(this);
+        if (food.accurateCorrection != 1.0) {
+            accurate.setChecked(false);
         }
 
         setCancelable(true);
@@ -137,10 +145,11 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         try {
             double count = editCount.getValue().doubleValue();
             if (count > 0) {
+                boolean accurate = this.accurate.isChecked();
                 if (isLastMeal == true) {
-                    prepareLastMeal(count);
+                    prepareLastMeal(count, accurate);
                 } else {
-                    prepareFoodList(count);
+                    prepareFoodList(count, accurate);
                 }
             }
             dismiss();
@@ -149,19 +158,29 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
     }
 
-    private void prepareFoodList(double count) {
+    private void prepareFoodList(double count, boolean accurate) {
         Food foodCopy = FoodService.cloneFood(food);
+        setFoodAccurateParam(foodCopy, accurate);
         multiplyCountByPortions(foodCopy, count);
         FoodService.setLastFood(foodCopy);
         FoodService.addFoodToList(foodCopy);
         FoodService.updateFoodCountAdded();
     }
 
-    private void prepareLastMeal(double count) {
+    private void prepareLastMeal(double count, boolean accurate) {
         Food foodCopy = FoodService.cloneFood(food);
         foodCopy.portionCount = 1;
+        setFoodAccurateParam(foodCopy, accurate);
         multiplyCountByPortions(foodCopy, count);
         EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
+    }
+
+    private void setFoodAccurateParam(Food food, boolean accurate) {
+        if (accurate == true) {
+            food.accurateCorrection = 1;
+        } else {
+            food.accurateCorrection = 0.9;
+        }
     }
 
     private void multiplyCountByPortions(Food food, double count) {
