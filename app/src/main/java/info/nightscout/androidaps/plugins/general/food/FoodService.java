@@ -28,7 +28,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.db.DatabaseHelper;
 import info.nightscout.androidaps.db.ICallback;
 import info.nightscout.androidaps.events.Event;
@@ -39,8 +38,6 @@ import info.nightscout.androidaps.plugins.bus.RxBus;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-
-import static info.nightscout.androidaps.plugins.general.food.FoodFragment.foodCountAdded;
 
 /**
  * Created by mike on 24.09.2017.
@@ -58,17 +55,31 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
     private static Food lastFood;
 
     public static void addFoodToList(Food food) {
-        boolean isAddedYet = false;
-        for(Food item : foodList) {
-            if (item._id.equals(food._id)) {
-                item.portionCount += food.portionCount;
-                isAddedYet = true;
-                break;
-            }
-        }
-        if (isAddedYet == false) {
+        boolean isAddedYet = isAddedYet(food, foodList);
+        if (isAddedYet == true) {
+            Food foodFromList = getFoodFromListWithTheSameId(food._id, foodList);
+            foodFromList.portionCount += food.portionCount;
+        } else {
             foodList.add(food);
         }
+    }
+
+    public static boolean isAddedYet(Food food, List<Food> foodList) {
+        for(Food item : foodList) {
+            if (item._id.equals(food._id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static Food getFoodFromListWithTheSameId(String _id, List<Food> foodList) {
+        for(Food item : foodList) {
+            if (item._id.equals(_id)) {
+                return item;
+            }
+        }
+        return null;
     }
 
     public static void setLastFood(Food food) {

@@ -16,7 +16,7 @@ class BolusService {
     companion object {
 
         fun calculateCarb(food : Food) : Double {
-            return food.carbs * food.portionCount * food.correctionFactor
+            return food.carbs * food.portionCount * food.correctionFactor * food.accurateCorrection
         }
 
         fun calculateCarb(foodList: List<Food>): Int {
