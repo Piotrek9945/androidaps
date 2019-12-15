@@ -198,7 +198,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         if (accurate == true) {
             food.accurateCorrection = 1;
         } else {
-            food.accurateCorrection = 0.9;
+            food.accurateCorrection = EcarbBolusService.ACCURATE_COEFFICIENT;
         }
     }
 
