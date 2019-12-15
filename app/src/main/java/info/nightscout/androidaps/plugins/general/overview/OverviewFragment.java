@@ -885,7 +885,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                 break;
             case R.id.overview_last_food_button:
                 Food lastFood = FoodService.getLastFood();
-                if (lastFood != null) {
+                if (lastFood != null && FoodService.getFoodList().size() == 0) {
                     new AddFoodDialog(lastFood, true).show(manager, "AddFoodDialog");
                 }
         }
