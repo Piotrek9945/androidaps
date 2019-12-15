@@ -40,6 +40,11 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private Button floatIncrementButton;
     private TextView lastMealText;
     private CheckBox accurate;
+    private Button otherSettingsButton;
+    private NumberPicker eCarbPercentage;
+    private TextView eCarbPercentageText;
+    private final String SHOW_OTHER_SETTINGS = "POKAŻ INNE USTAWIENIA";
+    private final String HIDE_OTHER_SETTINGS = "UKRYJ INNE USTAWIENIA";
 
     //one shot guards
     private boolean okClicked;
@@ -90,6 +95,15 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         accurate = view.findViewById(R.id.accurate);
         accurate.setOnClickListener(this);
+
+        otherSettingsButton = view.findViewById(R.id.other_settings_button);
+        otherSettingsButton.setOnClickListener(this);
+        otherSettingsButton.setText(SHOW_OTHER_SETTINGS);
+
+        eCarbPercentage = view.findViewById(R.id.addfood_ecarb_percentage);
+        eCarbPercentage.setOnClickListener(this);
+
+        eCarbPercentageText = view.findViewById(R.id.addfood_ecarb_percentage_text);
 
         if (isLastMeal == true && isAccurate(food)) {
             accurate.setChecked(true);
@@ -145,7 +159,20 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             case R.id.increment_button:
                 changePickerValue(+1);
                 break;
+            case R.id.other_settings_button:
+                if (eCarbPercentage.getVisibility() == View.VISIBLE) {
+                    setOtherSettingsVisibility(View.GONE);
+                    otherSettingsButton.setText(SHOW_OTHER_SETTINGS);
+                } else {
+                    setOtherSettingsVisibility(View.VISIBLE);
+                    otherSettingsButton.setText(HIDE_OTHER_SETTINGS);
+                }
         }
+    }
+
+    private void setOtherSettingsVisibility(int visibility) {
+        eCarbPercentageText.setVisibility(visibility);
+        eCarbPercentage.setVisibility(visibility);
     }
 
     private void changePickerValue(double changeValue) {
