@@ -90,9 +90,13 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         accurate = view.findViewById(R.id.accurate);
         accurate.setOnClickListener(this);
-        if (isAccurate(food)) {
+
+        if (isLastMeal == true && isAccurate(food)) {
             accurate.setChecked(true);
+        } else {
+            accurate.setChecked(false);
         }
+
         List<Food> foodList = FoodService.getFoodList();
         if (FoodService.isAddedYet(food, foodList)) {
             Food foodFromList = FoodService.getFoodFromListWithTheSameId(food._id, foodList);
