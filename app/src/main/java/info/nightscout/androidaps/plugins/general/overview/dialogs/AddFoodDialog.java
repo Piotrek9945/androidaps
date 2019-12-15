@@ -90,8 +90,15 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
 
         accurate = view.findViewById(R.id.accurate);
         accurate.setOnClickListener(this);
-        if (food.accurateCorrection != 1.0) {
-            accurate.setChecked(false);
+        if (isAccurate(food)) {
+            accurate.setChecked(true);
+        }
+        List<Food> foodList = FoodService.getFoodList();
+        if (FoodService.isAddedYet(food, foodList)) {
+            Food foodFromList = FoodService.getFoodFromListWithTheSameId(food._id, foodList);
+            boolean _accurate = isAccurate(foodFromList);
+            accurate.setChecked(_accurate);
+            accurate.setEnabled(false);
         }
 
         setCancelable(true);
@@ -102,6 +109,14 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             editCount.setValue(savedInstanceState.getDouble("editCount"));
         }
         return view;
+    }
+
+    private boolean isAccurate(Food food) {
+        if (food.accurateCorrection != 1.0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Override
