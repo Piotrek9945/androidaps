@@ -120,7 +120,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         otherSettingsButton.setText(SHOW_OTHER_SETTINGS);
 
         eCarbCorrection = view.findViewById(R.id.addfood_ecarb_correction);
-        eCarbCorrection.setParams(EcarbService.DEFAULT_ECARB_SAFETY_COEFFICIENT * 100, 10d, 200d, 10d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), eCarbCorrectionTextWatcher);
+        eCarbCorrection.setParams(getEcarbCorrectionInitVal(), 10d, 200d, 10d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), eCarbCorrectionTextWatcher);
         eCarbCorrection.setOnClickListener(this);
         if (FoodService.isAddedYet(food, foodList)) {
             Food foodFromList = FoodService.getFoodFromListWithTheSameId(food._id, foodList);
@@ -136,9 +136,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                         disableEcarbCorrectionPicker();
                     } else {
                         enableEcarbCorrectionPicker();
-                        if (eCarbCorrectionOldValue[0] == null) {
-                            eCarbCorrection.setValue(EcarbService.DEFAULT_ECARB_SAFETY_COEFFICIENT * 100);
-                        } else {
+                        if (eCarbCorrectionOldValue[0] != null) {
                             eCarbCorrection.setValue(eCarbCorrectionOldValue[0]);
                         }
                     }
@@ -168,6 +166,14 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             editCount.setValue(savedInstanceState.getDouble("editCount"));
         }
         return view;
+    }
+
+    private double getEcarbCorrectionInitVal() {
+        if (isLastMeal == true) {
+            return food.eCarbCorrection * 100;
+        } else {
+            return 100d;
+        }
     }
 
     private void disableEcarbCorrectionPicker() {
