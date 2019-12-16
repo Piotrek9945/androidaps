@@ -85,7 +85,7 @@
                 style="@style/mdtp_ActionButton.Text"/>
 
             <TextView
-                android:id="@+id/addfood_ecarb_percentage_text"
+                android:id="@+id/addfood_ecarb_correction_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -94,7 +94,7 @@
                 android:visibility="gone"/>
 
             <info.nightscout.androidaps.utils.NumberPicker
-                android:id="@+id/addfood_ecarb_percentage"
+                android:id="@+id/addfood_ecarb_correction"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"

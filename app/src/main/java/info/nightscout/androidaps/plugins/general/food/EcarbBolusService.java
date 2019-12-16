@@ -29,8 +29,6 @@ import info.nightscout.androidaps.utils.OKDialog;
 
 public class EcarbBolusService {
 
-    public static final double ACCURATE_COEFFICIENT = 0.9;
-
     public EcarbBolusService() {}
 
     public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList) {
