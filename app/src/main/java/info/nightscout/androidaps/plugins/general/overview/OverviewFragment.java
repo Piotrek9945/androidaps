@@ -1281,7 +1281,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             }
             if (pump.isInitialized() && !pump.isSuspended() && wizardButton != null) {
                 if (SP.getBoolean(R.string.key_show_wizard_button, true)) {
-                    wizardButton.setVisibility(View.VISIBLE);
+                    wizardButton.setVisibility(View.GONE);
                 } else {
                     wizardButton.setVisibility(View.GONE);
                 }
