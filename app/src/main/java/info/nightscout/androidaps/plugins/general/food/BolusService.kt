@@ -1,22 +1,14 @@
 package info.nightscout.androidaps.plugins.general.food
 
-import info.nightscout.androidaps.MainApp
-import info.nightscout.androidaps.R
-import info.nightscout.androidaps.db.CareportalEvent
-import info.nightscout.androidaps.interfaces.Constraint
 import info.nightscout.androidaps.plugins.general.food.FoodUtils.Companion.roundDoubleToInt
-import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
-import info.nightscout.androidaps.plugins.treatments.CarbsGenerator
-import info.nightscout.androidaps.utils.SafeParse
-
-import info.nightscout.androidaps.utils.DateUtil.now
-import kotlin.math.round
 
 class BolusService {
     companion object {
 
+        const val ACCURATE_CARB_COEFFICIENT = 0.9
+
         fun calculateCarb(food : Food) : Double {
-            return food.carbs * food.portionCount * food.correctionFactor * food.accurateCorrection
+            return food.carbs * food.portionCount * food.correctionFactor * food.accurateCarbCorrection * food.sensitivityFactor
         }
 
         fun calculateCarb(foodList: List<Food>): Int {

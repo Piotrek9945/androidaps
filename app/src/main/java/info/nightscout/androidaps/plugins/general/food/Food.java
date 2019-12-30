@@ -48,7 +48,13 @@ public class Food implements Serializable {
 
     public double correctionFactor = 1;
 
-    public double accurateCorrection = 1;
+    public double accurateCarbCorrection = 1;
+
+    public double accurateEcarbCorrection = 1;
+
+    public double eCarbCorrection = 1;
+
+    public double sensitivityFactor = 1;
 
     @DatabaseField
     public int carbs; // in grams

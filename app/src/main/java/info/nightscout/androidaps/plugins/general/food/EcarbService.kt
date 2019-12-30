@@ -16,13 +16,11 @@ import info.nightscout.androidaps.utils.DateUtil.now
 import info.nightscout.androidaps.utils.SafeParse
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.floor
-import kotlin.math.round
 
 class EcarbService {
     companion object {
 
-        private var ECARB_SAFETY_COEFFICIENT = 0.7
+        const val ACCURATE_ECARB_COEFFICIENT = 0.9
         private var RECENTLY_CREATED_MILLIS = 30 * 60 * 1000L
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
@@ -49,7 +47,7 @@ class EcarbService {
                 )
             }
 
-            return eCarbs * food.portionCount * ECARB_SAFETY_COEFFICIENT * food.correctionFactor * food.accurateCorrection
+            return eCarbs * food.portionCount * food.correctionFactor * food.accurateEcarbCorrection * food.eCarbCorrection * food.sensitivityFactor
         }
 
         fun generateEcarbs(newEcarbs : Int) {
