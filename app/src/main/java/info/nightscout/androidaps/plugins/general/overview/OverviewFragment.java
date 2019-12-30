@@ -1265,7 +1265,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             if (SP.getBoolean(R.string.key_show_carbs_button, true)
                     && (!ConfigBuilderPlugin.getPlugin().getActivePump().getPumpDescription().storesCarbInfo ||
                     (pump.isInitialized() && !pump.isSuspended()))) {
-                carbsButton.setVisibility(View.VISIBLE);
+                carbsButton.setVisibility(View.GONE);
             } else {
                 carbsButton.setVisibility(View.GONE);
             }
@@ -1288,7 +1288,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             }
             if (pump.isInitialized() && !pump.isSuspended() && insulinButton != null) {
                 if (SP.getBoolean(R.string.key_show_insulin_button, true)) {
-                    insulinButton.setVisibility(View.VISIBLE);
+                    insulinButton.setVisibility(View.GONE);
                 } else {
                     insulinButton.setVisibility(View.GONE);
                 }
