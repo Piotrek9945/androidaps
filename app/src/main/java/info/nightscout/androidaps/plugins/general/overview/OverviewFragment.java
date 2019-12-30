@@ -183,6 +183,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
     SingleClickButton carbsButton;
     SingleClickButton cgmButton;
     SingleClickButton quickWizardButton;
+    SingleClickButton calculatorButton;
     SingleClickButton lastFoodButton;
 
     boolean smallWidth;
@@ -293,6 +294,9 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
         quickWizardButton = (SingleClickButton) view.findViewById(R.id.overview_quickwizardbutton);
         quickWizardButton.setOnClickListener(this);
         quickWizardButton.setOnLongClickListener(this);
+        calculatorButton = (SingleClickButton) view.findViewById(R.id.overview_calculator_button);
+        calculatorButton.setOnClickListener(this);
+        calculatorButton.setOnLongClickListener(this);
         calibrationButton = (SingleClickButton) view.findViewById(R.id.overview_calibrationbutton);
         if (calibrationButton != null)
             calibrationButton.setOnClickListener(this);
