@@ -24,6 +24,7 @@ import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodPercentDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.OKDialog;
 
@@ -47,7 +48,7 @@ public class EcarbBolusService {
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
-                    EcarbBolusService.generateTreatment(context, foodList);
+                    showSensitivityDialog(manager, foodList);
                 }
             });
             builder.setNeutralButton("KOREKTA", (dialog, id) -> {
@@ -70,6 +71,10 @@ public class EcarbBolusService {
 
     public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
         new AddFoodPercentDialog(foodList).show(manager, "AddFoodPercentDialog");
+    }
+
+    public static void showSensitivityDialog(FragmentManager manager, List<Food> foodList) {
+        new AddFoodSensitivityDialog(foodList).show(manager, "ShowSensitivityDialog");
     }
 
     public static void generateTreatment(Context context, List<Food> foodList) {

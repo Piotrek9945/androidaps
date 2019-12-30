@@ -8,7 +8,7 @@ class BolusService {
         const val ACCURATE_CARB_COEFFICIENT = 0.9
 
         fun calculateCarb(food : Food) : Double {
-            return food.carbs * food.portionCount * food.correctionFactor * food.accurateCarbCorrection
+            return food.carbs * food.portionCount * food.correctionFactor * food.accurateCarbCorrection * food.sensitivityFactor
         }
 
         fun calculateCarb(foodList: List<Food>): Int {

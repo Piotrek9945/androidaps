@@ -47,7 +47,7 @@ class EcarbService {
                 )
             }
 
-            return eCarbs * food.portionCount * food.correctionFactor * food.accurateEcarbCorrection * food.eCarbCorrection
+            return eCarbs * food.portionCount * food.correctionFactor * food.accurateEcarbCorrection * food.eCarbCorrection * food.sensitivityFactor
         }
 
         fun generateEcarbs(newEcarbs : Int) {
