@@ -97,6 +97,17 @@ public class Food implements Serializable {
         return food;
     }
 
+    public static Food createFood(int carbs, int energy, int protein, int fat, double portionCount, boolean accurate) {
+        Food food = new Food();
+        food.carbs = carbs;
+        food.energy = energy;
+        food.protein = protein;
+        food.fat = fat;
+        food.portionCount = portionCount;
+        FoodUtils.Companion.setFoodAccurateParam(food, accurate);
+        return food;
+    }
+
     public boolean isEqual(Food other) {
         if (portion != other.portion)
             return false;

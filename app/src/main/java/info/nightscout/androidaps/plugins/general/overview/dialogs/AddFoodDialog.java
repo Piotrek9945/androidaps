@@ -29,6 +29,7 @@ import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.EcarbService;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
+import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.utils.NumberPicker;
 
 public class AddFoodDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -272,7 +273,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private void prepareFoodList(double count, boolean accurate, double eCarbCorrection) {
         Food foodCopy = FoodService.cloneFood(food);
         foodCopy.eCarbCorrection = eCarbCorrection;
-        setFoodAccurateParam(foodCopy, accurate);
+        FoodUtils.Companion.setFoodAccurateParam(foodCopy, accurate);
         multiplyCountByPortions(foodCopy, count);
         FoodService.setLastFood(foodCopy);
         FoodService.addFoodToList(foodCopy);
@@ -283,19 +284,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         Food foodCopy = FoodService.cloneFood(food);
         foodCopy.eCarbCorrection = eCarbCorrection;
         foodCopy.portionCount = 1;
-        setFoodAccurateParam(foodCopy, accurate);
+        FoodUtils.Companion.setFoodAccurateParam(foodCopy, accurate);
         multiplyCountByPortions(foodCopy, count);
         EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
-    }
-
-    private void setFoodAccurateParam(Food food, boolean accurate) {
-        if (accurate == true) {
-            food.accurateCarbCorrection = 1;
-            food.accurateEcarbCorrection = 1;
-        } else {
-            food.accurateCarbCorrection = BolusService.ACCURATE_CARB_COEFFICIENT;
-            food.accurateEcarbCorrection = EcarbService.ACCURATE_ECARB_COEFFICIENT;
-        }
     }
 
     private void multiplyCountByPortions(Food food, double count) {

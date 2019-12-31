@@ -96,6 +96,7 @@ import info.nightscout.androidaps.plugins.general.overview.dialogs.CalibrationDi
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewInsulinDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewTreatmentDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.NutritionWizardDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.WizardDialog;
 import info.nightscout.androidaps.plugins.general.overview.graphData.GraphData;
 import info.nightscout.androidaps.plugins.general.wear.ActionStringHandler;
@@ -183,6 +184,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
     SingleClickButton carbsButton;
     SingleClickButton cgmButton;
     SingleClickButton quickWizardButton;
+    SingleClickButton calculatorButton;
     SingleClickButton lastFoodButton;
 
     boolean smallWidth;
@@ -293,6 +295,9 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
         quickWizardButton = (SingleClickButton) view.findViewById(R.id.overview_quickwizardbutton);
         quickWizardButton.setOnClickListener(this);
         quickWizardButton.setOnLongClickListener(this);
+        calculatorButton = (SingleClickButton) view.findViewById(R.id.overview_calculator_button);
+        calculatorButton.setOnClickListener(this);
+        calculatorButton.setOnLongClickListener(this);
         calibrationButton = (SingleClickButton) view.findViewById(R.id.overview_calibrationbutton);
         if (calibrationButton != null)
             calibrationButton.setOnClickListener(this);
@@ -838,6 +843,9 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                 WizardDialog wizardDialog = new WizardDialog();
                 wizardDialog.show(manager, "WizardDialog");
                 break;
+            case R.id.overview_calculator_button:
+                new NutritionWizardDialog().show(manager, "NutritionWizardDialog");
+                break;
             case R.id.overview_calibrationbutton:
                 if (xdrip) {
                     CalibrationDialog calibrationDialog = new CalibrationDialog();
@@ -1261,7 +1269,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             if (SP.getBoolean(R.string.key_show_carbs_button, true)
                     && (!ConfigBuilderPlugin.getPlugin().getActivePump().getPumpDescription().storesCarbInfo ||
                     (pump.isInitialized() && !pump.isSuspended()))) {
-                carbsButton.setVisibility(View.VISIBLE);
+                carbsButton.setVisibility(View.GONE);
             } else {
                 carbsButton.setVisibility(View.GONE);
             }
@@ -1277,14 +1285,14 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             }
             if (pump.isInitialized() && !pump.isSuspended() && wizardButton != null) {
                 if (SP.getBoolean(R.string.key_show_wizard_button, true)) {
-                    wizardButton.setVisibility(View.VISIBLE);
+                    wizardButton.setVisibility(View.GONE);
                 } else {
                     wizardButton.setVisibility(View.GONE);
                 }
             }
             if (pump.isInitialized() && !pump.isSuspended() && insulinButton != null) {
                 if (SP.getBoolean(R.string.key_show_insulin_button, true)) {
-                    insulinButton.setVisibility(View.VISIBLE);
+                    insulinButton.setVisibility(View.GONE);
                 } else {
                     insulinButton.setVisibility(View.GONE);
                 }
