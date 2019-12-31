@@ -96,6 +96,7 @@ import info.nightscout.androidaps.plugins.general.overview.dialogs.CalibrationDi
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewInsulinDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewTreatmentDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.NutritionWizardDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.WizardDialog;
 import info.nightscout.androidaps.plugins.general.overview.graphData.GraphData;
 import info.nightscout.androidaps.plugins.general.wear.ActionStringHandler;
@@ -841,6 +842,9 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             case R.id.overview_wizardbutton:
                 WizardDialog wizardDialog = new WizardDialog();
                 wizardDialog.show(manager, "WizardDialog");
+                break;
+            case R.id.overview_calculator_button:
+                new NutritionWizardDialog().show(manager, "NutritionWizardDialog");
                 break;
             case R.id.overview_calibrationbutton:
                 if (xdrip) {
