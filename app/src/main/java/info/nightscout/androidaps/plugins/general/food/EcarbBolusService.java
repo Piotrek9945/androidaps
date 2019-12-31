@@ -44,7 +44,7 @@ public class EcarbBolusService {
                     text = text.concat(", " + FoodUtils.Companion.formatFloatToDisplay(food.portion * food.portionCount) + " " + food.units + ", ");
                 }
                 text = text.concat("eCarbs: " + "<font color='" + MainApp.gc(R.color.carbs) + "'>" + FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)) + "</font>");
-                text = text.concat(", Węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(BolusService.Companion.calculateCarb(food)) + "</font>");
+                text = text.concat(", węglow.: " + "<font color='" + MainApp.gc(R.color.colorCalculatorButton) + "'>" + FoodUtils.Companion.roundDoubleToInt(BolusService.Companion.calculateCarb(food)) + "</font>");
                 actions.add(text);
             }
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
