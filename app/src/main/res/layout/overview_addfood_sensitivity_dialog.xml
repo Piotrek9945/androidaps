@@ -24,7 +24,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="Wrażliwość"
+                android:text="Ruch"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/colorCarbsButton" />
 
@@ -41,35 +41,35 @@
                     android:layout_height="wrap_content">
 
                     <RadioButton
-                        android:id="@+id/number_1"
+                        android:id="@+id/sensitivity_bolus_factor_grade_1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="1" />
+                        android:text="bardzo mały" />
 
                     <RadioButton
-                        android:id="@+id/number_2"
+                        android:id="@+id/sensitivity_bolus_factor_grade_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2" />
+                        android:text="mały (np. krótki spacer)" />
 
                     <RadioButton
-                        android:id="@+id/number_3"
+                        android:id="@+id/sensitivity_bolus_factor_grade_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="3" />
+                        android:text="średni (np. umiarkowana praca fizyczna)" />
 
                     <RadioButton
-                        android:id="@+id/number_4"
+                        android:id="@+id/sensitivity_bolus_factor_grade_4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4" />
+                        android:text="duży (np. ciężka praca fizyczna)" />
 
                     <RadioButton
-                        android:id="@+id/number_5"
+                        android:id="@+id/sensitivity_bolus_factor_grade_5"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5" />
+                        android:text="bardzo duży (np. bieganie)" />
 
                 </RadioGroup>
 
