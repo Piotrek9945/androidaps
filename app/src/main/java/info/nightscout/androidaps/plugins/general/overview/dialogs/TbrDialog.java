@@ -19,22 +19,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.util.Date;
 
+import info.nightscout.androidaps.Constants;
 import info.nightscout.androidaps.R;
+import info.nightscout.androidaps.data.Profile;
+import info.nightscout.androidaps.db.Source;
+import info.nightscout.androidaps.db.TempTarget;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.plugins.profile.ns.NSProfilePlugin;
+import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
+import info.nightscout.androidaps.utils.JsonHelper;
 import info.nightscout.androidaps.utils.NumberPicker;
 
 public class TbrDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(TbrDialog.class);
 
-    private final int TBR_PERCENTAGE_RESET = 100;
     private final int TBR_PERCENTAGE_1 = 85;
+    private final int TEMP_TARGET_1 = 110;
+
     private final int TBR_PERCENTAGE_2 = 75;
+    private final int TEMP_TARGET_2 = 120;
+
     private final int TBR_PERCENTAGE_3 = 60;
+    private final int TEMP_TARGET_3 = 130;
+
     private final int TBR_PERCENTAGE_4 = 50;
+    private final int TEMP_TARGET_4 = 140;
 
     private RadioGroup tbrRadioGroup;
     private NumberPicker durationPicker;
@@ -77,7 +90,8 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
         resetButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setTbr(100, 0);
+                setTBR(100, 0);
+                setTempTarget(120, 0);
                 dismiss();
             }
         });
@@ -119,15 +133,34 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
         try {
             int tbrPercentage = getTbrPercentage();
             int durationInHours = FoodUtils.Companion.roundDoubleToInt(durationPicker.getValue());
-            setTbr(tbrPercentage, durationInHours);
+            if (durationInHours < 0) dismiss();
+            setTBR(tbrPercentage, durationInHours);
+            switch(tbrPercentage) {
+                case TBR_PERCENTAGE_1:
+                    setTempTarget(TEMP_TARGET_1, durationInHours);
+                    break;
+
+                case TBR_PERCENTAGE_2:
+                    setTempTarget(TEMP_TARGET_2, durationInHours);
+                    break;
+
+                case TBR_PERCENTAGE_3:
+                    setTempTarget(TEMP_TARGET_3, durationInHours);
+                    break;
+
+                case TBR_PERCENTAGE_4:
+                    setTempTarget(TEMP_TARGET_4, durationInHours);
+                    break;
+
+                default: throw new NullPointerException();
+            }
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
         }
     }
 
-    private void setTbr(int tbrPercentage, int durationInHours) {
-        if (durationInHours < 0) dismiss();
+    private void setTBR(int tbrPercentage, int durationInHours) {
         int durationInMinutes = durationInHours * 60;
         ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), "LocalProfile", durationInMinutes, tbrPercentage, 0);
     }
@@ -139,6 +172,27 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
             case R.id.tbr_percentage_3: return TBR_PERCENTAGE_3;
             case R.id.tbr_percentage_4: return TBR_PERCENTAGE_4;
             default: throw new NullPointerException();
+        }
+    }
+
+    private void setTempTarget(double target, int durationInHours) {
+        int durationInMinutes = durationInHours * 60;
+        final String reason = "Ręczne";
+        double targetBottom = target;
+        double targetTop = target;
+        if ((targetBottom != 0d && targetTop != 0d) || durationInMinutes == 0) {
+            TempTarget tempTarget = new TempTarget()
+                    .date(new Date().getTime())
+                    .duration(durationInMinutes)
+                    .reason(reason)
+                    .source(Source.USER);
+            if (tempTarget.durationInMinutes != 0) {
+                tempTarget.low(Profile.toMgdl(targetBottom, Constants.MGDL))
+                        .high(Profile.toMgdl(targetTop, Constants.MGDL));
+            } else {
+                tempTarget.low(0).high(0);
+            }
+            TreatmentsPlugin.getPlugin().addToHistoryTempTarget(tempTarget);
         }
     }
 
