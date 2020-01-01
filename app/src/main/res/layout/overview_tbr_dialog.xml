@@ -3,13 +3,11 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".plugins.general.overview.dialogs.AddFoodDialog">
+    android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -24,7 +22,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:text="Ruch"
+                android:text="Tymczasowa baza"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/colorCarbsButton" />
 
@@ -36,37 +34,33 @@
                 android:orientation="vertical">
 
                 <RadioGroup
-                    android:id="@+id/addfood_sensitivity"
+                    android:id="@+id/tbr_grade"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20px"
+                    android:layout_marginBottom="20px">
 
                     <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_1"
+                        android:id="@+id/tbr_percentage_1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="bardzo mały" />
-
-                    <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="mały (np. krótki spacer)" />
 
                     <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_3"
+                        android:id="@+id/tbr_percentage_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="średni (np. umiarkowana praca fizyczna)" />
 
                     <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_4"
+                        android:id="@+id/tbr_percentage_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="duży (np. ciężka praca fizyczna)" />
 
                     <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_5"
+                        android:id="@+id/tbr_percentage_4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="bardzo duży (np. bieganie)" />
@@ -75,9 +69,47 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="57dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="60px"
+                    android:layout_weight="1"
+                    android:paddingTop="5px"
+                    android:text="czas trwania"
+                    android:textAlignment="textEnd" />
 
-            <include layout="@layout/mdtp_done_button" />
+                <info.nightscout.androidaps.utils.NumberPicker
+                    android:id="@+id/tbr_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp">
+
+                </info.nightscout.androidaps.utils.NumberPicker>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/tbr_reset_button"
+                    style="@style/mdtp_ActionButton.Text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="fill"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginRight="8dp"
+                    android:text="Resetuj" />
+
+                <include layout="@layout/mdtp_done_button" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

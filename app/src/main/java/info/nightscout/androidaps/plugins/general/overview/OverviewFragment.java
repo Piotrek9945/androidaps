@@ -97,6 +97,7 @@ import info.nightscout.androidaps.plugins.general.overview.dialogs.NewCarbsDialo
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewInsulinDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NewTreatmentDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.NutritionWizardDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.WizardDialog;
 import info.nightscout.androidaps.plugins.general.overview.graphData.GraphData;
 import info.nightscout.androidaps.plugins.general.wear.ActionStringHandler;
@@ -186,6 +187,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
     SingleClickButton quickWizardButton;
     SingleClickButton calculatorButton;
     SingleClickButton lastFoodButton;
+    SingleClickButton tbrButton;
 
     boolean smallWidth;
     boolean smallHeight;
@@ -306,6 +308,8 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             cgmButton.setOnClickListener(this);
         lastFoodButton = (SingleClickButton) view.findViewById(R.id.overview_last_food_button);
         lastFoodButton.setOnClickListener(this);
+        tbrButton = (SingleClickButton) view.findViewById(R.id.overview_tbr_button);
+        tbrButton.setOnClickListener(this);
 
         acceptTempLayout = (LinearLayout) view.findViewById(R.id.overview_accepttemplayout);
 
@@ -896,6 +900,10 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                 if (lastFood != null && FoodService.getFoodList().size() == 0) {
                     new AddFoodDialog(lastFood, true).show(manager, "AddFoodDialog");
                 }
+                break;
+            case R.id.overview_tbr_button:
+                new TbrDialog().show(manager, "TbrDialog");
+                break;
         }
 
     }

@@ -1,15 +1,12 @@
 package info.nightscout.androidaps.plugins.general.overview.dialogs;
 
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -19,24 +16,20 @@ import androidx.fragment.app.DialogFragment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.Food;
-import info.nightscout.androidaps.plugins.general.food.FoodService;
-import info.nightscout.androidaps.utils.NumberPicker;
-import info.nightscout.androidaps.utils.SpinnerHelper;
 
 public class AddFoodSensitivityDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodSensitivityDialog.class);
 
-    private final Double SENSITIVITY_FACTOR_GRADE_1 = 1.0;
-    private final Double SENSITIVITY_FACTOR_GRADE_2 = 0.9;
-    private final Double SENSITIVITY_FACTOR_GRADE_3 = 0.8;
-    private final Double SENSITIVITY_FACTOR_GRADE_4 = 0.7;
-    private final Double SENSITIVITY_FACTOR_GRADE_5 = 0.6;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1.0;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_5 = 0.6;
 
     private List<Food> foodList;
 
@@ -106,25 +99,19 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
     }
 
     private void setSensitivityFactor(List<Food> foodList) {
-        Double sensitivityFactor = getSensitivityFactor(getSelectedSensitivity());
+        Double sensitivityFactor = getSensitivityFactor();
         for (Food food : foodList) {
             food.sensitivityFactor = sensitivityFactor;
         }
     }
 
-    private Integer getSelectedSensitivity() {
-        RadioButton selectedSensitivity = getView().findViewById(sensitivityRadioGroup.getCheckedRadioButtonId());
-        String sensitivityTextValue = selectedSensitivity.getText().toString();
-        return Integer.parseInt(sensitivityTextValue);
-    }
-
-    private Double getSensitivityFactor(Integer sensitivityRadioButtonTextValue) {
-        switch (sensitivityRadioButtonTextValue) {
-            case 1: return SENSITIVITY_FACTOR_GRADE_1;
-            case 2: return SENSITIVITY_FACTOR_GRADE_2;
-            case 3: return SENSITIVITY_FACTOR_GRADE_3;
-            case 4: return SENSITIVITY_FACTOR_GRADE_4;
-            case 5: return SENSITIVITY_FACTOR_GRADE_5;
+    private Double getSensitivityFactor() {
+        switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
+            case R.id.sensitivity_bolus_factor_grade_1: return SENSITIVITY_BOLUS_FACTOR_GRADE_1;
+            case R.id.sensitivity_bolus_factor_grade_2: return SENSITIVITY_BOLUS_FACTOR_GRADE_2;
+            case R.id.sensitivity_bolus_factor_grade_3: return SENSITIVITY_BOLUS_FACTOR_GRADE_3;
+            case R.id.sensitivity_bolus_factor_grade_4: return SENSITIVITY_BOLUS_FACTOR_GRADE_4;
+            case R.id.sensitivity_bolus_factor_grade_5: return SENSITIVITY_BOLUS_FACTOR_GRADE_5;
             default: throw new NullPointerException();
         }
     }
