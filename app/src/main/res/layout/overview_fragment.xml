@@ -527,6 +527,21 @@
                     android:visibility="visible" />
 
                 <info.nightscout.androidaps.utils.SingleClickButton
+                    android:id="@+id/overview_tbr_button"
+                    style="?android:attr/buttonStyle"
+                    android:layout_width="0px"
+                    android:layout_height="fill_parent"
+                    android:layout_marginRight="-4dp"
+                    android:layout_weight="0.5"
+                    android:drawableTop="@drawable/icon_actions_starttempbasal"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:text="TBR"
+                    android:textColor="@color/colorSetTempButton"
+                    android:textSize="10sp"
+                    android:visibility="visible" />
+
+                <info.nightscout.androidaps.utils.SingleClickButton
                     android:id="@+id/overview_cgmbutton"
                     style="?android:attr/buttonStyle"
                     android:layout_width="0px"
