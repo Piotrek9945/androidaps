@@ -5,7 +5,7 @@ import info.nightscout.androidaps.plugins.general.food.FoodUtils.Companion.round
 class BolusService {
     companion object {
 
-        const val ACCURATE_CARB_COEFFICIENT = 0.9
+        const val ACCURATE_CARB_COEFFICIENT = 0.85
 
         fun calculateCarb(food : Food) : Double {
             return food.carbs * food.portionCount * food.correctionFactor * food.accurateCarbCorrection * food.sensitivityFactor
