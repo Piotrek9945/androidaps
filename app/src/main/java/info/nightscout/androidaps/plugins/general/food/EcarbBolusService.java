@@ -82,13 +82,38 @@ public class EcarbBolusService {
         int eCarbs = EcarbService.Companion.calculateEcarbs(foodList);
         int carbs = BolusService.Companion.calculateCarb(foodList);
 
+        Nutrition nutrition = new Nutrition(carbs, eCarbs);
+        fatProteinImpact(nutrition);
+
         if (carbs > 0) {
-            generateEcarbAndBolus(context, carbs, eCarbs);
+            generateEcarbAndBolus(context, nutrition.getCarbs(), nutrition.getECarbs());
         } else {
-            EcarbService.Companion.generateEcarbs(eCarbs);
+            EcarbService.Companion.generateEcarbs(nutrition.getECarbs());
         }
 
         FoodService.clearFoodCountAdded();
+    }
+
+    private static void fatProteinImpact(Nutrition nutrition) {
+        int oldCarbs = nutrition.getCarbs();
+        int oldECarbs = nutrition.getECarbs();
+
+        int delta;
+        if (oldECarbs > 40) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.3);
+        } else if (oldECarbs > 30) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.2);
+        } else if (oldECarbs > 20) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
+        } else {
+            delta = 0;
+        }
+
+        int newCarbs = oldCarbs - delta;
+        int newECarbs = oldECarbs + delta;
+
+        nutrition.setCarbs(newCarbs);
+        nutrition.setECarbs(newECarbs);
     }
 
     public static void generateEcarbAndBolus(Context context, int carbs, int eCarbs) {
