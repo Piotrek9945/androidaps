@@ -1300,7 +1300,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
             }
             if (pump.isInitialized() && !pump.isSuspended() && insulinButton != null) {
                 if (SP.getBoolean(R.string.key_show_insulin_button, true)) {
-                    insulinButton.setVisibility(View.GONE);
+                    insulinButton.setVisibility(View.VISIBLE);
                 } else {
                     insulinButton.setVisibility(View.GONE);
                 }

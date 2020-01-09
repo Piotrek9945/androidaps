@@ -20,7 +20,7 @@ import kotlin.math.abs
 class EcarbService {
     companion object {
 
-        const val ACCURATE_ECARB_COEFFICIENT = 0.85
+        const val ACCURATE_ECARB_COEFFICIENT = 1.0
         private var RECENTLY_CREATED_MILLIS = 30 * 60 * 1000L
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
@@ -183,10 +183,10 @@ class EcarbService {
 
         private fun getDuration(eCarbs: Int): Int {
             val wbt = getWBT(eCarbs)
-            return if (wbt > 6) {
-                8
-            } else {
-                wbt + 2
+            return when {
+                wbt > 5 -> 7
+                wbt > 2 -> wbt + 1
+                else -> wbt + 2
             }
         }
 
