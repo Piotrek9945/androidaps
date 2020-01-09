@@ -20,7 +20,7 @@ import kotlin.math.abs
 class EcarbService {
     companion object {
 
-        const val ACCURATE_ECARB_COEFFICIENT = 0.85
+        const val ACCURATE_ECARB_COEFFICIENT = 1.0
         private var RECENTLY_CREATED_MILLIS = 30 * 60 * 1000L
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
