@@ -229,6 +229,9 @@ public class CommandQueue {
             //Carbs only can be added in parallel as they can be "in the future".
         } else {
             if (isRunning(type) && (isEcarbEnded == false || eCarbs == 0)) {
+                if (callback == null || callback.result == null) {
+                    return false;
+                }
                 if (!callback.result.success) {
                     callback.result(executingNowError()).run();
                 }
