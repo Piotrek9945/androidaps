@@ -176,7 +176,7 @@ class EcarbService {
             val time = now() + ECARB_TIME_OFFSET_MINS * 1000 * 60
 
             if (eCarbsAfterConstraints > 0) {
-                CarbsGenerator.generateCarbs(eCarbsAfterConstraints, time, duration, "")
+                CarbsGenerator.createCarb(eCarbsAfterConstraints, time, "", "")
                 NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, duration, ECARB_TIME_OFFSET_MINS))
             }
         }
