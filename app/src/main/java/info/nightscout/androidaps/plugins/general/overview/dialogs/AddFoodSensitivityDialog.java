@@ -27,11 +27,11 @@ import info.nightscout.androidaps.plugins.general.food.Food;
 public class AddFoodSensitivityDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodSensitivityDialog.class);
 
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1.0;
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9;
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8;
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7;
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_5 = 0.6;
+    public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1.0;
+    public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9;
+    public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8;
+    public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7;
+    public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_5 = 0.6;
 
     private List<Food> foodList;
 
@@ -92,8 +92,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         }
         okClicked = true;
         try {
-            TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
-            setSensitivityFactor(foodList);
+            setSensitivityFactor(getSensitivityFactor(), foodList);
             EcarbBolusService.generateTreatment(getContext(), foodList);
             dismiss();
         } catch (Exception e) {
@@ -101,8 +100,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         }
     }
 
-    private void setSensitivityFactor(List<Food> foodList) {
-        Double sensitivityFactor = getSensitivityFactor();
+    public static void setSensitivityFactor(Double sensitivityFactor, List<Food> foodList) {
         for (Food food : foodList) {
             food.sensitivityFactor = sensitivityFactor;
         }
