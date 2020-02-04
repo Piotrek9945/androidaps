@@ -100,11 +100,11 @@ public class EcarbBolusService {
 
         int delta;
         if (oldECarbs > 40) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.2);
-        } else if (oldECarbs > 30) {
             delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.15);
-        } else if (oldECarbs > 20) {
+        } else if (oldECarbs > 30) {
             delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
+        } else if (oldECarbs > 20) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.05);
         } else {
             delta = 0;
         }
