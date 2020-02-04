@@ -13,6 +13,8 @@ import android.widget.RadioGroup;
 
 import androidx.fragment.app.DialogFragment;
 
+import info.nightscout.androidaps.db.TempTarget;
+import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +92,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         }
         okClicked = true;
         try {
+            TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
             setSensitivityFactor(foodList);
             EcarbBolusService.generateTreatment(getContext(), foodList);
             dismiss();
