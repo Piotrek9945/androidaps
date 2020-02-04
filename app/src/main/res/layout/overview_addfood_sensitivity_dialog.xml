@@ -45,25 +45,25 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="bardzo mały" />
+                        android:text="brak" />
 
                     <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="mały (np. krótki spacer)" />
+                        android:text="mały" />
 
                     <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="średni (np. umiarkowana praca fizyczna)" />
+                        android:text="średni" />
 
                     <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="duży (np. ciężka praca fizyczna)" />
+                        android:text="duży" />
 
                     <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_5"
