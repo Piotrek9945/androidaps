@@ -45,25 +45,25 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="mały (np. krótki spacer)" />
+                        android:text="brak ruchu" />
 
                     <RadioButton
                         android:id="@+id/tbr_percentage_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="średni (np. umiarkowana praca fizyczna)" />
+                        android:text="mały ruch" />
 
                     <RadioButton
                         android:id="@+id/tbr_percentage_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="duży (np. ciężka praca fizyczna)" />
+                        android:text="średni ruch" />
 
                     <RadioButton
                         android:id="@+id/tbr_percentage_4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="bardzo duży (np. bieganie)" />
+                        android:text="duży ruch" />
 
                 </RadioGroup>
 

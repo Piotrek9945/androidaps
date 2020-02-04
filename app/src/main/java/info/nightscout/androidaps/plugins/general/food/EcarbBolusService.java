@@ -18,12 +18,14 @@ import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.data.Profile;
 import info.nightscout.androidaps.data.QuickWizardEntry;
+import info.nightscout.androidaps.db.TempTarget;
 import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodPercentDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
+import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.OKDialog;
 
@@ -49,7 +51,22 @@ public class EcarbBolusService {
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
-                    showSensitivityDialog(manager, foodList);
+                    TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
+                    if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 110) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList);
+                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 120) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_3, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList);
+                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 130) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_4, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList);
+                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 140) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_5, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList);
+                    } else {
+                        showSensitivityDialog(manager, foodList);
+                    }
                 }
             });
             builder.setNeutralButton("KOREKTA", (dialog, id) -> {
@@ -100,11 +117,11 @@ public class EcarbBolusService {
 
         int delta;
         if (oldECarbs > 40) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.2);
-        } else if (oldECarbs > 30) {
             delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.15);
-        } else if (oldECarbs > 20) {
+        } else if (oldECarbs > 30) {
             delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
+        } else if (oldECarbs > 20) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.05);
         } else {
             delta = 0;
         }
