@@ -110,7 +110,7 @@ public class EcarbBolusService {
         }
 
         int newCarbs = oldCarbs - delta;
-        int newECarbs = oldECarbs;
+        int newECarbs = oldECarbs + delta;
 
         nutrition.setCarbs(newCarbs);
         nutrition.setECarbs(newECarbs);
