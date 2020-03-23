@@ -298,8 +298,6 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                         i.putExtra("title", MainApp.gs(R.string.tempbasaldeliveryerror))
                                         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                         MainApp.instance().startActivity(i)
-                                    } else {
-                                        EcarbService.generateEcarbs(eCarbs)
                                     }
                                 }
                             })
@@ -341,6 +339,8 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                     i.putExtra("title", MainApp.gs(R.string.treatmentdeliveryerror))
                                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     MainApp.instance().startActivity(i)
+                                } else {
+                                    EcarbService.generateEcarbs(eCarbs)
                                 }
                             }
                         })
