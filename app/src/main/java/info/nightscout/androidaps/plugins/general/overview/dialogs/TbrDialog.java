@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import info.nightscout.androidaps.Constants;
@@ -30,6 +32,8 @@ import info.nightscout.androidaps.db.TempTarget;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.food.FoodUtils;
+import info.nightscout.androidaps.plugins.profile.local.LocalProfileFragment;
+import info.nightscout.androidaps.plugins.profile.local.LocalProfilePlugin;
 import info.nightscout.androidaps.plugins.profile.ns.NSProfilePlugin;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.DateUtil;
@@ -163,8 +167,9 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
     }
 
     private void setTBR(int tbrPercentage, int durationInHours) {
+        String currentProfileName = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(DateUtil.now()).profileName;
         int durationInMinutes = durationInHours * 60;
-        ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), "LocalProfile", durationInMinutes, tbrPercentage, 0, DateUtil.now());
+        ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), currentProfileName, durationInMinutes, tbrPercentage, 0, DateUtil.now());
     }
 
     private int getTbrPercentage() {
