@@ -177,6 +177,7 @@ public class MainApp extends Application {
             pluginsList = new ArrayList<>();
             // Register all tabs in app here
             pluginsList.add(OverviewPlugin.INSTANCE);
+            pluginsList.add(FoodPlugin.getPlugin());
             pluginsList.add(IobCobCalculatorPlugin.getPlugin());
             if (!Config.NSCLIENT) pluginsList.add(ActionsPlugin.INSTANCE);
             pluginsList.add(InsulinOrefRapidActingPlugin.getPlugin());
@@ -218,7 +219,6 @@ public class MainApp extends Application {
             pluginsList.add(SourceEversensePlugin.getPlugin());
             pluginsList.add(RandomBgPlugin.INSTANCE);
             if (!Config.NSCLIENT) pluginsList.add(SmsCommunicatorPlugin.INSTANCE);
-            pluginsList.add(FoodPlugin.getPlugin());
 
             pluginsList.add(WearPlugin.initPlugin(this));
             pluginsList.add(StatuslinePlugin.initPlugin(this));
