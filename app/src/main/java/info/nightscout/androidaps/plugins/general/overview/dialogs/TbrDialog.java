@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 import info.nightscout.androidaps.Constants;
@@ -31,6 +32,7 @@ import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.plugins.profile.ns.NSProfilePlugin;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
+import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.JsonHelper;
 import info.nightscout.androidaps.utils.NumberPicker;
 
@@ -162,7 +164,7 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
     private void setTBR(int tbrPercentage, int durationInHours) {
         int durationInMinutes = durationInHours * 60;
-        ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), "LocalProfile", durationInMinutes, tbrPercentage, 0);
+        ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), "LocalProfile", durationInMinutes, tbrPercentage, 0, DateUtil.now());
     }
 
     private int getTbrPercentage() {
