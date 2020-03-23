@@ -106,7 +106,7 @@ class WizardDialog : DialogFragment() {
                 okClicked = true
                 calculateInsulin()
                 context?.let { context ->
-                    wizard?.confirmAndExecute(context)
+                    wizard?.confirmAndExecute(context, 0)
                 }
             }
             dismiss()
