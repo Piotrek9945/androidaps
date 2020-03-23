@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.util.Date;
 
 import info.nightscout.androidaps.Constants;
@@ -31,6 +32,7 @@ import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.plugins.profile.ns.NSProfilePlugin;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
+import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.JsonHelper;
 import info.nightscout.androidaps.utils.NumberPicker;
 
@@ -74,8 +76,8 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.overview_tbr_dialog, container, false);
 
-        view.findViewById(R.id.ok).setOnClickListener(this);
-        view.findViewById(R.id.cancel).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_ok).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_cancel).setOnClickListener(this);
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -83,7 +85,7 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
         tbrRadioGroup = view.findViewById(R.id.tbr_grade);
 
         durationPicker = view.findViewById(R.id.tbr_duration);
-        durationPicker.setParams(1d, 1d, 48d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), textWatcher);
+        durationPicker.setParams(1d, 1d, 48d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
         durationPicker.setOnClickListener(this);
 
         resetButton = view.findViewById(R.id.tbr_reset_button);
@@ -114,10 +116,10 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
     @Override
     public synchronized void onClick(View view) {
         switch (view.getId()) {
-            case R.id.ok:
+            case R.id.mdtp_ok:
                 submit();
                 break;
-            case R.id.cancel:
+            case R.id.mdtp_cancel:
                 dismiss();
                 break;
         }
@@ -162,7 +164,7 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
     private void setTBR(int tbrPercentage, int durationInHours) {
         int durationInMinutes = durationInHours * 60;
-        ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), "LocalProfile", durationInMinutes, tbrPercentage, 0);
+        ProfileFunctions.doProfileSwitch(ConfigBuilderPlugin.getPlugin().getActiveProfileInterface().getProfile(), "LocalProfile", durationInMinutes, tbrPercentage, 0, DateUtil.now());
     }
 
     private int getTbrPercentage() {

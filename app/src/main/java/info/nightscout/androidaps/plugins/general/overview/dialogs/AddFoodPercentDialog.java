@@ -58,14 +58,14 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.overview_addfood_percent_dialog, container, false);
 
-        view.findViewById(R.id.ok).setOnClickListener(this);
-        view.findViewById(R.id.cancel).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_ok).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_cancel).setOnClickListener(this);
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_percent);
-        editCount.setParams(100d, 30d, 300d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        editCount.setParams(100d, 30d, 300d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -87,10 +87,10 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
     @Override
     public synchronized void onClick(View view) {
         switch (view.getId()) {
-            case R.id.ok:
+            case R.id.mdtp_ok:
                 submit();
                 break;
-            case R.id.cancel:
+            case R.id.mdtp_cancel:
                 dismiss();
                 break;
         }
