@@ -63,26 +63,26 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.overview_nutrition_wizard_dialog, container, false);
 
-        view.findViewById(R.id.ok).setOnClickListener(this);
-        view.findViewById(R.id.cancel).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_ok).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_cancel).setOnClickListener(this);
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         carbPicker = view.findViewById(R.id.nutrition_wizard_carbs_input);
-        carbPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        carbPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         energyPicker = view.findViewById(R.id.nutrition_wizard_energy_input);
-        energyPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        energyPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         fatPicker = view.findViewById(R.id.nutrition_wizard_fat_input);
-        fatPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        fatPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         proteinPicker = view.findViewById(R.id.nutrition_wizard_protein_input);
-        proteinPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.ok), textWatcher);
+        proteinPicker.setParams(0d, 0d, 1000d, 1d, new DecimalFormat("0"), true, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         portionCountPicker = view.findViewById(R.id.nutrition_wizard_portion_count);
-        portionCountPicker.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.ok), textWatcher);
+        portionCountPicker.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         accurateCheckBox = view.findViewById(R.id.nutrition_wizard_accurate);
         accurateCheckBox.setOnClickListener(this);
@@ -102,10 +102,10 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
     @Override
     public synchronized void onClick(View view) {
         switch (view.getId()) {
-            case R.id.ok:
+            case R.id.mdtp_ok:
                 submit();
                 break;
-            case R.id.cancel:
+            case R.id.mdtp_cancel:
                 dismiss();
                 break;
             case R.id.nutrition_wizard_decrement_button:

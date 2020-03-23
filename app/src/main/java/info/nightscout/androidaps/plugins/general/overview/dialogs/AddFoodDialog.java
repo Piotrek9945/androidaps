@@ -92,14 +92,14 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         List<Food> foodList = FoodService.getFoodList();
         View view = inflater.inflate(R.layout.overview_addfood_dialog, container, false);
 
-        view.findViewById(R.id.ok).setOnClickListener(this);
-        view.findViewById(R.id.cancel).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_ok).setOnClickListener(this);
+        view.findViewById(R.id.mdtp_cancel).setOnClickListener(this);
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         editCount = view.findViewById(R.id.addfood_edit_count);
-        editCount.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.ok), editCountTextWatcher);
+        editCount.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.mdtp_ok), editCountTextWatcher);
 
         floatDecrementButton = view.findViewById(R.id.decrement_button);
         floatDecrementButton.setOnClickListener(this);
@@ -121,7 +121,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         otherSettingsButton.setText(SHOW_OTHER_SETTINGS);
 
         eCarbCorrection = view.findViewById(R.id.addfood_ecarb_correction);
-        eCarbCorrection.setParams(getEcarbCorrectionInitVal(), 10d, 200d, 10d, new DecimalFormat("0"), false, view.findViewById(R.id.ok), eCarbCorrectionTextWatcher);
+        eCarbCorrection.setParams(getEcarbCorrectionInitVal(), 10d, 200d, 10d, new DecimalFormat("0"), false, view.findViewById(R.id.mdtp_ok), eCarbCorrectionTextWatcher);
         eCarbCorrection.setOnClickListener(this);
         if (FoodService.isAddedYet(food, foodList)) {
             Food foodFromList = FoodService.getFoodFromListWithTheSameId(food._id, foodList);
@@ -212,10 +212,10 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     @Override
     public synchronized void onClick(View view) {
         switch (view.getId()) {
-            case R.id.ok:
+            case R.id.mdtp_ok:
                 submit();
                 break;
-            case R.id.cancel:
+            case R.id.mdtp_cancel:
                 dismiss();
                 break;
             case R.id.decrement_button:
