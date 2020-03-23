@@ -1,5 +1,6 @@
 package info.nightscout.androidaps.plugins.general.food;
 
+import android.app.AlertDialog;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.Editable;
@@ -294,7 +295,7 @@ public class FoodFragment extends Fragment {
             return foodList.size();
         }
 
-        class FoodsViewHolder extends RecyclerView.ViewHolder {
+        class FoodsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
             TextView name;
             TextView portion;
             TextView carbs;
