@@ -52,7 +52,7 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
 
     private static List<Food> foodList = new ArrayList<>();
 
-    private static Food lastFood;
+    private static List<Food> lastFoodList = new ArrayList<>();
 
     public static void addFoodToList(Food food) {
         boolean isAddedYet = isAddedYet(food, foodList);
@@ -82,12 +82,12 @@ public class FoodService extends OrmLiteBaseService<DatabaseHelper> {
         return null;
     }
 
-    public static void setLastFood(Food food) {
-        FoodService.lastFood = cloneFood(food);
+    public static void setLastFoodList(List<Food> food) {
+        FoodService.lastFoodList = cloneFoodList(food);
     }
 
-    public static Food getLastFood() {
-        return lastFood;
+    public static List<Food> getLastFoodList() {
+        return lastFoodList;
     }
 
     public static List<Food> getFoodList() { return FoodService.foodList; }

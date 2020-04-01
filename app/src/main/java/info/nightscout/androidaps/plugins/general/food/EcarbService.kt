@@ -20,7 +20,6 @@ import kotlin.math.abs
 class EcarbService {
     companion object {
 
-        const val ACCURATE_ECARB_COEFFICIENT = 1.0
         private var RECENTLY_CREATED_MILLIS = 30 * 60 * 1000L
         @JvmStatic val ECARB_TIME_OFFSET_MINS = 15
 
@@ -47,7 +46,7 @@ class EcarbService {
                 )
             }
 
-            val returnEcarbs = eCarbs * food.portionCount * food.correctionFactor * food.accurateEcarbCorrection * food.eCarbCorrection * food.sensitivityFactor
+            val returnEcarbs = eCarbs * food.portionCount * food.correctionFactor * food.eCarbCorrection * food.sensitivityFactor
             return if (returnEcarbs < 0.0) {
                 0.0
             } else {

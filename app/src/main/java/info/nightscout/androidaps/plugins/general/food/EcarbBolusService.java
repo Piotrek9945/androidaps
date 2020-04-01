@@ -23,7 +23,7 @@ import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
-import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodPercentDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodMultiplyCorrectionDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
@@ -33,7 +33,7 @@ public class EcarbBolusService {
 
     public EcarbBolusService() {}
 
-    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList) {
+    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isMultiplyPreSet) {
         if (foodList.size() > 0) {
             List<String> actions = new LinkedList<>();
             for (Food food : foodList) {
@@ -51,6 +51,12 @@ public class EcarbBolusService {
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
+                    if (isMultiplyPreSet == false) {
+                        List<Food> foodListClone = FoodService.cloneFoodList(foodList);
+                        FoodService.getLastFoodList().clear();
+                        FoodService.setLastFoodList(foodListClone);
+                    }
+
                     TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
                     if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 110) {
                         AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2, foodList);
@@ -69,11 +75,13 @@ public class EcarbBolusService {
                     }
                 }
             });
-            builder.setNeutralButton("KOREKTA", (dialog, id) -> {
-                synchronized (builder) {
-                    showAddFoodPercent(manager, foodList);
-                }
-            });
+            if (!isMultiplyPreSet) {
+                builder.setNeutralButton("KROTNOŚĆ", (dialog, id) -> {
+                    synchronized (builder) {
+                        showAddFoodPercent(manager, foodList);
+                    }
+                });
+            }
             builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
             builder.show();
         }
@@ -88,7 +96,7 @@ public class EcarbBolusService {
     }
 
     public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
-        new AddFoodPercentDialog(foodList).show(manager, "AddFoodPercentDialog");
+        new AddFoodMultiplyCorrectionDialog(foodList).show(manager, "AddFoodPercentDialog");
     }
 
     public static void showSensitivityDialog(FragmentManager manager, List<Food> foodList) {
