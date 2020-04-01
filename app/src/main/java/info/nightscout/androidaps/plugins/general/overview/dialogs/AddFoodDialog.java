@@ -96,7 +96,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 if (food.portion == 1.0) {
                     text = text.concat(food.name + ", " + FoodUtils.Companion.formatFloatToDisplay(food.portionCount) + " " + food.units + "\n");
                 } else {
-                    text = text.concat(food.name + ", " + FoodUtils.Companion.formatFloatToDisplay(food.portionCount) + " " + "x" + " " + food.portion + " " + food.units + "\n");
+                    text = text.concat(food.name + ", " + FoodUtils.Companion.formatFloatToDisplay(food.portionCount) + " " + "x" + " " + FoodUtils.Companion.formatFloatToDisplay(food.portion) + " " + food.units + "\n");
                 }
             }
             lastMealText.setText(text);

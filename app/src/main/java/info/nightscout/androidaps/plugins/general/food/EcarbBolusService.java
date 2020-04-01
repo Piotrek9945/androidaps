@@ -75,12 +75,14 @@ public class EcarbBolusService {
                     }
                 }
             });
-            builder.setNeutralButton("KROTNOŚĆ", (dialog, id) -> {
-                synchronized (builder) {
-                    showAddFoodPercent(manager, foodList);
-                }
-            });
-            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+            if (!isMultiplyPreSet) {
+                builder.setNeutralButton("KROTNOŚĆ", (dialog, id) -> {
+                    synchronized (builder) {
+                        showAddFoodPercent(manager, foodList);
+                    }
+                });
+                builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
+            }
             builder.show();
         }
     }
