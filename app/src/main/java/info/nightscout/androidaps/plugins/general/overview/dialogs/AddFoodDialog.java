@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
@@ -24,12 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 import info.nightscout.androidaps.R;
-import info.nightscout.androidaps.plugins.general.food.BolusService;
 import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
-import info.nightscout.androidaps.plugins.general.food.EcarbService;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
-import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.utils.NumberPicker;
 
 public class AddFoodDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -42,7 +38,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private Button floatDecrementButton;
     private Button floatIncrementButton;
     private TextView lastMealText;
-    private CheckBox accurate;
     private Button otherSettingsButton;
     private NumberPicker eCarbCorrection;
     private TextView eCarbCorrectionText;
@@ -113,9 +108,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             lastMealText.setText(food.name + ", " + food.portion + " " + food.units);
         }
 
-        accurate = view.findViewById(R.id.accurate);
-        accurate.setOnClickListener(this);
-
         otherSettingsButton = view.findViewById(R.id.other_settings_button);
         otherSettingsButton.setOnClickListener(this);
         otherSettingsButton.setText(SHOW_OTHER_SETTINGS);
@@ -128,36 +120,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             eCarbCorrection.setValue(foodFromList.eCarbCorrection * 100);
             disableEcarbCorrectionPicker();
         }
-        final Double[] eCarbCorrectionOldValue = new Double[1];
-        accurate.setOnCheckedChangeListener(
-                (buttonView, isChecked) -> {
-                    if (isChecked == true) {
-                        eCarbCorrectionOldValue[0] = eCarbCorrection.getValue();
-                        eCarbCorrection.setValue(100d);
-                        disableEcarbCorrectionPicker();
-                    } else {
-                        enableEcarbCorrectionPicker();
-                        if (eCarbCorrectionOldValue[0] != null) {
-                            eCarbCorrection.setValue(eCarbCorrectionOldValue[0]);
-                        }
-                    }
-                }
-        );
-
         eCarbCorrectionText = view.findViewById(R.id.addfood_ecarb_correction_text);
-
-        if (isLastMeal == true && isAccurate(food)) {
-            accurate.setChecked(true);
-        } else {
-            accurate.setChecked(false);
-        }
-
-        if (FoodService.isAddedYet(food, foodList)) {
-            Food foodFromList = FoodService.getFoodFromListWithTheSameId(food._id, foodList);
-            boolean _accurate = isAccurate(foodFromList);
-            accurate.setChecked(_accurate);
-            accurate.setEnabled(false);
-        }
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -184,22 +147,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 eCarbCorrection.setValue(oldValue);
             }
         });
-    }
-
-    private void enableEcarbCorrectionPicker() {
-        eCarbCorrection.setOnValueChangedListener(value -> {
-            if (eCarbCorrection.getValue() == value) {} else {
-                eCarbCorrection.setValue(value);
-            }
-        });
-    }
-
-    private boolean isAccurate(Food food) {
-        if (food.accurateCarbCorrection == 1.0 && food.accurateEcarbCorrection == 1.0) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override
@@ -256,12 +203,11 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         try {
             double count = editCount.getValue().doubleValue();
             if (count > 0) {
-                boolean accurate = this.accurate.isChecked();
                 double eCarbCorrection = this.eCarbCorrection.getValue() / 100;
                 if (isLastMeal == true) {
-                    prepareLastMeal(count, accurate, eCarbCorrection);
+                    prepareLastMeal(count, eCarbCorrection);
                 } else {
-                    prepareFoodList(count, accurate, eCarbCorrection);
+                    prepareFoodList(count, eCarbCorrection);
                 }
             }
             dismiss();
@@ -270,21 +216,19 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         }
     }
 
-    private void prepareFoodList(double count, boolean accurate, double eCarbCorrection) {
+    private void prepareFoodList(double count,  double eCarbCorrection) {
         Food foodCopy = FoodService.cloneFood(food);
         foodCopy.eCarbCorrection = eCarbCorrection;
-        FoodUtils.Companion.setFoodAccurateParam(foodCopy, accurate);
         multiplyCountByPortions(foodCopy, count);
         FoodService.setLastFood(foodCopy);
         FoodService.addFoodToList(foodCopy);
         FoodService.updateFoodCountAdded();
     }
 
-    private void prepareLastMeal(double count, boolean accurate, double eCarbCorrection) {
+    private void prepareLastMeal(double count, double eCarbCorrection) {
         Food foodCopy = FoodService.cloneFood(food);
         foodCopy.eCarbCorrection = eCarbCorrection;
         foodCopy.portionCount = 1;
-        FoodUtils.Companion.setFoodAccurateParam(foodCopy, accurate);
         multiplyCountByPortions(foodCopy, count);
         EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(foodCopy));
     }
