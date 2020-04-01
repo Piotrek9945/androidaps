@@ -9,6 +9,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 
 import androidx.fragment.app.DialogFragment;
@@ -23,19 +24,22 @@ import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.Food;
 import info.nightscout.androidaps.plugins.general.food.FoodService;
-import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.utils.NumberPicker;
 
-public class AddFoodPercentDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
-    private static Logger log = LoggerFactory.getLogger(AddFoodPercentDialog.class);
+public class AddFoodMultiplyCorrectionDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
+    private static Logger log = LoggerFactory.getLogger(AddFoodMultiplyCorrectionDialog.class);
 
     private NumberPicker editCount;
+    private NumberPicker editMultiply;
+
+    private Button decrementButton;
+    private Button incrementButton;
 
     //one shot guards
     private boolean okClicked;
     private List<Food> foodListCopy;
 
-    public AddFoodPercentDialog(List<Food> foodList) {
+    public AddFoodMultiplyCorrectionDialog(List<Food> foodList) {
         this.foodListCopy = FoodService.cloneFoodList(foodList);
     }
 
@@ -56,13 +60,22 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.overview_addfood_percent_dialog, container, false);
+        View view = inflater.inflate(R.layout.overview_addfood_meal_multiply_correction, container, false);
 
         view.findViewById(R.id.mdtp_ok).setOnClickListener(this);
         view.findViewById(R.id.mdtp_cancel).setOnClickListener(this);
 
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        editMultiply = view.findViewById(R.id.addfood_edit_multiply);
+        editMultiply.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
+
+        decrementButton = view.findViewById(R.id.overview_addfood_meal_multiply_correction_decrement_button);
+        decrementButton.setOnClickListener(this);
+
+        incrementButton = view.findViewById(R.id.overview_addfood_meal_multiply_correction_increment_button);
+        incrementButton.setOnClickListener(this);
 
         editCount = view.findViewById(R.id.addfood_edit_percent);
         editCount.setParams(100d, 30d, 300d, 5d, new DecimalFormat("0"), true, view.findViewById(R.id.mdtp_ok), textWatcher);
@@ -93,7 +106,19 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
             case R.id.mdtp_cancel:
                 dismiss();
                 break;
+            case R.id.overview_addfood_meal_multiply_correction_decrement_button:
+                changePickerValue(-1);
+                break;
+            case R.id.overview_addfood_meal_multiply_correction_increment_button:
+                changePickerValue(+1);
+                break;
         }
+    }
+
+    private void changePickerValue(double changeValue) {
+        double oldValue = editMultiply.getValue();
+        double newValue = oldValue + changeValue;
+        editMultiply.setValue(newValue);
     }
 
     private void submit() {
@@ -108,6 +133,10 @@ public class AddFoodPercentDialog extends DialogFragment implements OnClickListe
             for (Food food : foodListCopy) {
                 food.correctionFactor = correction;
             }
+
+            FoodService.getLastFoodList().clear();
+            FoodService.setLastFoodList(foodListCopy);
+
             EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy);
 
             dismiss();

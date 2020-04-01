@@ -23,7 +23,7 @@ import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
-import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodPercentDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodMultiplyCorrectionDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
@@ -69,7 +69,7 @@ public class EcarbBolusService {
                     }
                 }
             });
-            builder.setNeutralButton("KOREKTA", (dialog, id) -> {
+            builder.setNeutralButton("KROTNOŚĆ", (dialog, id) -> {
                 synchronized (builder) {
                     showAddFoodPercent(manager, foodList);
                 }
@@ -88,7 +88,7 @@ public class EcarbBolusService {
     }
 
     public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
-        new AddFoodPercentDialog(foodList).show(manager, "AddFoodPercentDialog");
+        new AddFoodMultiplyCorrectionDialog(foodList).show(manager, "AddFoodPercentDialog");
     }
 
     public static void showSensitivityDialog(FragmentManager manager, List<Food> foodList) {

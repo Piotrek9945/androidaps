@@ -899,7 +899,7 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                     ConfigBuilderPlugin.getPlugin().getCommandQueue().readStatus("RefreshClicked", null);
                 break;
             case R.id.overview_last_food_button:
-                Food lastFood = FoodService.getLastFood();
+                Food lastFood = FoodService.getLastFoodList().get(0);
                 if (lastFood != null && FoodService.getFoodList().size() == 0) {
                     new AddFoodDialog(lastFood, true).show(manager, "AddFoodDialog");
                 }

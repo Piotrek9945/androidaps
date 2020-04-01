@@ -220,7 +220,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         Food foodCopy = FoodService.cloneFood(food);
         foodCopy.eCarbCorrection = eCarbCorrection;
         multiplyCountByPortions(foodCopy, count);
-        FoodService.setLastFood(foodCopy);
         FoodService.addFoodToList(foodCopy);
         FoodService.updateFoodCountAdded();
     }
