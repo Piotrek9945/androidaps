@@ -121,7 +121,7 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
         }
         okClicked = true;
         try {
-            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(getFood()));
+            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(getFood()), false);
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
