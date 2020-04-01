@@ -81,8 +81,8 @@ public class EcarbBolusService {
                         showAddFoodPercent(manager, foodList);
                     }
                 });
-                builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
             }
+            builder.setNegativeButton(MainApp.gs(R.string.cancel), null);
             builder.show();
         }
     }

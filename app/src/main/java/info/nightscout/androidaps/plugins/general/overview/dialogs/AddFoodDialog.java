@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.List;
 
 import info.nightscout.androidaps.R;
@@ -173,8 +172,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     }
 
     private void prepareLastMeal(double count) {
-        multiplyCountByPortions(foodList, count);
-        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodList, true);
+        List<Food> foodListCopy = FoodService.cloneFoodList(foodList);
+        multiplyCountByPortions(foodListCopy, count);
+        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, true);
     }
 
     private void multiplyCountByPortions(Food food, double count) {

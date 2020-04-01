@@ -40,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -899,9 +900,9 @@ public class OverviewFragment extends Fragment implements View.OnClickListener, 
                     ConfigBuilderPlugin.getPlugin().getCommandQueue().readStatus("RefreshClicked", null);
                 break;
             case R.id.overview_last_food_button:
-                Food lastFood = FoodService.getLastFoodList().get(0);
-                if (lastFood != null && FoodService.getFoodList().size() == 0) {
-                    new AddFoodDialog(lastFood, true).show(manager, "AddFoodDialog");
+                List<Food> list = FoodService.getLastFoodList();
+                if (list != null && list.size() > 0) {
+                    new AddFoodDialog(null, true).show(manager, "AddFoodDialog");
                 }
                 break;
             case R.id.overview_tbr_button:
