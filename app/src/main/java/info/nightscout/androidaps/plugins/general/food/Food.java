@@ -48,10 +48,6 @@ public class Food implements Serializable {
 
     public double correctionFactor = 1;
 
-    public double accurateCarbCorrection = 1;
-
-    public double accurateEcarbCorrection = 1;
-
     public double eCarbCorrection = 1;
 
     public double sensitivityFactor = 1;
@@ -97,14 +93,13 @@ public class Food implements Serializable {
         return food;
     }
 
-    public static Food createFood(int carbs, int energy, int protein, int fat, double portionCount, boolean accurate) {
+    public static Food createFood(int carbs, int energy, int protein, int fat, double portionCount) {
         Food food = new Food();
         food.carbs = carbs;
         food.energy = energy;
         food.protein = protein;
         food.fat = fat;
         food.portionCount = portionCount;
-        FoodUtils.Companion.setFoodAccurateParam(food, accurate);
         return food;
     }
 

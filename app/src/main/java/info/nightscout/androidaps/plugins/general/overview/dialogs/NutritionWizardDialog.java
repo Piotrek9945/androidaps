@@ -35,7 +35,6 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
     private NumberPicker fatPicker;
     private NumberPicker proteinPicker;
     private NumberPicker portionCountPicker;
-    private CheckBox accurateCheckBox;
 
     private Button decrementButton;
     private Button incrementButton;
@@ -83,9 +82,6 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
 
         portionCountPicker = view.findViewById(R.id.nutrition_wizard_portion_count);
         portionCountPicker.setParams(1d, 0.1d, 99999d, 0.1d, new DecimalFormat("0.0"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
-
-        accurateCheckBox = view.findViewById(R.id.nutrition_wizard_accurate);
-        accurateCheckBox.setOnClickListener(this);
 
         decrementButton = view.findViewById(R.id.nutrition_wizard_decrement_button);
         decrementButton.setOnClickListener(this);
@@ -138,7 +134,7 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
         int protein = FoodUtils.Companion.roundDoubleToInt(proteinPicker.getValue());
         int fat = FoodUtils.Companion.roundDoubleToInt(fatPicker.getValue());
         double portionCount = portionCountPicker.getValue();
-        return Food.createFood(carbs, energy, protein, fat, portionCount, accurateCheckBox.isChecked());
+        return Food.createFood(carbs, energy, protein, fat, portionCount);
     }
 
     @Override
