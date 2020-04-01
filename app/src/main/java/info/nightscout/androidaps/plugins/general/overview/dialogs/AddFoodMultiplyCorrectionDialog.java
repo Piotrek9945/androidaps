@@ -134,15 +134,23 @@ public class AddFoodMultiplyCorrectionDialog extends DialogFragment implements O
                 food.correctionFactor = correction;
             }
 
-            FoodService.getLastFoodList().clear();
-            FoodService.setLastFoodList(foodListCopy);
-
-            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy);
+            setLastFoodList(foodListCopy);
+            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, true);
 
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
         }
+    }
+
+    private void setLastFoodList(List<Food> foodList) {
+        List<Food> foodListClone = FoodService.cloneFoodList(foodList);
+        for (Food food : foodListClone) {
+            food.portionCount = food.portionCount / editMultiply.getValue();
+        }
+
+        FoodService.getLastFoodList().clear();
+        FoodService.setLastFoodList(foodListClone);
     }
 
     @Override

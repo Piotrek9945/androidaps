@@ -33,7 +33,7 @@ public class EcarbBolusService {
 
     public EcarbBolusService() {}
 
-    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList) {
+    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isMultiplyPreSet) {
         if (foodList.size() > 0) {
             List<String> actions = new LinkedList<>();
             for (Food food : foodList) {
@@ -51,6 +51,12 @@ public class EcarbBolusService {
             builder.setMessage(Html.fromHtml(Joiner.on("<br/>").join(actions)));
             builder.setPositiveButton(MainApp.gs(R.string.ok), (dialog, id) -> {
                 synchronized (builder) {
+                    if (isMultiplyPreSet == false) {
+                        List<Food> foodListClone = FoodService.cloneFoodList(foodList);
+                        FoodService.getLastFoodList().clear();
+                        FoodService.setLastFoodList(foodListClone);
+                    }
+
                     TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
                     if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 110) {
                         AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2, foodList);

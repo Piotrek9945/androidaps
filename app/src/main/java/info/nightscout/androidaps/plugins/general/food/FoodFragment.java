@@ -99,7 +99,7 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.pass_bolus:
-                        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), FoodService.getFoodList());
+                        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), FoodService.getFoodList(), false);
                         break;
                 }
             }
