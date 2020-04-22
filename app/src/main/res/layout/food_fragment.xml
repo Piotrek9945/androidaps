@@ -111,6 +111,18 @@
                 android:textSize="16dp" />
 
             <TextView
+                android:id="@+id/carbs_only"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="5dp"
+                android:paddingStart="5dp"
+                android:layout_weight="1"
+                android:textAlignment="viewEnd"
+                android:textColor="@android:color/holo_purple"
+                android:text="Zapisz"
+                android:textSize="16dp" />
+
+            <TextView
                 android:id="@+id/pass_bolus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

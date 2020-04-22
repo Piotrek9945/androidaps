@@ -38,9 +38,11 @@ public class AddFoodMultiplyCorrectionDialog extends DialogFragment implements O
     //one shot guards
     private boolean okClicked;
     private List<Food> foodListCopy;
+    private boolean isCarbsOnly;
 
-    public AddFoodMultiplyCorrectionDialog(List<Food> foodList) {
+    public AddFoodMultiplyCorrectionDialog(List<Food> foodList, Boolean isCarbsOnly) {
         this.foodListCopy = FoodService.cloneFoodList(foodList);
+        this.isCarbsOnly = isCarbsOnly;
     }
 
     final private TextWatcher textWatcher = new TextWatcher() {
@@ -135,7 +137,7 @@ public class AddFoodMultiplyCorrectionDialog extends DialogFragment implements O
             }
 
             setLastFoodList(foodListCopy);
-            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, true);
+            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, true, isCarbsOnly);
 
             dismiss();
         } catch (Exception e) {

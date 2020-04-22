@@ -54,10 +54,10 @@ class EcarbService {
             }
         }
 
-        fun generateEcarbs(newEcarbs : Int) {
+        fun generateEcarbs(newEcarbs : Int, isDelay: Boolean) {
             if (newEcarbs > 0) {
                 var oldEcarbs = getCountAndRemoveNotAbsorbedEcarbsFromLastMeals()
-                generateEcarbWrapped(oldEcarbs + newEcarbs)
+                generateEcarbWrapped(oldEcarbs + newEcarbs, isDelay)
             }
         }
         
@@ -162,17 +162,22 @@ class EcarbService {
             }
         }
 
-        private fun generateEcarbWrapped(eCarbs: Int) {
+        private fun generateEcarbWrapped(eCarbs: Int, isDelay: Boolean) {
             ConfigBuilderPlugin.getPlugin().commandQueue.isEcarbEnded = true
-            generateEcarbNow(eCarbs)
+            generateEcarbNow(eCarbs, isDelay)
             ConfigBuilderPlugin.getPlugin().commandQueue.eCarbs = 0
         }
 
-        private fun generateEcarbNow(eCarbs: Int) {
+        private fun generateEcarbNow(eCarbs: Int, isDelay: Boolean) {
             val duration = getDuration(eCarbs)
             val eCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarbs)).value()
 
-            val time = now() + ECARB_TIME_OFFSET_MINS * 1000 * 60
+
+            var time = if (isDelay) {
+                now() + ECARB_TIME_OFFSET_MINS * 1000 * 60
+            } else {
+                now()
+            }
 
             if (eCarbsAfterConstraints > 0) {
                 CarbsGenerator.createCarb(eCarbsAfterConstraints, time, "", "")

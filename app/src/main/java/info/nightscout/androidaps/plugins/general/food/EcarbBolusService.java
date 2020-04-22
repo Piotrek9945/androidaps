@@ -33,7 +33,7 @@ public class EcarbBolusService {
 
     public EcarbBolusService() {}
 
-    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isMultiplyPreSet) {
+    public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isMultiplyPreSet, boolean isCarbsOnly) {
         if (foodList.size() > 0) {
             List<String> actions = new LinkedList<>();
             for (Food food : foodList) {
@@ -60,25 +60,25 @@ public class EcarbBolusService {
                     TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
                     if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 110) {
                         AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2, foodList);
-                        EcarbBolusService.generateTreatment(context, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 120) {
                         AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_3, foodList);
-                        EcarbBolusService.generateTreatment(context, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 130) {
                         AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_4, foodList);
-                        EcarbBolusService.generateTreatment(context, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 140) {
                         AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_5, foodList);
-                        EcarbBolusService.generateTreatment(context, foodList);
+                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else {
-                        showSensitivityDialog(manager, foodList);
+                        showSensitivityDialog(manager, foodList, isCarbsOnly);
                     }
                 }
             });
             if (!isMultiplyPreSet) {
                 builder.setNeutralButton("KROTNOŚĆ", (dialog, id) -> {
                     synchronized (builder) {
-                        showAddFoodPercent(manager, foodList);
+                        showAddFoodPercent(manager, foodList, isCarbsOnly);
                     }
                 });
             }
@@ -95,15 +95,15 @@ public class EcarbBolusService {
         }
     }
 
-    public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList) {
-        new AddFoodMultiplyCorrectionDialog(foodList).show(manager, "AddFoodPercentDialog");
+    public static void showAddFoodPercent(FragmentManager manager, List<Food> foodList, boolean isCarbsOnly) {
+        new AddFoodMultiplyCorrectionDialog(foodList, isCarbsOnly).show(manager, "AddFoodPercentDialog");
     }
 
-    public static void showSensitivityDialog(FragmentManager manager, List<Food> foodList) {
-        new AddFoodSensitivityDialog(foodList).show(manager, "ShowSensitivityDialog");
+    public static void showSensitivityDialog(FragmentManager manager, List<Food> foodList, boolean isCarbsOnly) {
+        new AddFoodSensitivityDialog(foodList, isCarbsOnly).show(manager, "ShowSensitivityDialog");
     }
 
-    public static void generateTreatment(Context context, List<Food> foodList) {
+    public static void generateTreatment(Context context, List<Food> foodList, boolean isCarbsOnly) {
         int eCarbs = EcarbService.Companion.calculateEcarbs(foodList);
         int carbs = BolusService.Companion.calculateCarb(foodList);
 
@@ -111,9 +111,13 @@ public class EcarbBolusService {
         fatProteinImpact(nutrition);
 
         if (carbs > 0) {
+            if (isCarbsOnly) {
+                EcarbService.Companion.generateEcarbs(nutrition.getECarbs(), true);
+                EcarbService.Companion.generateEcarbs(nutrition.getCarbs(), false);
+            }
             generateEcarbAndBolus(context, nutrition.getCarbs(), nutrition.getECarbs());
         } else {
-            EcarbService.Companion.generateEcarbs(nutrition.getECarbs());
+            EcarbService.Companion.generateEcarbs(nutrition.getECarbs(), true);
         }
 
         FoodService.clearFoodCountAdded();
