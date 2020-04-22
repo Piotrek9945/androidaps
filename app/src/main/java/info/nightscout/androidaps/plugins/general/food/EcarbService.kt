@@ -169,35 +169,20 @@ class EcarbService {
         }
 
         private fun generateEcarbNow(eCarbs: Int, isDelay: Boolean) {
-            var duration = getDuration(eCarbs)
             val eCarbsAfterConstraints = MainApp.getConstraintChecker().applyCarbsConstraints(Constraint(eCarbs)).value()
             var offset = ECARB_TIME_OFFSET_MINS
 
             var time = if (isDelay) {
                 now() + ECARB_TIME_OFFSET_MINS * 1000 * 60
             } else {
-                duration = 0
                 offset = 0
                 now()
             }
 
             if (eCarbsAfterConstraints > 0) {
                 CarbsGenerator.createCarb(eCarbsAfterConstraints, time, "", "")
-                NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, duration, offset))
+                NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, MainApp.gs(R.string.generated_ecarbs_note, eCarbsAfterConstraints, 0, offset))
             }
-        }
-
-        private fun getDuration(eCarbs: Int): Int {
-            val wbt = getWBT(eCarbs)
-            return when {
-                wbt > 5 -> 7
-                wbt > 2 -> wbt + 1
-                else -> wbt + 2
-            }
-        }
-
-        private fun getWBT(eCarbs: Int): Int {
-            return FoodUtils.roundDoubleToInt(eCarbs / 10.0)
         }
 
     }
