@@ -106,9 +106,9 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
         isCarbsOnly = view.findViewById(R.id.addfood_dialog_is_carbs_only);
         isCarbsOnly.setOnClickListener(this);
         if (isLastMeal) {
-            isCarbsOnly.setEnabled(true);
+            isCarbsOnly.setVisibility(View.VISIBLE);
         } else {
-            isCarbsOnly.setEnabled(false);
+            isCarbsOnly.setVisibility(View.INVISIBLE);
         }
 
         setCancelable(true);
