@@ -50,6 +50,7 @@ public class FoodFragment extends Fragment {
 
     private TextView clearList;
     private TextView passBolus;
+    private TextView carbsOnly;
 
     public static TextView foodCountAdded;
     private List<Food> unfiltered;
@@ -92,6 +93,23 @@ public class FoodFragment extends Fragment {
                 }
             }
         });
+
+
+        carbsOnly = view.findViewById(R.id.carbs_only);
+        carbsOnly.setPaintFlags(carbsOnly.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        carbsOnly.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (v.getId()) {
+                    case R.id.carbs_only:
+                        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), FoodService.getFoodList(), false, true);
+                        break;
+                }
+            }
+
+        });
+
+
         passBolus = view.findViewById(R.id.pass_bolus);
         passBolus.setPaintFlags(passBolus.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
         passBolus.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +117,7 @@ public class FoodFragment extends Fragment {
             public void onClick(View v) {
                 switch (v.getId()) {
                     case R.id.pass_bolus:
-                        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), FoodService.getFoodList(), false);
+                        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), FoodService.getFoodList(), false, false);
                         break;
                 }
             }

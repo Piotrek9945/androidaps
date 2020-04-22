@@ -72,6 +72,20 @@
 
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="10dp"
+                android:paddingBottom="5dp">
+
+                <CheckBox
+                    android:id="@+id/addfood_dialog_is_carbs_only"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="bez insuliny"/>
+
+            </LinearLayout>
+
             <include
                 layout="@layout/mdtp_done_button" />
 

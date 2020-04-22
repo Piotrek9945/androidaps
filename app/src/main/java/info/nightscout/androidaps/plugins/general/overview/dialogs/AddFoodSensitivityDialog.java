@@ -8,13 +8,10 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import androidx.fragment.app.DialogFragment;
 
-import info.nightscout.androidaps.db.TempTarget;
-import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +31,16 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
     public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_5 = 0.6;
 
     private List<Food> foodList;
+    private boolean isCarbsOnly;
 
     private RadioGroup sensitivityRadioGroup;
 
     //one shot guards
     private boolean okClicked;
 
-    public AddFoodSensitivityDialog(List<Food> foodList) {
+    public AddFoodSensitivityDialog(List<Food> foodList, boolean isCarbsOnly) {
         this.foodList = foodList;
+        this.isCarbsOnly = isCarbsOnly;
     }
 
     @Override
@@ -93,7 +92,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         okClicked = true;
         try {
             setSensitivityFactor(getSensitivityFactor(), foodList);
-            EcarbBolusService.generateTreatment(getContext(), foodList);
+            EcarbBolusService.generateTreatment(getContext(), foodList, isCarbsOnly);
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);

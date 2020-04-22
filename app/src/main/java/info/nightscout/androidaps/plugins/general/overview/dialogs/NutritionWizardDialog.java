@@ -39,6 +39,8 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
     private Button decrementButton;
     private Button incrementButton;
 
+    private CheckBox isCarbsOnly;
+
     //one shot guards
     private boolean okClicked;
 
@@ -89,6 +91,9 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
         incrementButton = view.findViewById(R.id.nutrition_wizard_increment_button);
         incrementButton.setOnClickListener(this);
 
+        isCarbsOnly = view.findViewById(R.id.nutrition_wizard_is_carbs_only);
+        isCarbsOnly.setOnClickListener(this);
+
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
 
@@ -121,7 +126,7 @@ public class NutritionWizardDialog extends DialogFragment implements OnClickList
         }
         okClicked = true;
         try {
-            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(getFood()), false);
+            EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), Collections.singletonList(getFood()), false, isCarbsOnly.isChecked());
             dismiss();
         } catch (Exception e) {
             log.error("Unhandled exception", e);
