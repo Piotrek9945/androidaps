@@ -73,7 +73,6 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/addfood_dialog_is_carbs_only_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingTop="10dp"

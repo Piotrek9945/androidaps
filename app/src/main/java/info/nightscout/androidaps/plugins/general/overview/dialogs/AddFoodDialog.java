@@ -12,7 +12,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.DialogFragment;
@@ -42,7 +41,6 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private Button floatIncrementButton;
     private TextView lastMealText;
     private CheckBox isCarbsOnly;
-    private LinearLayout isCarbsOnlyLayout;
 
     //one shot guards
     private boolean okClicked;
@@ -105,14 +103,12 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
             lastMealText.setText(text);
         }
 
-        isCarbsOnlyLayout = view.findViewById(R.id.addfood_dialog_is_carbs_only_layout);
-
         isCarbsOnly = view.findViewById(R.id.addfood_dialog_is_carbs_only);
         isCarbsOnly.setOnClickListener(this);
         if (isLastMeal) {
-            isCarbsOnlyLayout.setVisibility(View.GONE);
+            isCarbsOnly.setVisibility(View.GONE);
         } else {
-            isCarbsOnlyLayout.setVisibility(View.INVISIBLE);
+            isCarbsOnly.setVisibility(View.INVISIBLE);
         }
 
         setCancelable(true);
