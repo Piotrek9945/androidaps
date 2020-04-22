@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
@@ -39,6 +40,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private Button floatDecrementButton;
     private Button floatIncrementButton;
     private TextView lastMealText;
+    private CheckBox isCarbsOnly;
 
     //one shot guards
     private boolean okClicked;
@@ -99,6 +101,14 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
                 }
             }
             lastMealText.setText(text);
+        }
+
+        isCarbsOnly = view.findViewById(R.id.addfood_dialog_is_carbs_only);
+        isCarbsOnly.setOnClickListener(this);
+        if (isLastMeal) {
+            isCarbsOnly.setVisibility(View.VISIBLE);
+        } else {
+            isCarbsOnly.setVisibility(View.GONE);
         }
 
         setCancelable(true);
@@ -174,7 +184,7 @@ public class AddFoodDialog extends DialogFragment implements OnClickListener, Co
     private void prepareLastMeal(double count) {
         List<Food> foodListCopy = FoodService.cloneFoodList(foodList);
         multiplyCountByPortions(foodListCopy, count);
-        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, true);
+        EcarbBolusService.generateTreatmentWithSummary(getContext(), getFragmentManager(), foodListCopy, true, isCarbsOnly.isChecked());
     }
 
     private void multiplyCountByPortions(Food food, double count) {

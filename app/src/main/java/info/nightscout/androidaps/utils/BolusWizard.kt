@@ -340,7 +340,7 @@ class BolusWizard @JvmOverloads constructor(val profile: Profile,
                                     i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     MainApp.instance().startActivity(i)
                                 } else {
-                                    EcarbService.generateEcarbs(eCarbs)
+                                    EcarbService.generateEcarbs(eCarbs, true)
                                 }
                             }
                         })
