@@ -114,8 +114,9 @@ public class EcarbBolusService {
             if (isCarbsOnly) {
                 EcarbService.Companion.generateEcarbs(nutrition.getECarbs(), true);
                 EcarbService.Companion.generateEcarbs(nutrition.getCarbs(), false);
+            } else {
+                generateEcarbAndBolus(context, nutrition.getCarbs(), nutrition.getECarbs());
             }
-            generateEcarbAndBolus(context, nutrition.getCarbs(), nutrition.getECarbs());
         } else {
             EcarbService.Companion.generateEcarbs(nutrition.getECarbs(), true);
         }
