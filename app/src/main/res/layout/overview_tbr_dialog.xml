@@ -45,52 +45,22 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="brak ruchu" />
+                        android:text="mały ruch" />
 
                     <RadioButton
                         android:id="@+id/tbr_percentage_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="mały ruch" />
-
-                    <RadioButton
-                        android:id="@+id/tbr_percentage_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="średni ruch" />
 
                     <RadioButton
-                        android:id="@+id/tbr_percentage_4"
+                        android:id="@+id/tbr_percentage_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="duży ruch" />
 
                 </RadioGroup>
 
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="57dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="60px"
-                    android:layout_weight="1"
-                    android:paddingTop="5px"
-                    android:text="czas trwania"
-                    android:textAlignment="textEnd" />
-
-                <info.nightscout.androidaps.utils.NumberPicker
-                    android:id="@+id/tbr_duration"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="5dp">
-
-                </info.nightscout.androidaps.utils.NumberPicker>
             </LinearLayout>
 
             <LinearLayout
