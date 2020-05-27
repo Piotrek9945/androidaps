@@ -29,6 +29,10 @@ import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.OKDialog;
 
+import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TEMP_TARGET_1;
+import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TEMP_TARGET_2;
+import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TEMP_TARGET_3;
+
 public class EcarbBolusService {
 
     public EcarbBolusService() {}
@@ -58,17 +62,11 @@ public class EcarbBolusService {
                     }
 
                     TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
-                    if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 110) {
-                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2, foodList);
+                    if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TEMP_TARGET_1) {
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
-                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 120) {
-                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_3, foodList);
+                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TEMP_TARGET_2) {
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
-                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 130) {
-                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_4, foodList);
-                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
-                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == 140) {
-                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_5, foodList);
+                    } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TEMP_TARGET_3) {
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else {
                         showSensitivityDialog(manager, foodList, isCarbsOnly);

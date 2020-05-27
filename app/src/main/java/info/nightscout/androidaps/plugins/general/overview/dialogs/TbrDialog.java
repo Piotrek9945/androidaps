@@ -18,10 +18,6 @@ import androidx.fragment.app.DialogFragment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DecimalFormat;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 import info.nightscout.androidaps.Constants;
@@ -31,32 +27,27 @@ import info.nightscout.androidaps.db.Source;
 import info.nightscout.androidaps.db.TempTarget;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
-import info.nightscout.androidaps.plugins.general.food.FoodUtils;
-import info.nightscout.androidaps.plugins.profile.local.LocalProfileFragment;
-import info.nightscout.androidaps.plugins.profile.local.LocalProfilePlugin;
-import info.nightscout.androidaps.plugins.profile.ns.NSProfilePlugin;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.DateUtil;
-import info.nightscout.androidaps.utils.JsonHelper;
-import info.nightscout.androidaps.utils.NumberPicker;
 
 public class TbrDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(TbrDialog.class);
 
-    private final int TBR_PERCENTAGE_1 = 85;
-    public final int TEMP_TARGET_1 = 110;
 
-    private final int TBR_PERCENTAGE_2 = 75;
-    public final int TEMP_TARGET_2 = 120;
+    private final int DURATION_1 = 3;
+    public static final int TEMP_TARGET_1 = 110;
+    private final int TBR_PERCENTAGE_1 = 90;
 
-    private final int TBR_PERCENTAGE_3 = 60;
-    public final int TEMP_TARGET_3 = 130;
 
-    private final int TBR_PERCENTAGE_4 = 50;
-    public final int TEMP_TARGET_4 = 140;
+    private final int DURATION_2 = 6;
+    public static final int TEMP_TARGET_2 = 120;
+    private static final int TBR_PERCENTAGE_2 = 80;
+
+    private final int DURATION_3 = 24;
+    public static final int TEMP_TARGET_3 = 140;
+    private final int TBR_PERCENTAGE_3 = 70;
 
     private RadioGroup tbrRadioGroup;
-    private NumberPicker durationPicker;
     private Button resetButton;
 
     //one shot guards
@@ -87,10 +78,6 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         tbrRadioGroup = view.findViewById(R.id.tbr_grade);
-
-        durationPicker = view.findViewById(R.id.tbr_duration);
-        durationPicker.setParams(1d, 1d, 48d, 1d, new DecimalFormat("0"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
-        durationPicker.setOnClickListener(this);
 
         resetButton = view.findViewById(R.id.tbr_reset_button);
         resetButton.setOnClickListener(new View.OnClickListener() {
@@ -138,24 +125,24 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
         okClicked = true;
         try {
             int tbrPercentage = getTbrPercentage();
-            int durationInHours = FoodUtils.Companion.roundDoubleToInt(durationPicker.getValue());
-            if (durationInHours < 0) dismiss();
-            setTBR(tbrPercentage, durationInHours);
+            int durationInHours;
             switch(tbrPercentage) {
-                case TBR_PERCENTAGE_1:
+                case 1:
+                    durationInHours = DURATION_1;
                     setTempTarget(TEMP_TARGET_1, durationInHours);
+                    setTBR(TBR_PERCENTAGE_1, durationInHours);
                     break;
 
-                case TBR_PERCENTAGE_2:
+                case 2:
+                    durationInHours = DURATION_2;
                     setTempTarget(TEMP_TARGET_2, durationInHours);
+                    setTBR(TBR_PERCENTAGE_2, durationInHours);
                     break;
 
-                case TBR_PERCENTAGE_3:
+                case 3:
+                    durationInHours = DURATION_3;
                     setTempTarget(TEMP_TARGET_3, durationInHours);
-                    break;
-
-                case TBR_PERCENTAGE_4:
-                    setTempTarget(TEMP_TARGET_4, durationInHours);
+                    setTBR(TBR_PERCENTAGE_3, durationInHours);
                     break;
 
                 default: throw new NullPointerException();
@@ -174,10 +161,9 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
     private int getTbrPercentage() {
         switch (tbrRadioGroup.getCheckedRadioButtonId()) {
-            case R.id.tbr_percentage_1: return TBR_PERCENTAGE_1;
-            case R.id.tbr_percentage_2: return TBR_PERCENTAGE_2;
-            case R.id.tbr_percentage_3: return TBR_PERCENTAGE_3;
-            case R.id.tbr_percentage_4: return TBR_PERCENTAGE_4;
+            case R.id.tbr_percentage_1: return 1;
+            case R.id.tbr_percentage_2: return 2;
+            case R.id.tbr_percentage_3: return 3;
             default: throw new NullPointerException();
         }
     }
