@@ -10,7 +10,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="610px"
             android:layout_height="wrap_content"
             android:focusableInTouchMode="true"
             android:orientation="vertical"
