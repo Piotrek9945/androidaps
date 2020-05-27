@@ -65,12 +65,6 @@
                         android:layout_height="wrap_content"
                         android:text="duży ruch" />
 
-                    <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_5"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="bardzo duży ruch (np. bieganie)" />
-
                 </RadioGroup>
 
             </LinearLayout>

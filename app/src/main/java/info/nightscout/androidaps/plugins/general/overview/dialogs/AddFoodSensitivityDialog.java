@@ -28,7 +28,6 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
     public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9;
     public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8;
     public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7;
-    public static final Double SENSITIVITY_BOLUS_FACTOR_GRADE_5 = 0.6;
 
     private List<Food> foodList;
     private boolean isCarbsOnly;
@@ -111,7 +110,6 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
             case R.id.sensitivity_bolus_factor_grade_2: return SENSITIVITY_BOLUS_FACTOR_GRADE_2;
             case R.id.sensitivity_bolus_factor_grade_3: return SENSITIVITY_BOLUS_FACTOR_GRADE_3;
             case R.id.sensitivity_bolus_factor_grade_4: return SENSITIVITY_BOLUS_FACTOR_GRADE_4;
-            case R.id.sensitivity_bolus_factor_grade_5: return SENSITIVITY_BOLUS_FACTOR_GRADE_5;
             default: throw new NullPointerException();
         }
     }
