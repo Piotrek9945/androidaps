@@ -127,14 +127,17 @@ public class EcarbBolusService {
         int oldECarbs = nutrition.getECarbs();
 
         int delta;
-        if (oldECarbs > 40) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.15);
-        } else if (oldECarbs > 30) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
-        } else if (oldECarbs > 20) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.05);
-        } else {
+        double ratio = (double) oldECarbs / oldCarbs;
+        if (ratio < 0.2) {
             delta = 0;
+        } else if (ratio < 0.5) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
+        } else if (ratio < 1) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.3);
+        } else if (ratio < 3) {
+            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.6);
+        } else {
+            delta = oldCarbs;
         }
 
         int newCarbs = oldCarbs - delta;
