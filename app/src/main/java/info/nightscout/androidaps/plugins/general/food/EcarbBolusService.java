@@ -106,7 +106,7 @@ public class EcarbBolusService {
         int carbs = BolusService.Companion.calculateCarb(foodList);
 
         Nutrition nutrition = new Nutrition(carbs, eCarbs);
-        fatProteinImpact(nutrition);
+//        fatProteinImpact(nutrition);
 
         if (carbs > 0) {
             if (isCarbsOnly) {
@@ -122,6 +122,7 @@ public class EcarbBolusService {
         FoodService.clearFoodCountAdded();
     }
 
+    // w tej konfiguracji więcej szkody niż pożytku...
     private static void fatProteinImpact(Nutrition nutrition) {
         int oldCarbs = nutrition.getCarbs();
         int oldECarbs = nutrition.getECarbs();
