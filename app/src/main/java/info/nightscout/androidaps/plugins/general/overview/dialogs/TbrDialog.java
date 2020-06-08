@@ -34,17 +34,17 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
     private static Logger log = LoggerFactory.getLogger(TbrDialog.class);
 
 
-    private final int DURATION_1 = 3;
+    private final int DURATION_1 = 12;
     public static final int TEMP_TARGET_1 = 110;
     private final int TBR_PERCENTAGE_1 = 90;
 
 
-    private final int DURATION_2 = 6;
+    private final int DURATION_2 = 24;
     public static final int TEMP_TARGET_2 = 120;
     private static final int TBR_PERCENTAGE_2 = 80;
 
-    private final int DURATION_3 = 24;
-    public static final int TEMP_TARGET_3 = 140;
+    private final int DURATION_3 = 48;
+    public static final int TEMP_TARGET_3 = 130;
     private final int TBR_PERCENTAGE_3 = 70;
 
     private RadioGroup tbrRadioGroup;
