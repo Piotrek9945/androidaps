@@ -26,8 +26,8 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
 
     private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1.0;
     private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9;
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8;
-    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.9;
+    private final Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.8;
 
     private List<Food> foodList;
     private boolean isCarbsOnly;
