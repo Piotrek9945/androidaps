@@ -24,10 +24,10 @@ import info.nightscout.androidaps.plugins.general.food.Food;
 public class AddFoodSensitivityDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodSensitivityDialog.class);
 
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1.0;
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9;
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.9;
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.8;
+    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 100d;
+    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 90d;
+    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 90d;
+    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 80d;
 
     private List<Food> foodList;
     private boolean isCarbsOnly;
