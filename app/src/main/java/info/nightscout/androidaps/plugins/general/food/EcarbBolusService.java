@@ -63,10 +63,13 @@ public class EcarbBolusService {
 
                     TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
                     if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TEMP_TARGET_1) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2, foodList);
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TEMP_TARGET_2) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_3, foodList);
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TEMP_TARGET_3) {
+                        AddFoodSensitivityDialog.setSensitivityFactor(AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_4, foodList);
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else {
                         showSensitivityDialog(manager, foodList, isCarbsOnly);
