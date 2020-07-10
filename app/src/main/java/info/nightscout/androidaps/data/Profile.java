@@ -357,17 +357,21 @@ public class Profile {
     private double getICCorrection() {
         switch(percentage) {
             case TBR_PERCENTAGE_1:
-                return 100d / SENSITIVITY_BOLUS_FACTOR_GRADE_2;
+                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_2);
 
             case TBR_PERCENTAGE_2:
-                return 100d / SENSITIVITY_BOLUS_FACTOR_GRADE_3;
+                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_3);
 
             case TBR_PERCENTAGE_3:
-                return 100d / SENSITIVITY_BOLUS_FACTOR_GRADE_4;
+                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_4);
 
             default:
                 return 100d / percentage;
         }
+    }
+
+    private double multiply(double count) {
+        return count * 100;
     }
 
     private double getValueToTime(LongSparseArray<Double> array, Integer timeAsSeconds) {
