@@ -25,11 +25,17 @@ import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodMultiplyCorrectionDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
+import info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.OKDialog;
 
 public class EcarbBolusService {
+
+    public static final Double DECREASE_WBT_PERCENTAGE_NO_MOVEMENT = 0.3;
+    public static final Double DECREASE_WBT_PERCENTAGE_SMALL_MOVEMENT = 0.5;
+    public static final Double DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT = 0.7;
+    public static final Double DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT = 1.0;
 
     public EcarbBolusService() {}
 
@@ -99,6 +105,9 @@ public class EcarbBolusService {
 
         Nutrition nutrition = new Nutrition(carbs, eCarbs);
 //        fatProteinImpact(nutrition);
+        if (foodList.size() > 0 && foodList.get(0).eCarbCorrection == 1.0) {
+            WBTCorrection(nutrition);
+        }
 
         if (carbs > 0) {
             if (isCarbsOnly) {
@@ -115,28 +124,49 @@ public class EcarbBolusService {
     }
 
     // w tej konfiguracji więcej szkody niż pożytku...
-    private static void fatProteinImpact(Nutrition nutrition) {
-        int oldCarbs = nutrition.getCarbs();
+//    private static void fatProteinImpact(Nutrition nutrition) {
+//        int oldCarbs = nutrition.getCarbs();
+//        int oldECarbs = nutrition.getECarbs();
+//
+//        int delta;
+//        double ratio = (double) oldECarbs / oldCarbs;
+//        if (ratio < 0.2) {
+//            delta = 0;
+//        } else if (ratio < 0.5) {
+//            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
+//        } else if (ratio < 1) {
+//            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.3);
+//        } else if (ratio < 3) {
+//            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.6);
+//        } else {
+//            delta = oldCarbs;
+//        }
+//
+//        int newCarbs = oldCarbs - delta;
+//        int newECarbs = oldECarbs + delta;
+//
+//        nutrition.setCarbs(newCarbs);
+//        nutrition.setECarbs(newECarbs);
+//    }
+
+        private static void WBTCorrection(Nutrition nutrition) {
         int oldECarbs = nutrition.getECarbs();
+        int newECarbs;
 
-        int delta;
-        double ratio = (double) oldECarbs / oldCarbs;
-        if (ratio < 0.2) {
-            delta = 0;
-        } else if (ratio < 0.5) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.1);
-        } else if (ratio < 1) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.3);
-        } else if (ratio < 3) {
-            delta = FoodUtils.Companion.roundDoubleToInt(oldCarbs * 0.6);
+        TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
+        if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TEMP_TARGET_1) {
+            // mały ruch
+            newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_SMALL_MOVEMENT));
+        } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TEMP_TARGET_2) {
+            // średni ruch
+            newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT));
+        } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TEMP_TARGET_3) {
+            // duży ruch
+            newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT));
         } else {
-            delta = oldCarbs;
+            // brak ruchu
+            newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_NO_MOVEMENT));
         }
-
-        int newCarbs = oldCarbs - delta;
-        int newECarbs = oldECarbs + delta;
-
-        nutrition.setCarbs(newCarbs);
         nutrition.setECarbs(newECarbs);
     }
 

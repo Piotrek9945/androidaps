@@ -91,6 +91,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         okClicked = true;
         try {
             setSensitivityFactor(getSensitivityFactor(), foodList);
+            setECarbCorrection(getECarbCorrection(), foodList);
             EcarbBolusService.generateTreatment(getContext(), foodList, isCarbsOnly);
             dismiss();
         } catch (Exception e) {
@@ -104,12 +105,29 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         }
     }
 
+    public static void setECarbCorrection(Double eCarbCorrection, List<Food> foodList) {
+        for (Food food : foodList) {
+            food.eCarbCorrection = eCarbCorrection;
+        }
+    }
+
+
     private Double getSensitivityFactor() {
         switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
             case R.id.sensitivity_bolus_factor_grade_1: return SENSITIVITY_BOLUS_FACTOR_GRADE_1;
             case R.id.sensitivity_bolus_factor_grade_2: return SENSITIVITY_BOLUS_FACTOR_GRADE_2;
             case R.id.sensitivity_bolus_factor_grade_3: return SENSITIVITY_BOLUS_FACTOR_GRADE_3;
             case R.id.sensitivity_bolus_factor_grade_4: return SENSITIVITY_BOLUS_FACTOR_GRADE_4;
+            default: throw new NullPointerException();
+        }
+    }
+
+    private Double getECarbCorrection() {
+        switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
+            case R.id.sensitivity_bolus_factor_grade_1: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_NO_MOVEMENT);
+            case R.id.sensitivity_bolus_factor_grade_2: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_SMALL_MOVEMENT);
+            case R.id.sensitivity_bolus_factor_grade_3: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT);
+            case R.id.sensitivity_bolus_factor_grade_4: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT);
             default: throw new NullPointerException();
         }
     }
