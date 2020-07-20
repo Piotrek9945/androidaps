@@ -35,16 +35,16 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
 
     private final int DURATION_1 = 12;
-    private final int TEMP_TARGET_1 = 110;
+    public final int TEMP_TARGET_1 = 110;
     public static final int TBR_PERCENTAGE_1 = 80;
 
 
     private final int DURATION_2 = 24;
-    private final int TEMP_TARGET_2 = 120;
+    public final int TEMP_TARGET_2 = 120;
     public static final int TBR_PERCENTAGE_2 = 50;
 
     private final int DURATION_3 = 48;
-    private final int TEMP_TARGET_3 = 130;
+    public final int TEMP_TARGET_3 = 130;
     public static final int TBR_PERCENTAGE_3 = 20;
 
     private RadioGroup tbrRadioGroup;
