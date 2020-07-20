@@ -105,7 +105,9 @@ public class EcarbBolusService {
 
         Nutrition nutrition = new Nutrition(carbs, eCarbs);
 //        fatProteinImpact(nutrition);
-        WBTCorrection(nutrition);
+        if (foodList.size() > 0 && foodList.get(0).eCarbCorrection == 1.0) {
+            WBTCorrection(nutrition);
+        }
 
         if (carbs > 0) {
             if (isCarbsOnly) {
@@ -152,13 +154,13 @@ public class EcarbBolusService {
         int newECarbs;
 
         TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
-        if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TBR_PERCENTAGE_1) {
+        if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TEMP_TARGET_1) {
             // mały ruch
             newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_SMALL_MOVEMENT));
-        } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TBR_PERCENTAGE_2) {
+        } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TEMP_TARGET_2) {
             // średni ruch
             newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT));
-        } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TBR_PERCENTAGE_3) {
+        } else if (tt != null && tt.reason != null && tt.reason.equals("Ręczne") && tt.low == TbrDialog.TEMP_TARGET_3) {
             // duży ruch
             newECarbs = FoodUtils.Companion.roundDoubleToInt(oldECarbs * (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT));
         } else {
