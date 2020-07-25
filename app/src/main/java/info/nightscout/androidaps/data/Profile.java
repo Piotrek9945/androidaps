@@ -27,9 +27,6 @@ import info.nightscout.androidaps.utils.DecimalFormatter;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import info.nightscout.androidaps.utils.MidnightTime;
 
-import static info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2;
-import static info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_3;
-import static info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_4;
 import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TBR_PERCENTAGE_1;
 import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TBR_PERCENTAGE_2;
 import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TBR_PERCENTAGE_3;
@@ -328,7 +325,8 @@ public class Profile {
         if (array == isf_v)
             multiplier = 100d / percentage;
         else if (array == ic_v)
-            multiplier = getICCorrection();
+//            multiplier = getICCorrection();
+            multiplier = 100d / percentage;
         else if (array == basal_v)
             multiplier = percentage / 100d;
         else
@@ -342,7 +340,8 @@ public class Profile {
         if (array == isf)
             multiplier = 100d / percentage;
         else if (array == ic)
-            multiplier = getICCorrection();
+//            multiplier = getICCorrection();
+            multiplier = 100d / percentage;
         else if (array == basal)
             multiplier = percentage / 100d;
         else if (array == targetLow)
@@ -354,21 +353,21 @@ public class Profile {
         return multiplier;
     }
 
-    private double getICCorrection() {
-        switch(percentage) {
-            case TBR_PERCENTAGE_1:
-                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_2);
-
-            case TBR_PERCENTAGE_2:
-                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_3);
-
-            case TBR_PERCENTAGE_3:
-                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_4);
-
-            default:
-                return 100d / percentage;
-        }
-    }
+//    private double getICCorrection() {
+//        switch(percentage) {
+//            case TBR_PERCENTAGE_1:
+//                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_2);
+//
+//            case TBR_PERCENTAGE_2:
+//                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_3);
+//
+//            case TBR_PERCENTAGE_3:
+//                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_4);
+//
+//            default:
+//                return 100d / percentage;
+//        }
+//    }
 
     private double multiply(double count) {
         return count * 100;
