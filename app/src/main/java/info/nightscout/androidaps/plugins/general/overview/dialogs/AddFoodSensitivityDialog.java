@@ -24,10 +24,11 @@ import info.nightscout.androidaps.plugins.general.food.Food;
 public class AddFoodSensitivityDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodSensitivityDialog.class);
 
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1d;
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9d;
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8d;
-    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7d;
+//    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_0 = 1.1d;
+//    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_1 = 1d;
+//    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_2 = 0.9d;
+//    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8d;
+//    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7d;
 
     private List<Food> foodList;
     private boolean isCarbsOnly;
@@ -114,10 +115,26 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
 
     private Double getSensitivityFactor() {
         switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
-            case R.id.sensitivity_bolus_factor_grade_1: return SENSITIVITY_BOLUS_FACTOR_GRADE_1;
-            case R.id.sensitivity_bolus_factor_grade_2: return SENSITIVITY_BOLUS_FACTOR_GRADE_2;
-            case R.id.sensitivity_bolus_factor_grade_3: return SENSITIVITY_BOLUS_FACTOR_GRADE_3;
-            case R.id.sensitivity_bolus_factor_grade_4: return SENSITIVITY_BOLUS_FACTOR_GRADE_4;
+            // obniżony
+            case R.id.sensitivity_bolus_factor_grade_0:
+                return TbrDialog.TBR_PERCENTAGE_0 / 100.0;
+
+            // normalny
+            case R.id.sensitivity_bolus_factor_grade_1:
+                return 1.0;
+
+            // podwyższony
+            case R.id.sensitivity_bolus_factor_grade_2:
+                return TbrDialog.TBR_PERCENTAGE_2 / 100.0;
+
+            // duży
+            case R.id.sensitivity_bolus_factor_grade_3:
+                return TbrDialog.TBR_PERCENTAGE_3 / 100.0;
+
+            // b. duży (sport)
+            case R.id.sensitivity_bolus_factor_grade_4:
+                return TbrDialog.TBR_PERCENTAGE_4 / 100.0;
+
             default: throw new NullPointerException();
         }
     }

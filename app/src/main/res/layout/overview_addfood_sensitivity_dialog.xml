@@ -41,29 +41,36 @@
                     android:layout_height="wrap_content">
 
                     <RadioButton
-                        android:id="@+id/sensitivity_bolus_factor_grade_1"
+                        android:id="@+id/sensitivity_bolus_factor_grade_0"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
                         android:text="brak ruchu" />
 
                     <RadioButton
+                        android:id="@+id/sensitivity_bolus_factor_grade_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="normalny ruch" />
+
+                    <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="mały ruch" />
+                        android:text="podwyższony ruch" />
 
                     <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="średni ruch" />
+                        android:text="duży ruch" />
 
                     <RadioButton
                         android:id="@+id/sensitivity_bolus_factor_grade_4"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="duży ruch" />
+                        android:text="b. duży ruch (sport)" />
 
                 </RadioGroup>
 

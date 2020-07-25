@@ -27,9 +27,6 @@ import info.nightscout.androidaps.utils.DecimalFormatter;
 import info.nightscout.androidaps.utils.FabricPrivacy;
 import info.nightscout.androidaps.utils.MidnightTime;
 
-import static info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_2;
-import static info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_3;
-import static info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog.SENSITIVITY_BOLUS_FACTOR_GRADE_4;
 import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TBR_PERCENTAGE_1;
 import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TBR_PERCENTAGE_2;
 import static info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog.TBR_PERCENTAGE_3;
@@ -356,21 +353,21 @@ public class Profile {
         return multiplier;
     }
 
-    private double getICCorrection() {
-        switch(percentage) {
-            case TBR_PERCENTAGE_1:
-                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_2);
-
-            case TBR_PERCENTAGE_2:
-                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_3);
-
-            case TBR_PERCENTAGE_3:
-                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_4);
-
-            default:
-                return 100d / percentage;
-        }
-    }
+//    private double getICCorrection() {
+//        switch(percentage) {
+//            case TBR_PERCENTAGE_1:
+//                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_2);
+//
+//            case TBR_PERCENTAGE_2:
+//                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_3);
+//
+//            case TBR_PERCENTAGE_3:
+//                return 100d / multiply(SENSITIVITY_BOLUS_FACTOR_GRADE_4);
+//
+//            default:
+//                return 100d / percentage;
+//        }
+//    }
 
     private double multiply(double count) {
         return count * 100;

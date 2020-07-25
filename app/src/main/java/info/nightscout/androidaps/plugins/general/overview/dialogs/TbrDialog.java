@@ -35,24 +35,24 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
     private final int DURATION_0 = 24;
     public static final int TEMP_TARGET_0 = 90;
-    public static final int TBR_PERCENTAGE_0 = 120;
+    public static final int TBR_PERCENTAGE_0 = 110;
 
     private final int DURATION_1 = 24;
-    public static final int TEMP_TARGET_1 = 100;
-    public static final int TBR_PERCENTAGE_1 = 90;
+    public static final int TEMP_TARGET_1 = 90;
+    public static final int TBR_PERCENTAGE_1 = 100;
 
     private final int DURATION_2 = 24;
     public static final int TEMP_TARGET_2 = 100;
-    public static final int TBR_PERCENTAGE_2 = 80;
+    public static final int TBR_PERCENTAGE_2 = 90;
 
 
     private final int DURATION_3 = 24;
     public static final int TEMP_TARGET_3 = 110;
-    public static final int TBR_PERCENTAGE_3 = 50;
+    public static final int TBR_PERCENTAGE_3 = 70;
 
     private final int DURATION_4 = 24;
-    public static final int TEMP_TARGET_4 = 120;
-    public static final int TBR_PERCENTAGE_4 = 30;
+    public static final int TEMP_TARGET_4 = 130;
+    public static final int TBR_PERCENTAGE_4 = 50;
 
     private RadioGroup tbrRadioGroup;
     private Button resetButton;
