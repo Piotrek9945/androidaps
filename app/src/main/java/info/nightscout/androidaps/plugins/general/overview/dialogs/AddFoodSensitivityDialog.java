@@ -91,7 +91,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         okClicked = true;
         try {
             setSensitivityFactor(getSensitivityFactor(), foodList);
-            setECarbCorrection(getECarbCorrection(), foodList);
+//            setECarbCorrection(getECarbCorrection(), foodList);
             EcarbBolusService.generateTreatment(getContext(), foodList, isCarbsOnly);
             dismiss();
         } catch (Exception e) {

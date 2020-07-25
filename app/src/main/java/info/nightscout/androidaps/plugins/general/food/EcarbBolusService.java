@@ -106,7 +106,7 @@ public class EcarbBolusService {
         Nutrition nutrition = new Nutrition(carbs, eCarbs);
 //        fatProteinImpact(nutrition);
         if (foodList.size() > 0 && foodList.get(0).eCarbCorrection == 1.0) {
-            WBTCorrection(nutrition);
+//            WBTCorrection(nutrition);
         }
 
         if (carbs > 0) {
