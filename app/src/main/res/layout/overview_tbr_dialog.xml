@@ -41,23 +41,37 @@
                     android:layout_marginBottom="20px">
 
                     <RadioButton
+                        android:id="@+id/tbr_percentage_0"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="brak ruchu" />
+
+                    <RadioButton
                         android:id="@+id/tbr_percentage_1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:checked="true"
-                        android:text="mały ruch" />
+                        android:text="normalny ruch" />
 
                     <RadioButton
                         android:id="@+id/tbr_percentage_2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="średni ruch" />
+                        android:checked="true"
+                        android:text="podwyższony ruch" />
 
                     <RadioButton
                         android:id="@+id/tbr_percentage_3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="duży ruch" />
+
+                    <RadioButton
+                        android:id="@+id/tbr_percentage_4"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="b. duży ruch (sport)" />
 
                 </RadioGroup>
 
