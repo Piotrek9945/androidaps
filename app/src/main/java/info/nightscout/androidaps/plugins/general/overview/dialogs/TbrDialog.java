@@ -33,26 +33,26 @@ import info.nightscout.androidaps.utils.DateUtil;
 public class TbrDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(TbrDialog.class);
 
-    private final int DURATION_0 = 24;
+    private final int DURATION_0 = 12;
     public static final int TEMP_TARGET_0 = 90;
     public static final int TBR_PERCENTAGE_0 = 110;
 
-    private final int DURATION_1 = 24;
+    private final int DURATION_1 = 12;
     public static final int TEMP_TARGET_1 = 90;
     public static final int TBR_PERCENTAGE_1 = 100;
 
-    private final int DURATION_2 = 24;
+    private final int DURATION_2 = 12;
     public static final int TEMP_TARGET_2 = 100;
-    public static final int TBR_PERCENTAGE_2 = 90;
+    public static final int TBR_PERCENTAGE_2 = 70;
 
 
-    private final int DURATION_3 = 24;
+    private final int DURATION_3 = 12;
     public static final int TEMP_TARGET_3 = 110;
-    public static final int TBR_PERCENTAGE_3 = 70;
+    public static final int TBR_PERCENTAGE_3 = 50;
 
-    private final int DURATION_4 = 24;
+    private final int DURATION_4 = 12;
     public static final int TEMP_TARGET_4 = 130;
-    public static final int TBR_PERCENTAGE_4 = 50;
+    public static final int TBR_PERCENTAGE_4 = 20;
 
     private RadioGroup tbrRadioGroup;
     private Button resetButton;
@@ -136,31 +136,31 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
             switch(tbrPercentage) {
                 case 0:
                     durationInHours = DURATION_0;
-                    setTempTarget(TEMP_TARGET_0, durationInHours);
+//                    setTempTarget(TEMP_TARGET_0, durationInHours);
                     setTBR(TBR_PERCENTAGE_0, durationInHours);
                     break;
 
                 case 1:
                     durationInHours = DURATION_1;
-                    setTempTarget(TEMP_TARGET_1, durationInHours);
+//                    setTempTarget(TEMP_TARGET_1, durationInHours);
                     setTBR(TBR_PERCENTAGE_1, durationInHours);
                     break;
 
                 case 2:
                     durationInHours = DURATION_2;
-                    setTempTarget(TEMP_TARGET_2, durationInHours);
+//                    setTempTarget(TEMP_TARGET_2, durationInHours);
                     setTBR(TBR_PERCENTAGE_2, durationInHours);
                     break;
 
                 case 3:
                     durationInHours = DURATION_3;
-                    setTempTarget(TEMP_TARGET_3, durationInHours);
+//                    setTempTarget(TEMP_TARGET_3, durationInHours);
                     setTBR(TBR_PERCENTAGE_3, durationInHours);
                     break;
 
                 case 4:
                     durationInHours = DURATION_4;
-                    setTempTarget(TEMP_TARGET_4, durationInHours);
+//                    setTempTarget(TEMP_TARGET_4, durationInHours);
                     setTBR(TBR_PERCENTAGE_4, durationInHours);
                     break;
 
