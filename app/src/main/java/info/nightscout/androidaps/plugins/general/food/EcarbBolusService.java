@@ -28,6 +28,7 @@ import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensit
 import info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
+import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.OKDialog;
 
 public class EcarbBolusService {
@@ -63,8 +64,9 @@ public class EcarbBolusService {
                         FoodService.setLastFoodList(foodListClone);
                     }
 
-                    TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
-                    if (tt != null && tt.reason != null && tt.reason.equals("Ręczne")) {
+//                    TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
+                    int duration = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(DateUtil.now()).durationInMinutes;
+                    if (duration > 0) {
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else {
                         showSensitivityDialog(manager, foodList, isCarbsOnly);
