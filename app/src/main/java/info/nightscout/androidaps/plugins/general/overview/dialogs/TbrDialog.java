@@ -33,6 +33,12 @@ import info.nightscout.androidaps.utils.DateUtil;
 public class TbrDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(TbrDialog.class);
 
+    private final int DURATION_MIN2 = 72;
+    public static final int TBR_PERCENTAGE_MIN2 = 90;
+
+    private final int DURATION_MIN1 = 72;
+    public static final int TBR_PERCENTAGE_MIN1 = 80;
+
     private final int DURATION_0 = 12;
     public static final int TEMP_TARGET_0 = 90;
     public static final int TBR_PERCENTAGE_0 = 110;
@@ -134,6 +140,16 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
             int tbrPercentage = getTbrPercentage();
             int durationInHours;
             switch(tbrPercentage) {
+                case -2:
+                    durationInHours = DURATION_MIN2;
+                    setTBR(TBR_PERCENTAGE_MIN2, durationInHours);
+                    break;
+
+                case -1:
+                    durationInHours = DURATION_MIN1;
+                    setTBR(TBR_PERCENTAGE_MIN1, durationInHours);
+                    break;
+
                 case 0:
                     durationInHours = DURATION_0;
 //                    setTempTarget(TEMP_TARGET_0, durationInHours);
@@ -180,6 +196,8 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
     private int getTbrPercentage() {
         switch (tbrRadioGroup.getCheckedRadioButtonId()) {
+            case R.id.tbr_percentage_min2: return -2;
+            case R.id.tbr_percentage_min1: return -1;
             case R.id.tbr_percentage_0: return 0;
             case R.id.tbr_percentage_1: return 1;
             case R.id.tbr_percentage_2: return 2;
