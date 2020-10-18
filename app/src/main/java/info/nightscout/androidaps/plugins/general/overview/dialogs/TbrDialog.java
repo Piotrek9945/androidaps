@@ -142,12 +142,12 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
             switch(tbrPercentage) {
                 case -2:
                     durationInHours = DURATION_MIN2;
-                    setTBR(TBR_PERCENTAGE_MIN1, durationInHours);
+                    setTBR(TBR_PERCENTAGE_MIN2, durationInHours);
                     break;
 
                 case -1:
                     durationInHours = DURATION_MIN1;
-                    setTBR(TBR_PERCENTAGE_MIN2, durationInHours);
+                    setTBR(TBR_PERCENTAGE_MIN1, durationInHours);
                     break;
 
                 case 0:
