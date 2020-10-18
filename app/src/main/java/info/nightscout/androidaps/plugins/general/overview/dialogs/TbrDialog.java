@@ -47,18 +47,18 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
     public static final int TEMP_TARGET_1 = 90;
     public static final int TBR_PERCENTAGE_1 = 100;
 
-    private final int DURATION_2 = 12;
-    public static final int TEMP_TARGET_2 = 100;
+    private final int DURATION_2 = 6;
+    public static final int TEMP_TARGET_2 = 120;
     public static final int TBR_PERCENTAGE_2 = 70;
 
 
-    private final int DURATION_3 = 12;
-    public static final int TEMP_TARGET_3 = 110;
+    private final int DURATION_3 = 6;
+    public static final int TEMP_TARGET_3 = 140;
     public static final int TBR_PERCENTAGE_3 = 50;
 
-    private final int DURATION_4 = 12;
-    public static final int TEMP_TARGET_4 = 130;
-    public static final int TBR_PERCENTAGE_4 = 20;
+    private final int DURATION_4 = 6;
+    public static final int TEMP_TARGET_4 = 150;
+    public static final int TBR_PERCENTAGE_4 = 30;
 
     private RadioGroup tbrRadioGroup;
     private Button resetButton;
@@ -152,31 +152,31 @@ public class TbrDialog extends DialogFragment implements OnClickListener, Compou
 
                 case 0:
                     durationInHours = DURATION_0;
-//                    setTempTarget(TEMP_TARGET_0, durationInHours);
+                    setTempTarget(TEMP_TARGET_0, durationInHours);
                     setTBR(TBR_PERCENTAGE_0, durationInHours);
                     break;
 
                 case 1:
                     durationInHours = DURATION_1;
-//                    setTempTarget(TEMP_TARGET_1, durationInHours);
+                    setTempTarget(TEMP_TARGET_1, durationInHours);
                     setTBR(TBR_PERCENTAGE_1, durationInHours);
                     break;
 
                 case 2:
                     durationInHours = DURATION_2;
-//                    setTempTarget(TEMP_TARGET_2, durationInHours);
+                    setTempTarget(TEMP_TARGET_2, durationInHours);
                     setTBR(TBR_PERCENTAGE_2, durationInHours);
                     break;
 
                 case 3:
                     durationInHours = DURATION_3;
-//                    setTempTarget(TEMP_TARGET_3, durationInHours);
+                    setTempTarget(TEMP_TARGET_3, durationInHours);
                     setTBR(TBR_PERCENTAGE_3, durationInHours);
                     break;
 
                 case 4:
                     durationInHours = DURATION_4;
-//                    setTempTarget(TEMP_TARGET_4, durationInHours);
+                    setTempTarget(TEMP_TARGET_4, durationInHours);
                     setTBR(TBR_PERCENTAGE_4, durationInHours);
                     break;
 
