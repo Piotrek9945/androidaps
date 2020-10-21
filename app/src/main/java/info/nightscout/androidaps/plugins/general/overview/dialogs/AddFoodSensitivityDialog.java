@@ -81,12 +81,6 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         sensitivityMultiply = view.findViewById(R.id.addfood_sensitivity_multiply);
         sensitivityMultiply.setParams(100d, 10d, 900d, 10d, new DecimalFormat("0'%'"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
 
-        decrementButton = view.findViewById(R.id.overview_addfood_sensitivity_decrement_button);
-        decrementButton.setOnClickListener(this);
-
-        incrementButton = view.findViewById(R.id.overview_addfood_sensitivity_increment_button);
-        incrementButton.setOnClickListener(this);
-
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
 

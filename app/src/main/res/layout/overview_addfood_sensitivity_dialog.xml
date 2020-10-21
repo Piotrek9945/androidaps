@@ -43,33 +43,6 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingTop="10dp"
-                android:paddingBottom="5dp">
-
-                <Button
-                    android:id="@+id/overview_addfood_sensitivity_decrement_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="4"
-                    android:text="-10%" />
-
-                <Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/overview_addfood_sensitivity_increment_button"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="4"
-                    android:text="+10%" />
-
-            </LinearLayout>
-
             <include layout="@layout/mdtp_done_button" />
 
         </LinearLayout>
