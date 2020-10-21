@@ -69,11 +69,11 @@ public class EcarbBolusService {
 
 //                    TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
                     int duration = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(now()).durationInMinutes;
-                    if (duration > 0) {
-                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
-                    } else {
+//                    if (duration > 0) {
+//                        EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
+//                    } else {
                         showSensitivityDialog(manager, foodList, isCarbsOnly);
-                    }
+//                    }
                 }
             });
             if (!isMultiplyPreSet) {
