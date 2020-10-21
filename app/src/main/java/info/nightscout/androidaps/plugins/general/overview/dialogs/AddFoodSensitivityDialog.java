@@ -79,7 +79,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         sensitivityMultiply = view.findViewById(R.id.addfood_sensitivity_multiply);
-        sensitivityMultiply.setParams(100d, 10d, 900d, 10d, new DecimalFormat("0'%'"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
+        sensitivityMultiply.setParams(100d, 0d, 900d, 10d, new DecimalFormat("0"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
@@ -119,7 +119,7 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         okClicked = true;
         try {
 //            setECarbCorrection(getECarbCorrection(), foodList);
-            Double percent = sensitivityMultiply.getValue();
+            Double percent = sensitivityMultiply.getValue() / 100;
             setSensitivityFactor(percent, foodList);
             EcarbBolusService.generateTreatment(getContext(), foodList, isCarbsOnly);
             dismiss();
