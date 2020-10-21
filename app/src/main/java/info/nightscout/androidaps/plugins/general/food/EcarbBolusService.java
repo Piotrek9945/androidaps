@@ -18,11 +18,14 @@ import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.data.Profile;
 import info.nightscout.androidaps.data.QuickWizardEntry;
+import info.nightscout.androidaps.db.CareportalEvent;
+import info.nightscout.androidaps.db.Source;
 import info.nightscout.androidaps.db.TempTarget;
 import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
+import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodMultiplyCorrectionDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog;
@@ -30,6 +33,8 @@ import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
 import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.OKDialog;
+
+import static info.nightscout.androidaps.utils.DateUtil.now;
 
 public class EcarbBolusService {
 
@@ -65,7 +70,7 @@ public class EcarbBolusService {
                     }
 
 //                    TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
-                    int duration = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(DateUtil.now()).durationInMinutes;
+                    int duration = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(now()).durationInMinutes;
                     if (duration > 0) {
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else {
@@ -111,6 +116,11 @@ public class EcarbBolusService {
 //            WBTCorrection(nutrition);
         }
 
+        String notes = getNotes(foodList, eCarbs, carbs);
+        try {
+            sendFoodNotes(notes);
+        } catch (Exception ignored) {}
+
         if (carbs > 0) {
             if (isCarbsOnly) {
                 EcarbService.Companion.generateEcarbs(nutrition.getECarbs(), true);
@@ -123,6 +133,41 @@ public class EcarbBolusService {
         }
 
         FoodService.clearFoodCountAdded();
+    }
+
+    private static void sendFoodNotes(String notes) throws JSONException {
+//        JSONObject json = new JSONObject();
+//        List<String> actions = new LinkedList<>();
+//
+//        actions.add(MainApp.gs(R.string.careportal_newnstreatment_notes_label) + ": " + notes);
+//        json.put("notes", notes);
+//        long eventTime = now();
+//        json.put("created_at", DateUtil.toISOString(eventTime));
+//        json.put("mills", eventTime);
+//        json.put("eventType", CareportalEvent.NOTE);
+//        json.put("units", ProfileFunctions.getSystemUnits());
+//
+//        CareportalEvent careportalEvent = new CareportalEvent();
+//        careportalEvent.date = eventTime;
+//        careportalEvent.source = Source.USER;
+//        careportalEvent.eventType = CareportalEvent.NOTE;
+//        careportalEvent.json = json.toString();
+//        MainApp.getDbHelper().createOrUpdate(careportalEvent);
+//        NSUpload.uploadCareportalEntryToNS(json);
+        NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, notes);
+    }
+
+    private static String getNotes(List<Food> foodList, int eCarbs, int carbs) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < foodList.size(); i++) {
+            sb.append("posiłek nr " + (i+1) + "/" + foodList.size() + ": ");
+            sb.append("nazwa: " + foodList.get(i).name + ", ");
+            sb.append("porcja: " + foodList.get(i).portion + " " + foodList.get(i).units + ", ");
+            sb.append("liczba porcji: " + foodList.get(i).portionCount + ", ");
+            sb.append("carbs: " + carbs + ", ");
+            sb.append("eCarbs: " + eCarbs + ". ");
+        }
+        return sb.toString();
     }
 
     // w tej konfiguracji więcej szkody niż pożytku...
