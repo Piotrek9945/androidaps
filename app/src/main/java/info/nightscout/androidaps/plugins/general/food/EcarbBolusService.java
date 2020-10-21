@@ -41,8 +41,6 @@ public class EcarbBolusService {
     public static final Double DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT = 0.7;
     public static final Double DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT = 1.0;
 
-    public static String lastNotes = null;
-
     public EcarbBolusService() {}
 
     public static void generateTreatmentWithSummary(Context context, FragmentManager manager, List<Food> foodList, boolean isMultiplyPreSet, boolean isCarbsOnly) {
@@ -133,10 +131,7 @@ public class EcarbBolusService {
     }
 
     private static void sendFoodNotes(String notes) {
-        if (lastNotes == null || !lastNotes.equals(notes)) {
-            lastNotes = notes;
-            NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, notes);
-        }
+        NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, notes);
     }
 
     private static void sendNotes(List<Food> foodList, int eCarbs, int carbs) {
