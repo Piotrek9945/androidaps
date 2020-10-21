@@ -18,18 +18,21 @@ import info.nightscout.androidaps.MainApp;
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.data.Profile;
 import info.nightscout.androidaps.data.QuickWizardEntry;
+import info.nightscout.androidaps.db.CareportalEvent;
 import info.nightscout.androidaps.db.TempTarget;
 import info.nightscout.androidaps.interfaces.Constraint;
 import info.nightscout.androidaps.interfaces.PumpInterface;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
+import info.nightscout.androidaps.plugins.general.nsclient.NSUpload;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodMultiplyCorrectionDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.AddFoodSensitivityDialog;
 import info.nightscout.androidaps.plugins.general.overview.dialogs.TbrDialog;
 import info.nightscout.androidaps.plugins.treatments.TreatmentsPlugin;
 import info.nightscout.androidaps.utils.BolusWizard;
-import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.OKDialog;
+
+import static info.nightscout.androidaps.utils.DateUtil.now;
 
 public class EcarbBolusService {
 
@@ -65,7 +68,7 @@ public class EcarbBolusService {
                     }
 
 //                    TempTarget tt = TreatmentsPlugin.getPlugin().getTempTargetFromHistory();
-                    int duration = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(DateUtil.now()).durationInMinutes;
+                    int duration = TreatmentsPlugin.getPlugin().getProfileSwitchFromHistory(now()).durationInMinutes;
                     if (duration > 0) {
                         EcarbBolusService.generateTreatment(context, foodList, isCarbsOnly);
                     } else {
@@ -111,6 +114,8 @@ public class EcarbBolusService {
 //            WBTCorrection(nutrition);
         }
 
+        sendNotes(foodList, eCarbs, carbs);
+
         if (carbs > 0) {
             if (isCarbsOnly) {
                 EcarbService.Companion.generateEcarbs(nutrition.getECarbs(), true);
@@ -123,6 +128,25 @@ public class EcarbBolusService {
         }
 
         FoodService.clearFoodCountAdded();
+    }
+
+    private static void sendFoodNotes(String notes) {
+        NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, notes);
+    }
+
+    private static void sendNotes(List<Food> foodList, int eCarbs, int carbs) {
+        for (int i = 0; i < foodList.size(); i++) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("posiłek nr " + (i+1) + "/" + foodList.size() + ": ");
+            sb.append("nazwa: " + foodList.get(i).name + ", ");
+            sb.append("porcja: " + foodList.get(i).portion + " " + foodList.get(i).units + ", ");
+            sb.append("liczba porcji: " + foodList.get(i).portionCount + ", ");
+            sb.append("carbs: " + carbs + ", ");
+            sb.append("eCarbs: " + eCarbs + ". ");
+            try {
+                sendFoodNotes(sb.toString());
+            } catch (Exception ignored) {}
+        }
     }
 
     // w tej konfiguracji więcej szkody niż pożytku...
