@@ -1,12 +1,15 @@
 package info.nightscout.androidaps.plugins.general.overview.dialogs;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 
@@ -15,11 +18,13 @@ import androidx.fragment.app.DialogFragment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 import info.nightscout.androidaps.R;
 import info.nightscout.androidaps.plugins.general.food.EcarbBolusService;
 import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.utils.NumberPicker;
 
 public class AddFoodSensitivityDialog extends DialogFragment implements OnClickListener, CompoundButton.OnCheckedChangeListener {
     private static Logger log = LoggerFactory.getLogger(AddFoodSensitivityDialog.class);
@@ -30,6 +35,11 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
 //    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_3 = 0.8d;
 //    public final static Double SENSITIVITY_BOLUS_FACTOR_GRADE_4 = 0.7d;
 
+    private NumberPicker sensitivityMultiply;
+
+    private Button decrementButton;
+    private Button incrementButton;
+
     private List<Food> foodList;
     private boolean isCarbsOnly;
 
@@ -37,6 +47,20 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
 
     //one shot guards
     private boolean okClicked;
+
+    final private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void afterTextChanged(Editable s) {}
+
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+//            setSummaryText();
+        }
+    };
 
     public AddFoodSensitivityDialog(List<Food> foodList, boolean isCarbsOnly) {
         this.foodList = foodList;
@@ -54,19 +78,28 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
-        sensitivityRadioGroup = view.findViewById(R.id.addfood_sensitivity);
+        sensitivityMultiply = view.findViewById(R.id.addfood_sensitivity_multiply);
+        sensitivityMultiply.setParams(100d, 10d, 900d, 10d, new DecimalFormat("0'%'"), false, view.findViewById(R.id.mdtp_ok), textWatcher);
+
+        decrementButton = view.findViewById(R.id.overview_addfood_sensitivity_decrement_button);
+        decrementButton.setOnClickListener(this);
+
+        incrementButton = view.findViewById(R.id.overview_addfood_sensitivity_increment_button);
+        incrementButton.setOnClickListener(this);
 
         setCancelable(true);
         getDialog().setCanceledOnTouchOutside(false);
 
         //recovering state if there is something
         if (savedInstanceState != null) {
+            sensitivityMultiply.setValue(savedInstanceState.getDouble("sensitivityMultiply"));
         }
         return view;
     }
 
     @Override
     public void onSaveInstanceState(Bundle carbsDialogState) {
+        carbsDialogState.putDouble("sensitivityMultiply", sensitivityMultiply.getValue());
         super.onSaveInstanceState(carbsDialogState);
     }
 
@@ -91,8 +124,9 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         }
         okClicked = true;
         try {
-            setSensitivityFactor(getSensitivityFactor(), foodList);
 //            setECarbCorrection(getECarbCorrection(), foodList);
+            Double percent = sensitivityMultiply.getValue();
+            setSensitivityFactor(percent, foodList);
             EcarbBolusService.generateTreatment(getContext(), foodList, isCarbsOnly);
             dismiss();
         } catch (Exception e) {
@@ -106,48 +140,21 @@ public class AddFoodSensitivityDialog extends DialogFragment implements OnClickL
         }
     }
 
-    public static void setECarbCorrection(Double eCarbCorrection, List<Food> foodList) {
-        for (Food food : foodList) {
-            food.eCarbCorrection = eCarbCorrection;
-        }
-    }
+//    public static void setECarbCorrection(Double eCarbCorrection, List<Food> foodList) {
+//        for (Food food : foodList) {
+//            food.eCarbCorrection = eCarbCorrection;
+//        }
+//    }
 
-
-    private Double getSensitivityFactor() {
-        switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
-            // obniżony
-            case R.id.sensitivity_bolus_factor_grade_0:
-                return TbrDialog.TBR_PERCENTAGE_0 / 100.0;
-
-            // normalny
-            case R.id.sensitivity_bolus_factor_grade_1:
-                return 1.0;
-
-            // podwyższony
-            case R.id.sensitivity_bolus_factor_grade_2:
-                return TbrDialog.TBR_PERCENTAGE_2 / 100.0;
-
-            // duży
-            case R.id.sensitivity_bolus_factor_grade_3:
-                return TbrDialog.TBR_PERCENTAGE_3 / 100.0;
-
-            // b. duży (sport)
-            case R.id.sensitivity_bolus_factor_grade_4:
-                return TbrDialog.TBR_PERCENTAGE_4 / 100.0;
-
-            default: throw new NullPointerException();
-        }
-    }
-
-    private Double getECarbCorrection() {
-        switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
-            case R.id.sensitivity_bolus_factor_grade_1: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_NO_MOVEMENT);
-            case R.id.sensitivity_bolus_factor_grade_2: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_SMALL_MOVEMENT);
-            case R.id.sensitivity_bolus_factor_grade_3: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT);
-            case R.id.sensitivity_bolus_factor_grade_4: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT);
-            default: throw new NullPointerException();
-        }
-    }
+//    private Double getECarbCorrection() {
+//        switch (sensitivityRadioGroup.getCheckedRadioButtonId()) {
+//            case R.id.sensitivity_bolus_factor_grade_1: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_NO_MOVEMENT);
+//            case R.id.sensitivity_bolus_factor_grade_2: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_SMALL_MOVEMENT);
+//            case R.id.sensitivity_bolus_factor_grade_3: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_MEDIUM_MOVEMENT);
+//            case R.id.sensitivity_bolus_factor_grade_4: return (1 - EcarbBolusService.DECREASE_WBT_PERCENTAGE_BIG_MOVEMENT);
+//            default: throw new NullPointerException();
+//        }
+//    }
 
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
