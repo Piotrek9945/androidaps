@@ -326,7 +326,8 @@ public class Profile {
             multiplier = 100d / percentage;
         else if (array == ic_v)
 //            multiplier = getICCorrection();
-            multiplier = 100d / percentage;
+//            multiplier = 100d / percentage;
+            multiplier = 1d;
         else if (array == basal_v)
             multiplier = percentage / 100d;
         else
@@ -341,7 +342,8 @@ public class Profile {
             multiplier = 100d / percentage;
         else if (array == ic)
 //            multiplier = getICCorrection();
-            multiplier = 100d / percentage;
+//            multiplier = 100d / percentage;
+            multiplier = 1d;
         else if (array == basal)
             multiplier = percentage / 100d;
         else if (array == targetLow)
