@@ -424,11 +424,13 @@ public class NSUpload {
             if (notes != null) {
                 data.put("notes", notes);
             }
-            JSONObject foods = new JSONObject();
-            JSONObject _id = new JSONObject();
-            _id.put("_id", id);
-            foods.put("foods", _id);
-            data.put("boluscalc", foods);
+            JSONObject boluscalc = new JSONObject();
+            JSONArray foods = new JSONArray();
+            JSONObject el = new JSONObject();
+            el.put("_id", id);
+            foods.put(el);
+            boluscalc.put("foods", foods);
+            data.put("boluscalc", boluscalc);
         } catch (JSONException e) {
             log.error("Unhandled exception", e);
         }
