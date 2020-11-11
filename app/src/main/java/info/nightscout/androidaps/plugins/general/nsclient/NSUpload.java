@@ -39,10 +39,16 @@ import info.nightscout.androidaps.plugins.aps.loop.DeviceStatus;
 import info.nightscout.androidaps.plugins.aps.loop.LoopPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ConfigBuilderPlugin;
 import info.nightscout.androidaps.plugins.configBuilder.ProfileFunctions;
+import info.nightscout.androidaps.plugins.general.food.BolusService;
+import info.nightscout.androidaps.plugins.general.food.EcarbService;
+import info.nightscout.androidaps.plugins.general.food.Food;
+import info.nightscout.androidaps.plugins.general.food.FoodUtils;
 import info.nightscout.androidaps.plugins.iob.iobCobCalculator.IobCobCalculatorPlugin;
 import info.nightscout.androidaps.utils.BatteryLevel;
 import info.nightscout.androidaps.utils.DateUtil;
 import info.nightscout.androidaps.utils.SP;
+
+import static info.nightscout.androidaps.utils.DateUtil.now;
 
 /**
  * Created by mike on 26.05.2017.
@@ -205,7 +211,7 @@ public class NSUpload {
                 IobTotal[] iob = IobCobCalculatorPlugin.getPlugin().calculateIobArrayInDia(profile);
                 if (iob.length > 0) {
                     deviceStatus.iob = iob[0].json();
-                    deviceStatus.iob.put("time", DateUtil.toISOString(DateUtil.now()));
+                    deviceStatus.iob.put("time", DateUtil.toISOString(now()));
                 }
             }
             deviceStatus.device = "openaps://" + Build.MANUFACTURER + " " + Build.MODEL;
@@ -415,10 +421,10 @@ public class NSUpload {
         UploadQueue.add(new DbRequest("dbAdd", "treatments", data));
     }
 
-    public static void uploadFoodEvent(String careportalEvent, long time, @Nullable String notes, String id) {
+    public static void uploadFoodEvent(long time, @Nullable String notes, String id) {
         JSONObject data = new JSONObject();
         try {
-            data.put("eventType", careportalEvent);
+            data.put("eventType", "food");
             data.put("created_at", DateUtil.toISOString(time));
             data.put("enteredBy", SP.getString("careportal_enteredby", MainApp.gs(R.string.app_name)));
             if (notes != null) {
@@ -429,6 +435,34 @@ public class NSUpload {
             JSONObject el = new JSONObject();
             el.put("_id", id);
             foods.put(el);
+            boluscalc.put("foods", foods);
+            data.put("boluscalc", boluscalc);
+        } catch (JSONException e) {
+            log.error("Unhandled exception", e);
+        }
+        UploadQueue.add(new DbRequest("dbAdd", "treatments", data));
+    }
+
+    public static void uploadFoodEvent2(List<Food> foodList) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("eventType", "food");
+            data.put("created_at", DateUtil.toISOString(now() - 2000));
+            data.put("enteredBy", SP.getString("careportal_enteredby", MainApp.gs(R.string.app_name)));
+            JSONObject boluscalc = new JSONObject();
+            JSONArray foods = new JSONArray();
+            for (int i = 0; i < foodList.size(); i++) {
+                JSONObject el = new JSONObject();
+                Food food = foodList.get(i);
+                el.put("_id", food._id);
+                el.put("name", food.name);
+                el.put("portions", food.portion);
+                el.put("units", food.units);
+                el.put("portionCount", food.portionCount);
+                el.put("carbs", FoodUtils.Companion.roundDoubleToInt(BolusService.Companion.calculateCarb(food)));
+                el.put("ecarbs", FoodUtils.Companion.roundDoubleToInt(EcarbService.Companion.calculateEcarbs(food)));
+                foods.put(el);
+            }
             boluscalc.put("foods", foods);
             data.put("boluscalc", boluscalc);
         } catch (JSONException e) {

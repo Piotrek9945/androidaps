@@ -130,21 +130,23 @@ public class EcarbBolusService {
         FoodService.clearFoodCountAdded();
     }
 
-    private static void sendFoodNotes(String notes, String id) {
-        NSUpload.uploadFoodEvent(CareportalEvent.NOTE, now() - 2000, notes, id);
+    private static void sendFoodNotes(List<Food> foodList) {
+//    private static void sendFoodNotes(String notes, String id) {
+        NSUpload.uploadFoodEvent2(foodList);
     }
 
     private static void sendNotes(List<Food> foodList, int eCarbs, int carbs) {
-        for (int i = 0; i < foodList.size(); i++) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("posiłek nr " + (i+1) + "/" + foodList.size() + ": ");
-            sb.append("nazwa: " + foodList.get(i).name + ", ");
-            sb.append("porcja: " + foodList.get(i).portion + " " + foodList.get(i).units + ", ");
-            sb.append("liczba porcji: " + foodList.get(i).portionCount + ", ");
-            sb.append("carbs: " + carbs + ", ");
-            sb.append("eCarbs: " + eCarbs + ". ");
-            sendFoodNotes(sb.toString(), foodList.get(i)._id);
-        }
+//        for (int i = 0; i < foodList.size(); i++) {
+//            StringBuilder sb = new StringBuilder();
+//            sb.append("posiłek nr " + (i+1) + "/" + foodList.size() + ": ");
+//            sb.append("nazwa: " + foodList.get(i).name + ", ");
+//            sb.append("porcja: " + foodList.get(i).portion + " " + foodList.get(i).units + ", ");
+//            sb.append("liczba porcji: " + foodList.get(i).portionCount + ", ");
+//            sb.append("carbs: " + carbs + ", ");
+//            sb.append("eCarbs: " + eCarbs + ". ");
+//            sendFoodNotes(sb.toString(), foodList.get(i)._id);
+//        }
+        sendFoodNotes(foodList);
     }
 
     // w tej konfiguracji więcej szkody niż pożytku...
