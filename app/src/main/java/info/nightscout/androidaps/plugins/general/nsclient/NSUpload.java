@@ -415,6 +415,26 @@ public class NSUpload {
         UploadQueue.add(new DbRequest("dbAdd", "treatments", data));
     }
 
+    public static void uploadFoodEvent(String careportalEvent, long time, @Nullable String notes, String id) {
+        JSONObject data = new JSONObject();
+        try {
+            data.put("eventType", careportalEvent);
+            data.put("created_at", DateUtil.toISOString(time));
+            data.put("enteredBy", SP.getString("careportal_enteredby", MainApp.gs(R.string.app_name)));
+            if (notes != null) {
+                data.put("notes", notes);
+            }
+            JSONObject foods = new JSONObject();
+            JSONObject _id = new JSONObject();
+            _id.put("_id", id);
+            foods.put("foods", _id);
+            data.put("boluscalc", foods);
+        } catch (JSONException e) {
+            log.error("Unhandled exception", e);
+        }
+        UploadQueue.add(new DbRequest("dbAdd", "treatments", data));
+    }
+
     public static void removeFoodFromNS(String _id) {
         try {
             UploadQueue.add(new DbRequest("dbRemove", "food", _id));

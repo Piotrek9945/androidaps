@@ -130,8 +130,8 @@ public class EcarbBolusService {
         FoodService.clearFoodCountAdded();
     }
 
-    private static void sendFoodNotes(String notes) {
-        NSUpload.uploadEvent(CareportalEvent.NOTE, now() - 2000, notes);
+    private static void sendFoodNotes(String notes, String id) {
+        NSUpload.uploadFoodEvent(CareportalEvent.NOTE, now() - 2000, notes, id);
     }
 
     private static void sendNotes(List<Food> foodList, int eCarbs, int carbs) {
@@ -143,9 +143,7 @@ public class EcarbBolusService {
             sb.append("liczba porcji: " + foodList.get(i).portionCount + ", ");
             sb.append("carbs: " + carbs + ", ");
             sb.append("eCarbs: " + eCarbs + ". ");
-            try {
-                sendFoodNotes(sb.toString());
-            } catch (Exception ignored) {}
+            sendFoodNotes(sb.toString(), foodList.get(i)._id);
         }
     }
 
