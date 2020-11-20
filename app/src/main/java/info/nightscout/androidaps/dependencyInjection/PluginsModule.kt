@@ -62,6 +62,12 @@ abstract class PluginsModule {
     @AllConfigs
     @IntoMap
     @IntKey(10)
+    abstract fun bindFoodPlugin(plugin: FoodPlugin): PluginBase
+
+    @Binds
+    @AllConfigs
+    @IntoMap
+    @IntKey(320)
     abstract fun bindIobCobCalculatorPlugin(plugin: IobCobCalculatorPlugin): PluginBase
 
     @Binds
@@ -237,12 +243,6 @@ abstract class PluginsModule {
     @IntoMap
     @IntKey(310)
     abstract fun bindObjectivesPlugin(plugin: ObjectivesPlugin): PluginBase
-
-    @Binds
-    @AllConfigs
-    @IntoMap
-    @IntKey(320)
-    abstract fun bindFoodPlugin(plugin: FoodPlugin): PluginBase
 
     @Binds
     @AllConfigs
