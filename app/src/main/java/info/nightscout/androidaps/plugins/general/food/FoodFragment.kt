@@ -169,7 +169,6 @@ class FoodFragment : DaggerFragment() {
 
         override fun onBindViewHolder(holder: FoodsViewHolder, position: Int) {
             val food = foodList[position]
-            holder.ns.visibility = if (food._id != null) View.VISIBLE else View.GONE
             holder.name.text = food.name
             holder.portion.text = food.portion.toString() + food.units
             holder.carbs.text = food.carbs.toString() + resourceHelper.gs(R.string.shortgramm)
@@ -190,7 +189,6 @@ class FoodFragment : DaggerFragment() {
             var fat: TextView = itemView.findViewById(R.id.food_fat)
             var protein: TextView = itemView.findViewById(R.id.food_protein)
             var energy: TextView = itemView.findViewById(R.id.food_energy)
-            var ns: TextView = itemView.findViewById(R.id.ns_sign)
         }
     }
 }

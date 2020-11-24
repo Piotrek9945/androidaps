@@ -74,15 +74,6 @@
                 android:text="Energy" />
 
             <TextView
-                android:id="@+id/ns_sign"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:width="30dp"
-                android:text="NS"
-                android:textAlignment="viewEnd"
-                android:textColor="@color/colorSetTempButton" />
-
-            <TextView
                 android:id="@+id/food_add"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
