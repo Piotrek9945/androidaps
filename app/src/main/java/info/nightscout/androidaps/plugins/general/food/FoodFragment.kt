@@ -1,7 +1,6 @@
 package info.nightscout.androidaps.plugins.general.food
 
 import android.content.DialogInterface
-import android.graphics.Paint
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -180,7 +179,6 @@ class FoodFragment : DaggerFragment() {
             if (food.protein == 0) holder.protein.visibility = View.INVISIBLE
             holder.energy.text = resourceHelper.gs(R.string.shortenergy) + ": " + food.energy + resourceHelper.gs(R.string.shortkilojoul)
             if (food.energy == 0) holder.energy.visibility = View.INVISIBLE
-            holder.remove.tag = food
         }
 
         override fun getItemCount(): Int = foodList.size
@@ -193,22 +191,6 @@ class FoodFragment : DaggerFragment() {
             var protein: TextView = itemView.findViewById(R.id.food_protein)
             var energy: TextView = itemView.findViewById(R.id.food_energy)
             var ns: TextView = itemView.findViewById(R.id.ns_sign)
-            var remove: TextView = itemView.findViewById(R.id.food_remove)
-
-            init {
-                remove.setOnClickListener { v: View ->
-                    val food = v.tag as Food
-                    activity?.let { activity ->
-                        showConfirmation(activity, resourceHelper.gs(R.string.confirmation), resourceHelper.gs(R.string.removerecord) + "\n" + food.name, DialogInterface.OnClickListener { _: DialogInterface?, _: Int ->
-                            if (food._id != null && food._id != "") {
-                                nsUpload.removeFoodFromNS(food._id)
-                            }
-                            foodPlugin.service?.delete(food)
-                        }, null)
-                    }
-                }
-                remove.paintFlags = remove.paintFlags or Paint.UNDERLINE_TEXT_FLAG
-            }
         }
     }
 }
