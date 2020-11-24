@@ -6,6 +6,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import info.nightscout.androidaps.utils.JsonHelper;
@@ -15,8 +16,21 @@ import info.nightscout.androidaps.utils.JsonHelper;
  */
 
 @DatabaseTable(tableName = Food.TABLE_FOODS)
-public class Food {
+public class Food implements Serializable {
     static final String TABLE_FOODS = "Foods";
+
+
+
+    public double portionCount = 1;
+
+    public double correctionFactor = 1;
+
+    public double eCarbCorrection = 1;
+
+    public double sensitivityFactor = 1;
+
+
+
 
     @DatabaseField(id = true)
     public long key;
@@ -81,6 +95,16 @@ public class Food {
             food.fat = JsonHelper.safeGetInt(json, "fat");
         }
 
+        return food;
+    }
+
+    public static Food createFood(int carbs, int energy, int protein, int fat, double portionCount) {
+        Food food = new Food();
+        food.carbs = carbs;
+        food.energy = energy;
+        food.protein = protein;
+        food.fat = fat;
+        food.portionCount = portionCount;
         return food;
     }
 
