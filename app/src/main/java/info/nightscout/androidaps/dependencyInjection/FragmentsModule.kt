@@ -3,6 +3,7 @@ package info.nightscout.androidaps.dependencyInjection
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 import info.nightscout.androidaps.activities.MyPreferenceFragment
+import info.nightscout.androidaps.custom.AddFoodDialog
 import info.nightscout.androidaps.dialogs.*
 import info.nightscout.androidaps.plugins.aps.loop.LoopFragment
 import info.nightscout.androidaps.plugins.aps.openAPSAMA.OpenAPSAMAFragment
@@ -126,4 +127,7 @@ abstract class FragmentsModule {
     abstract fun contributesRileyLinkStatusHistoryFragment(): RileyLinkStatusHistoryFragment
     @ContributesAndroidInjector
     abstract fun contributesRileyLinkStatusDeviceMedtronic(): RileyLinkStatusDeviceMedtronic
+
+    // CUSTOMIZATION
+    @ContributesAndroidInjector abstract fun contributesAddFoodDialog(): AddFoodDialog
 }

@@ -1,6 +1,5 @@
 package info.nightscout.androidaps.plugins.general.food
 
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,12 +13,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import dagger.android.support.DaggerFragment
 import info.nightscout.androidaps.R
+import info.nightscout.androidaps.custom.AddFoodDialog
 import info.nightscout.androidaps.events.EventFoodDatabaseChanged
 import info.nightscout.androidaps.plugins.bus.RxBusWrapper
 import info.nightscout.androidaps.plugins.general.food.FoodFragment.RecyclerViewAdapter.FoodsViewHolder
 import info.nightscout.androidaps.plugins.general.nsclient.NSUpload
 import info.nightscout.androidaps.utils.FabricPrivacy
-import info.nightscout.androidaps.utils.alertDialogs.OKDialog.showConfirmation
 import info.nightscout.androidaps.utils.resources.ResourceHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -178,6 +177,7 @@ class FoodFragment : DaggerFragment() {
             if (food.protein == 0) holder.protein.visibility = View.INVISIBLE
             holder.energy.text = resourceHelper.gs(R.string.shortenergy) + ": " + food.energy + resourceHelper.gs(R.string.shortkilojoul)
             if (food.energy == 0) holder.energy.visibility = View.INVISIBLE
+            holder.addBolus.tag = food
         }
 
         override fun getItemCount(): Int = foodList.size
@@ -189,6 +189,14 @@ class FoodFragment : DaggerFragment() {
             var fat: TextView = itemView.findViewById(R.id.food_fat)
             var protein: TextView = itemView.findViewById(R.id.food_protein)
             var energy: TextView = itemView.findViewById(R.id.food_energy)
+            var addBolus: TextView = itemView.findViewById(R.id.food_add)
+
+            init {
+                addBolus.setOnClickListener { v: View ->
+                    val food = v.tag as Food
+                    AddFoodDialog(food, false).show(parentFragmentManager, "AddFoodDialog")
+                }
+            }
         }
     }
 }
